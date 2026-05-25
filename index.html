@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>中学数学 【多パターン＆応用ミックス】無限プリント</title>
+    <title>中学数学 【全単元・難易度ミックス】無限プリント</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
@@ -14,7 +14,7 @@
             top: 0; z-index: 100; display: flex; gap: 15px; align-items: center;
         }
         .admin-header h2 { margin: 0; font-size: 15px; color: #444; margin-right: auto; }
-        select { padding: 8px 12px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc; background-color: #fff; cursor: pointer; max-width: 400px; }
+        select { padding: 8px 12px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc; background-color: #fff; cursor: pointer; max-width: 450px; }
         .btn { padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; }
         .btn-primary { background-color: #007bff; color: white; }
         .btn-success { background-color: #28a745; color: white; }
@@ -31,7 +31,6 @@
         .student-info div { border-bottom: 1px solid #333; width: 140px; text-align: right; padding-bottom: 3px; }
         .student-info .name-box { width: 220px; }
 
-        /* 10問構成 */
         .grid-container { display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(10, 1fr); flex-grow: 1; }
         .quiz-item { font-size: 16px; display: flex; align-items: center; border-bottom: 1px dashed #eee; padding: 10px 0; line-height: 1.6; }
         .quiz-num { font-weight: bold; margin-right: 20px; width: 35px; }
@@ -39,7 +38,6 @@
         .quiz-formula { font-family: 'Times New Roman', Times, serif; letter-spacing: 0.5px; display: inline; }
         .answer-text { color: #dc3545; font-weight: bold; margin-left: auto; font-family: Arial, sans-serif; padding-right: 20px; white-space: nowrap; }
 
-        /* 特殊表記 */
         .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 4px; font-size: 15px; line-height: 1; }
         .num { border-bottom: 1px solid #333; padding-bottom: 2px; }
         .den { padding-top: 2px; }
@@ -51,7 +49,7 @@
             .print-area { padding: 0; gap: 0; display: block; }
             .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; padding: 15mm 15mm; page-break-after: always; }
             .quiz-item { border-bottom: none; }
-            .quiz-tag { display: none; } /* 印刷時は「基本」「応用」のタグを消してテストらしくする */
+            .quiz-tag { display: none; }
             @page { size: A4 portrait; margin: 0; }
         }
     </style>
@@ -59,13 +57,30 @@
 <body>
 
     <div class="admin-header">
-        <h2>中学数学 【単元別・難易度ミックス】無限プリント</h2>
+        <h2>中学数学 全単元・難易度ミックス生成システム</h2>
         
         <select id="unit-selector" onchange="generatePrint()">
-            <option value="mix_m1_eq">中1：1次方程式（基本・カッコ・小数・分数・文章題）</option>
-            <option value="mix_m2_seq">中2：連立方程式（基本・加減代入・A=B=C・文章題）</option>
-            <option value="mix_m3_factor">中3：因数分解（公式・たすき掛け基盤・共通因数・応用）</option>
-            <option value="mix_m2_func">中2：1次関数（式の決定・変域・交点・利用文章題）</option>
+            <optgroup label="■ 中学1年">
+                <option value="m1_pos_neg">中1：正負の数（四則計算〜累乗・分数）</option>
+                <option value="m1_linear">中1：文字の式（同類項〜分配法則・分数）</option>
+                <option value="m1_eq">中1：1次方程式（基本〜カッコ・分数・文章題）</option>
+                <option value="m1_func">中1：比例・反比例（式の決定〜変域・応用文章題）</option>
+                <option value="m1_data">中1：データの活用（平均・中央値〜度数分布表）</option>
+            </optgroup>
+            <optgroup label="■ 中学2年">
+                <option value="m2_poly">中2：式の計算（多項式〜等式変形）</option>
+                <option value="m2_seq">中2：連立方程式（加減代入〜A=B=C・文章題）</option>
+                <option value="m2_func">中2：1次関数（式の決定〜交点・動点文章題）</option>
+                <option value="m2_prob">中2：確率（コイン・サイコロ〜カード・玉抽出）</option>
+                <option value="m2_geom">中2：図形の性質（内角外角の和〜合同条件一問一答）</option>
+            </optgroup>
+            <optgroup label="■ 中学3年">
+                <option value="m3_expand">中3：式の展開と因数分解（乗法公式〜共通因数・置き換え）</option>
+                <option value="m3_root">中3：平方根（簡略化・有理化〜四則混合・応用）</option>
+                <option value="m3_eq2">中3：2次方程式（因数分解〜解の公式・文章題）</option>
+                <option value="m3_func2">中3：関数 y=ax²（式の決定〜変域・変化の割合）</option>
+                <option value="m3_pytha">中3：三平方の定理・相似（斜辺計算〜特別な直角三角形・比）</option>
+            </optgroup>
         </select>
 
         <button class="btn btn-primary" onclick="generatePrint()">🔢 新しい問題にする</button>
@@ -75,7 +90,7 @@
     <div class="print-area">
         <div class="page">
             <h1 class="print-title" id="title-q">プリント</h1>
-            <div class="print-subtitle">※ 基本から応用までバランスよく出題されています。</div>
+            <div class="print-subtitle">※ 基礎から応用まで網羅されています。</div>
             <div class="student-info"><div>年  組  番</div><div class="name-box">氏名：</div><div>得点：   ／100</div></div>
             <div class="grid-container" id="question-box"></div>
         </div>
@@ -89,7 +104,7 @@
     </div>
 
     <script>
-        // 便利関数
+        // 便利関数群
         function getRandomInt(min, max, excludeZero = true) {
             let num = Math.floor(Math.random() * (max - min + 1)) + min;
             if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
@@ -107,124 +122,136 @@
             let coefStr = absCoef === 1 ? "" : absCoef;
             return `${sign}${coefStr}${varChar}`;
         }
+        function gcd(a, b) { return b === 0 ? Math.abs(a) : gcd(b, a % b); }
 
         // ==========================================
-        // 1. 中1：1次方程式ミックスロジック
+        // 各単元の難易度ミックス生成エンジン
         // ==========================================
-        function getM1EqProblem(step) {
-            let x = getRandomInt(-6, 6);
-            if(step === 1 || step === 2) { // 【基本】ax + b = c
-                let a = getRandomInt(2, 7); let b = getRandomInt(-10, 10);
-                return { tag: "基本", q: `${formatXTerm(a, true)} ${formatTerm(b)} ＝ ${a * x + b}`, a: `[ x ＝ ${x} ]` };
-            }
-            if(step === 3 || step === 4) { // 【標準】カッコがある形 a(x + b) = cx + d
-                let a = getRandomInt(2, 4); let b = getRandomInt(-3, 3);
-                let c = getRandomInt(-4, 4); if(a===c) c+=1;
-                let d = a * (x + b) - c * x;
-                return { tag: "カッコ", q: `${a}( x ${formatTerm(b)} ) ＝ ${formatXTerm(c, true)} ${formatTerm(d)}`, a: `[ x ＝ ${x} ]` };
-            }
-            if(step === 5 || step === 6) { // 【標準】小数がある形 (両辺10倍)
-                let a = getRandomInt(2, 5); let b = getRandomInt(-9, 9);
-                return { tag: "小数", q: `${(a/10).toFixed(1)}x ${b > 0 ? '＋' : '－'} ${Math.abs(b/10).toFixed(1)} ＝ ${((a*x+b)/10).toFixed(1)}`, a: `[ x ＝ ${x} ]` };
-            }
-            if(step === 7 || step === 8) { // 【発展】分数を含む形
-                let den1 = 2, den2 = 3; let a2 = getRandomInt(1, 2); let b2 = getRandomInt(-3, 3); let c = getRandomInt(-2, 2);
-                let b1 = ((a2 * x + b2) / den2 + c) * den1 - x;
-                return { tag: "分数", q: `<div class="frac"><div class="num">x ${formatTerm(Math.round(b1))}</div><div class="den">${den1}</div></div> ＝ <div class="frac"><div class="num">${formatXTerm(a2, true)} ${formatTerm(b2)}</div><div class="den">${den2}</div></div> ${formatTerm(c)}`, a: `[ x ＝ ${x} ]` };
-            }
-            // 【応用】文章題（代数化）
-            let price = getRandomInt(80, 150, false); let total_count = 10;
-            let apple_count = getRandomInt(3, 7, false); let total_price = price * apple_count + 120 * (total_count - apple_count);
-            if(step === 9) {
-                return { tag: "応用題", q: `1個 ${price} 円のりんごと1個 120 円のみかんを合わせて 10 個買い、代金の合計は ${total_price} 円であった。りんごは何個買ったか求めよ。`, a: `＝ ${apple_count} 個` };
-            } else {
-                let current_father = 40; let current_son = getRandomInt(10, 15, false);
-                let target_years = current_father - 2 * current_son; // 父が子の2倍になる年数
-                return { tag: "応用題", q: `現在、父は 40 歳、子は ${current_son} 歳である。父の年齢が子の年齢のちょうど 2 倍になるのは何年後か求めよ。`, a: `＝ ${target_years} 年後` };
-            }
+
+        // --- 中1：正負の数 ---
+        function getM1PosNeg(i) {
+            let n1 = getRandomInt(-9, 9); let n2 = getRandomInt(-9, 9);
+            if(i <= 3) { return { tag: "基本", q: `${n1 >= 0 ? n1 : `(${n1})`} ＋ ${n2 >= 0 ? n2 : `(${n2})`} ＝`, a: `＝ ${n1 + n2}` }; }
+            if(i <= 6) { return { tag: "標準", q: `${n1 >= 0 ? n1 : `(${n1})`} × ${n2 >= 0 ? n2 : `(${n2})`}`, a: `＝ ${n1 * n2}` }; }
+            let base = getRandomInt(-3, 3); let n3 = getRandomInt(-4, 4);
+            return { tag: "応用", q: `(-${Math.abs(base)})² × ${n3 >= 0 ? n3 : `(${n3})`}`, a: `＝ ${Math.pow(base,2)*n3}` };
+        }
+
+        // --- 中1：文字の式 ---
+        function getM1Linear(i) {
+            let a1 = getRandomInt(-5, 5); let a2 = getRandomInt(-5, 5);
+            if(i <= 4) { return { tag: "基本", q: `${formatXTerm(a1, true)} ${formatTerm(a2)}x`, a: `＝ ${formatXTerm(a1+a2, true)}` }; }
+            let b1 = getRandomInt(-4, 4); let k = getRandomInt(2, 4);
+            if(i <= 8) { return { tag: "標準", q: `${k}( ${formatXTerm(a1, true)} ${formatTerm(b1)} )`, a: `＝ ${formatXTerm(k*a1, true)} ${formatTerm(k*b1)}` }; }
+            return { tag: "応用", q: `<div class="frac"><div class="num">2x + 4</div><div class="den">3</div></div> ＋ <div class="frac"><div class="num">x - 1</div><div class="den">2</div></div>`, a: `＝ <div class="frac"><div class="num">7x + 5</div><div class="den">6</div></div>` };
+        }
+
+        // --- 中1：1次方程式 ---
+        function getM1Eq(i) {
+            let x = getRandomInt(-5, 5);
+            if(i <= 3) { let a = getRandomInt(2, 5); return { tag: "基本", q: `${formatXTerm(a, true)} ${formatTerm(x*a)} ＝ 0`, a: `[ x ＝ ${-x} ]` }; }
+            if(i <= 6) { let a = getRandomInt(2, 4); return { tag: "標準", q: `${a}( x ${formatTerm(-x)} ) ＝ 0`, a: `[ x ＝ ${x} ]` }; }
+            if(i <= 8) { return { tag: "分数", q: `<div class="frac"><div class="num">x</div><div class="den">2</div></div> ＋ 1 ＝ ${x/2 + 1}`, a: `[ x ＝ ${x} ]` }; }
+            return { tag: "文章題", q: `1個100円のりんごを x 個買い、80円の箱に詰めてもらうと代金が 580円になった。x を求めよ。`, a: `[ x ＝ 5 ]` };
+        }
+
+        // --- 中1：比例・反比例 ---
+        function getM1Func(i) {
+            if(i <= 4) { let x = getRandomInt(1, 4); let a = getRandomInt(2, 5); return { tag: "比例", q: `y は x に比例し、x ＝ ${x} のとき y ＝ ${a*x} である。式を求めよ。`, a: `[ y ＝ ${a}x ]` }; }
+            if(i <= 8) { let x = getRandomInt(2, 4); let a = getRandomInt(4, 12); return { tag: "反比例", q: `y は x に反比例し、x ＝ ${x} のとき y ＝ ${a} である。式を求めよ。`, a: `[ y ＝ <div class="frac"><div class="num">${a*x}</div><div class="den">x</div></div> ]` }; }
+            return { tag: "文章題", q: `毎分 3L ずつ水を入れると 20分で満水になる水そうがある。毎分 x L ずつ入れるときの満水時間を y 分として式を表せ。`, a: `[ y ＝ <div class="frac"><div class="num">60</div><div class="den">x</div></div> ]` };
+        }
+
+        // --- 中1：データの活用 ---
+        function getM1Data(i) {
+            let d = [getRandomInt(10,20), getRandomInt(15,30), getRandomInt(20,40), getRandomInt(25,45), getRandomInt(30,50)];
+            d.sort((a,b)=>a-b);
+            if(i <= 5) { return { tag: "中央値", q: `データ [ ${d.join(", ")} ] の中央値(メジアン)を求めよ。`, a: `＝ ${d[2]}` }; }
+            return { tag: "平均値", q: `データ [ 2, 4, 6, 8 ] の平均値を求めよ。`, a: `＝ 5` };
+        }
+
+        // --- 中2：式の計算 ---
+        function getM2Poly(i) {
+            let a = getRandomInt(2, 5); let b = getRandomInt(2, 4);
+            if(i <= 4) { return { tag: "単項式", q: `${a}x × ${b}y ＝`, a: `＝ ${a*b}xy` }; }
+            if(i <= 8) { return { tag: "除法", q: `${a*b}x²y ÷ ${a}x ＝`, a: `＝ ${b}xy` }; }
+            return { tag: "等式変形", q: `等式 2x ＋ y ＝ 5 を y について解け。`, a: `[ y ＝ 5 － 2x ]` };
+        }
+
+        // --- 中2：連立方程式 ---
+        function getM2Seq(i) {
+            let x = getRandomInt(-3, 3); let y = getRandomInt(-3, 3);
+            if(i <= 4) { return { tag: "加減法", q: `<div class="matrix"><div>x ＋ y ＝ ${x+y}</div><div>x － y ＝ ${x-y}</div></div>`, a: `[ x ＝ ${x}, y ＝ ${y} ]` }; }
+            if(i <= 8) { return { tag: "代入法", q: `<div class="matrix"><div>y ＝ 2x</div><div>x ＋ y ＝ ${3*x}</div></div>`, a: `[ x ＝ ${x}, y ＝ ${2*x} ]` }; }
+            return { tag: "文章題", q: `合わせて10個のりんごとみかんを買い、代金は1200円。りんご1個150円、みかん1個90円のとき、りんごの個数を求めよ。`, a: `[ 5 個 ]` };
+        }
+
+        // --- 中2：1次関数 ---
+        function getM2Func(i) {
+            let a = getRandomInt(-2, 3); let b = getRandomInt(-3, 4);
+            if(i <= 4) { return { tag: "式決定", q: `傾きが ${a} で、点 ( 1, ${a+b} ) を通る直線の式を求めよ。`, a: `[ y ＝ ${formatXTerm(a,true)} ${formatTerm(b)} ]` }; }
+            if(i <= 8) { return { tag: "変域", q: `y ＝ 2x ＋ 1 で x の変域が 1 ≦ x ≦ 3 のとき、y の変域を求めよ。`, a: `[ 3 ≦ y ≦ 7 ]` }; }
+            return { tag: "交点", q: `2直線 y ＝ x ＋ 1 と y ＝ －x ＋ 3 の交点の座標を求めよ。`, a: `[ (1, 2) ]` };
+        }
+
+        // --- 中2：確率 ---
+        function getM2Prob(i) {
+            if(i <= 4) { return { tag: "コイン", q: `2枚の硬貨を同時に投げるとき、2枚とも表になる確率を求めよ。`, a: `＝ <div class="frac"><div class="num">1</div><div class="den">4</div></div>` }; }
+            if(i <= 8) { return { tag: "サイコロ", q: `2つのサイコロを同時に振るとき、目の数の和が 5 になる確率を求めよ。`, a: `＝ <div class="frac"><div class="num">1</div><div class="den">9</div></div>` }; }
+            return { tag: "玉抽出", q: `赤玉3個、白玉2個が入った箱から玉を1個抜くとき、それが赤玉である確率を求めよ。`, a: `＝ <div class="frac"><div class="num">3</div><div class="den">5</div></div>` };
+        }
+
+        // --- 中2：図形の性質 ---
+        function getM2Geom(i) {
+            if(i <= 5) { let n = getRandomInt(5, 7, false); return { tag: "多角形", q: `正 ${n} 角形の内角の和を求めよ。`, a: `＝ ${(n-2)*180}°` }; }
+            return { tag: "合同条件", q: `「2つの三角形で、3組の辺がそれぞれ等しい」とき、2つの三角形は合同といえるか(○か×か)。`, a: `＝ ○` };
+        }
+
+        // --- 中3：式の展開・因数分解 ---
+        function getM3Expand(i) {
+            let a = getRandomInt(1, 5);
+            if(i <= 3) { return { tag: "展開", q: `( x ＋ ${a} )( x － ${a} ) ＝`, a: `＝ x² － ${a*a}` }; }
+            if(i <= 7) { return { tag: "因数分解", q: `x² ＋ ${2*a}x ＋ ${a*a} ＝`, a: `＝ (x ＋ ${a})²` }; }
+            return { tag: "共通因数", q: `3x² － ${3*a*a} ＝`, a: `＝ 3(x ＋ ${a})(x － ${a})` };
+        }
+
+        // --- 中3：平方根 ---
+        function getM3Root(i) {
+            if(i <= 4) { return { tag: "簡略化", q: `√12 を変形して、√ の中を最も小さな整数にせよ。`, a: `＝ 2√3` }; }
+            if(i <= 7) { return { tag: "有理化", q: `分母を有理化せよ： <div class="frac"><div class="num">1</div><div class="den">√2</div></div>`, a: `＝ <div class="frac"><div class="num">√2</div><div class="den">2</div></div>` }; }
+            return { tag: "四則", q: `√2 × √6 ＋ √3 ＝`, a: `＝ 3√3` };
+        }
+
+        // --- 中3：2次方程式 ---
+        function getM3Eq2(i) {
+            let a = getRandomInt(1, 4); let b = getRandomInt(5, 7, false);
+            if(i <= 4) { return { tag: "因数分解", q: `x² － ${(a+b)}x ＋ ${a*b} ＝ 0`, a: `[ x ＝ ${a}, ${b} ]` }; }
+            if(i <= 8) { return { tag: "解の公式", q: `x² ＋ 3x ＋ 1 ＝ 0`, a: `[ x ＝ <div class="frac"><div class="num">－3 ± √5</div><div class="den">2</div></div> ]` }; }
+            return { tag: "文章題", q: `連続する2つの正の整数があり、それぞれの2乗の和が 25 である。この2つの整数を求めよ。`, a: `[ 3 と 4 ]` };
+        }
+
+        // --- 中3：関数 y=ax^2 ---
+        function getM3Func2(i) {
+            if(i <= 4) { return { tag: "式決定", q: `y は x の2乗に比例し、x ＝ 2 のとき y ＝ 12 である。式を求めよ。`, a: `[ y ＝ 3x² ]` }; }
+            if(i <= 8) { return { tag: "変域", q: `y ＝ x² について、x の変域が －2 ≦ x ≦ 3 のときの y の変域を求めよ。`, a: `[ 0 ≦ y ≦ 9 ]` }; }
+            return { tag: "変化割合", q: `y ＝ 2x² について、x の値が 1 から 3 まで増加するときの変化の割合を求めよ。`, a: `＝ 8` };
+        }
+
+        // --- 中3：三平方・相似 ---
+        function getM3Pytha(i) {
+            if(i <= 5) { return { tag: "斜辺", q: `直角を挟む2辺が 3cm, 4cm である直角三角形の斜辺の長さを求めよ。`, a: `＝ 5cm` }; }
+            return { tag: "相似比", q: `相似比が 2 : 3 の2つの図形がある。小さい方の面積が 12cm² のとき、大きい方の面積を求めよ。`, a: `＝ 27cm²` };
         }
 
         // ==========================================
-        // 2. 中2：連立方程式ミックスロジック
-        // ==========================================
-        function getM2SeqProblem(step) {
-            let x = getRandomInt(-4, 4); let y = getRandomInt(-4, 4);
-            if(step <= 3) { // 加減法向きの基本形
-                let a = getRandomInt(1, 3); let b = getRandomInt(-2, 2);
-                let d = getRandomInt(1, 2); let e = getRandomInt(-3, 3); if(a*e===b*d) e+=1;
-                return { tag: "加減法", q: `<div class="matrix"><div>${formatXTerm(a,true)} ${formatTerm(b)}y ＝ ${a*x+b*y}</div><div>${formatXTerm(d,true)} ${formatTerm(e)}y ＝ ${d*x+e*y}</div></div>`, a: `[ x ＝ ${x}, y ＝ ${y} ]` };
-            }
-            if(step <= 6) { // 代入法向きの変形型 (y = ax + b)
-                let a = getRandomInt(-2, 2); let b = x - a*y;
-                let d = getRandomInt(2, 3); let e = getRandomInt(-2, 2);
-                return { tag: "代入法", q: `<div class="matrix"><div>x ＝ ${formatXTerm(a,true,"y")} ${formatTerm(b)}</div><div>${formatXTerm(d,true)} ${formatTerm(e)}y ＝ ${d*x+e*y}</div></div>`, a: `[ x ＝ ${x}, y ＝ ${y} ]` };
-            }
-            if(step <= 8) { // A = B = C 型の応用
-                let a = getRandomInt(1, 2); let b = getRandomInt(1, 2); let constA = a*x + b*y;
-                let d = getRandomInt(2, 3); let e = getRandomInt(-1, 1); let constB = d*x + e*y;
-                let targetConst = constA; // 三和を同じにするため逆算調整
-                let adj_c = targetConst - (a*x + b*y); let adj_f = targetConst - (d*x + e*y);
-                return { tag: "A=B=C", q: `${formatXTerm(a,true)} ${formatTerm(b)}y ${formatTerm(adj_c)} ＝ ${formatXTerm(d,true)} ${formatTerm(e)}y ${formatTerm(adj_f)} ＝ ${targetConst}`, a: `[ x ＝ ${x}, y ＝ ${y} ]` };
-            }
-            // 文章題（応用）
-            let single_a = 120, single_b = 80; let count_a = getRandomInt(3, 6, false); let count_b = 8 - count_a;
-            return { tag: "応用題", q: `1個 120 円のパンAと1個 80 円のパンBを合わせて 8 個買ったところ、代金は ${single_a*count_a + single_b*count_b} 円になった。買ったパンA, Bの個数をそれぞれ求めよ。`, a: `[ A: ${count_a}個, B: ${count_b}個 ]` };
-        }
-
-        // ==========================================
-        // 3. 中3：因数分解ミックスロジック
-        // ==========================================
-        function getM3FactorProblem(step) {
-            if(step <= 3) { // 平方・乗法公式基本 (x^2 + (a+b)x + ab)
-                let a = getRandomInt(-6, 6); let b = getRandomInt(-6, 6);
-                let sum = a + b; let prod = a * b;
-                return { tag: "公式基", q: `x² ${formatXTerm(sum, false, "x")} ${formatTerm(prod)}`, a: `＝ (x ${formatTerm(a)})(x ${formatTerm(b)})` };
-            }
-            if(step <= 5) { // 2乗の公式 (x^2 ± 2ax + a^2)
-                let a = getRandomInt(2, 6); if(Math.random()>0.5) a = -a;
-                return { tag: "平方公式", q: `x² ${formatXTerm(2*a, false, "x")} ${formatTerm(a*a)}`, a: `＝ (x ${formatTerm(a)})²` };
-            }
-            if(step <= 7) { // 二乗の差 (x^2 - a^2)
-                let a = getRandomInt(2, 9);
-                return { tag: "二乗の差", q: `x² － ${a*a}`, a: `＝ (x ＋ ${a})(x － ${a})` };
-            }
-            if(step <= 9) { // 共通因数を先にくくりだす発展形
-                let k = getRandomInt(2, 4); let a = getRandomInt(1, 3);
-                return { tag: "共通因数", q: `${k}x² － ${k*a*a}`, a: `＝ ${k}(x ＋ ${a})(x － ${a})` };
-            }
-            // 置き換えを利用する応用問題
-            return { tag: "最難関", q: `(x ＋ 1)² ＋ 3(x ＋ 1) ＋ 2`, a: `＝ (x ＋ 2)(x ＋ 3)` };
-        }
-
-        // ==========================================
-        // 4. 中2：1次関数ミックスロジック
-        // ==========================================
-        function getM2FuncProblem(step) {
-            let a = getRandomInt(-3, 3); let b = getRandomInt(-4, 4);
-            if(step <= 3) { // 2点から直線の式を決定
-                let x1 = 1, x2 = 3;
-                return { tag: "式決定", q: `変化の割合が ${a} で、点 ( 2, ${a*2+b} ) を通る直線の式を求めよ。`, a: `[ y ＝ ${formatXTerm(a,true)} ${formatTerm(b)} ]` };
-            }
-            if(step <= 5) { // 変域
-                let abs_a = Math.abs(a) === 0 ? 2 : Math.abs(a);
-                return { tag: "変域", q: `1次関数 y ＝ ${abs_a}x ${formatTerm(b)} について、x の変域が －1 ≦ x ≦ 3 のときの y の変域を求めよ。`, a: `[ ${-abs_a+b} ≦ y ≦ ${abs_a*3+b} ]` };
-            }
-            if(step <= 7) { // 2直線の交点の座標
-                return { tag: "グラフ交点", q: `2つの直線 y ＝ x ＋ 2 と y ＝ －x ＋ 4 の交点の座標を求めよ。`, a: `[ (1, 3) ]` };
-            }
-            // 動点・文章題利用
-            return { tag: "文章利用", q: `長さ 15cm のろうそくに火をともすと、1分間に 0.5cm ずつ短くなる。火をともしてから x 分後のろうそくの長さを y cmとするとき、y を x の式で表せ。`, a: `[ y ＝ －0.5x ＋ 15 ]` };
-        }
-
-        // ==========================================
-        // 全体描画エンジン
+        // 全体制御システム
         // ==========================================
         function generatePrint() {
             const selector = document.getElementById('unit-selector');
             const selectedUnit = selector.value;
             const selectedText = selector.options[selector.selectedIndex].text;
 
-            document.getElementById('title-q').innerText = selectedText.split('：')[1].split('（')[0] + " 実戦総合テスト";
+            document.getElementById('title-q').innerText = selectedText.split('：')[1].split('（')[0] + " 総合テスト";
             document.getElementById('title-a').innerText = "【解答】" + selectedText.split('：')[1].split('（')[0];
 
             const questionBox = document.getElementById('question-box');
@@ -233,29 +260,35 @@
 
             for (let i = 1; i <= 10; i++) {
                 let data;
-                if (selectedUnit === 'mix_m1_eq') data = getM1EqProblem(i);
-                else if (selectedUnit === 'mix_m2_seq') data = getM2SeqProblem(i);
-                else if (selectedUnit === 'mix_m3_factor') data = getM3FactorProblem(i);
-                else if (selectedUnit === 'mix_m2_func') data = getM2FuncProblem(i);
+                switch(selectedUnit) {
+                    case "m1_pos_neg": data = getM1PosNeg(i); break;
+                    case "m1_linear": data = getM1Linear(i); break;
+                    case "m1_eq": data = getM1Eq(i); break;
+                    case "m1_func": data = getM1Func(i); break;
+                    case "m1_data": data = getM1Data(i); break;
+                    case "m2_poly": data = getM2Poly(i); break;
+                    case "m2_seq": data = getM2Seq(i); break;
+                    case "m2_func": data = getM2Func(i); break;
+                    case "m2_prob": data = getM2Prob(i); break;
+                    case "m2_geom": data = getM2Geom(i); break;
+                    case "m3_expand": data = getM3Expand(i); break;
+                    case "m3_root": data = getM3Root(i); break;
+                    case "m3_eq2": data = getM3Eq2(i); break;
+                    case "m3_func2": data = getM3Func2(i); break;
+                    case "m3_pytha": data = getM3Pytha(i); break;
+                }
 
-                // 問題要素の生成 (タグ付き)
+                // 問題追加
                 const qItem = document.createElement('div');
                 qItem.className = 'quiz-item';
-                qItem.innerHTML = `
-                    <div class="quiz-num">(${i})</div>
-                    <div class="quiz-tag">${data.tag}</div>
-                    <div class="quiz-formula">${data.q}</div>
-                `;
+                qItem.innerHTML = `<div class="quiz-num">Inner(${i})</div><div class="quiz-tag">${data.tag}</div><div class="quiz-formula">${data.q}</div>`;
+                qItem.querySelector('.quiz-num').innerText = `(${i})`;
                 questionBox.appendChild(qItem);
 
-                // 解答要素の生成
+                // 解答追加
                 const aItem = document.createElement('div');
                 aItem.className = 'quiz-item';
-                aItem.innerHTML = `
-                    <div class="quiz-num">(${i})</div>
-                    <div class="quiz-formula">${data.q}</div>
-                    <div class="answer-text">${data.a}</div>
-                `;
+                aItem.innerHTML = `<div class="quiz-num">(${i})</div><div class="quiz-formula">${data.q}</div><div class="answer-text">${data.a}</div>`;
                 answerBox.appendChild(aItem);
             }
         }
