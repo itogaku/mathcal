@@ -2,11 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>中学数学 プリント自動生成システム</title>
+    <title>中学数学 発展・自動生成プリント</title>
     <style>
-        /* ==========================================
-           1. 画面表示用の共通スタイル（ブラウザ閲覧用）
-           ========================================== */
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
             margin: 0;
@@ -14,8 +11,6 @@
             background-color: #f0f2f5;
             color: #333;
         }
-        
-        /* 操作用ヘッダー */
         .admin-header {
             background-color: #ffffff;
             padding: 15px 30px;
@@ -28,7 +23,6 @@
             align-items: center;
         }
         .admin-header h2 { margin: 0; font-size: 16px; color: #444; margin-right: auto; }
-        
         select {
             padding: 8px 12px;
             font-size: 15px;
@@ -37,7 +31,6 @@
             background-color: #fff;
             cursor: pointer;
         }
-        
         .btn {
             padding: 10px 20px;
             font-size: 15px;
@@ -45,14 +38,10 @@
             cursor: pointer;
             border: none;
             border-radius: 6px;
-            transition: all 0.2s;
         }
         .btn-primary { background-color: #007bff; color: white; }
-        .btn-primary:hover { background-color: #0056b3; }
         .btn-success { background-color: #28a745; color: white; }
-        .btn-success:hover { background-color: #218838; }
 
-        /* プリント台紙（A4サイズ再現） */
         .print-area {
             display: flex;
             flex-direction: column;
@@ -66,26 +55,13 @@
             background-color: #ffffff;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             box-sizing: border-box;
-            padding: 15mm 15mm; /* 上下余白を少し縮小 */
+            padding: 15mm 15mm;
             position: relative;
             display: flex;
             flex-direction: column;
         }
-
-        /* プリント内のパーツデザイン */
-        .print-title {
-            text-align: center;
-            font-size: 24px;
-            margin-top: 0;
-            margin-bottom: 5px;
-            letter-spacing: 2px;
-        }
-        .print-subtitle {
-            text-align: center;
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 20px;
-        }
+        .print-title { text-align: center; font-size: 24px; margin: 0 0 5px 0; letter-spacing: 2px; }
+        .print-subtitle { text-align: center; font-size: 13px; color: #666; margin-bottom: 20px; }
         .student-info {
             display: flex;
             justify-content: flex-end;
@@ -93,96 +69,79 @@
             margin-bottom: 25px;
             font-size: 13px;
         }
-        .student-info div {
-            border-bottom: 1px solid #333;
-            width: 140px;
-            text-align: right;
-            padding-bottom: 3px;
-        }
+        .student-info div { border-bottom: 1px solid #333; width: 140px; text-align: right; padding-bottom: 3px; }
         .student-info .name-box { width: 220px; }
 
-        /* 問題の配置エリア（残りの高さをいっぱいに使って等分する） */
+        /* 1ページ10問に設定（複雑な式が入るため、隙間を広げるため全体で10問に変更） */
         .grid-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             grid-template-rows: repeat(10, 1fr);
-            flex-grow: 1; /* 紙面の縦幅に合わせて自動で引き伸ばす */
-            row-gap: 5mm; /* 画面表示時の予備の隙間 */
+            flex-grow: 1;
         }
         .quiz-item {
-            font-size: 18px;
+            font-size: 19px;
             display: flex;
-            align-items: center; /* 縦中央に揃えて余白感を均等に */
-            border-bottom: 1px dashed #eee; /* 解答を書きやすくするための目安線（印刷時は好みに応じて変更可） */
-            padding-bottom: 5px;
+            align-items: center;
+            border-bottom: 1px dashed #eee;
+            padding: 10px 0;
         }
-        .quiz-num {
-            font-weight: bold;
-            margin-right: 10px;
-            width: 30px;
-        }
+        .quiz-num { font-weight: bold; margin-right: 20px; width: 35px; }
         .quiz-formula {
             font-family: 'Times New Roman', Times, serif;
-            font-style: italic;
             letter-spacing: 1px;
+            display: flex;
+            align-items: center;
         }
         .answer-text {
             color: #dc3545;
             font-weight: bold;
-            margin-left: 15px;
+            margin-left: auto; /* 解答を右端に寄せる */
             font-family: Arial, sans-serif;
+            padding-right: 20px;
         }
 
-        /* ==========================================
-           2. 印刷用（PDF出力時）のスタイル安定化設定
-           ========================================== */
-        @media print {
-            html, body {
-                width: 210mm;
-                height: 297mm;
-                background-color: #fff;
-            }
-            .admin-header { display: none; } /* ボタン非表示 */
-            .print-area { padding: 0; gap: 0; display: block; }
-            
-            .page {
-                box-shadow: none;
-                margin: 0;
-                width: 210mm;
-                height: 297mm;
-                padding: 15mm 15mm;
-                page-break-after: always; /* 強制改ページ */
-                page-break-inside: avoid;
-            }
-            
-            /* 印刷時は点線を消してスッキリさせる */
-            .quiz-item {
-                border-bottom: none;
-                font-size: 16px; /* 確実にはみ出しを防ぐため一回り小さく */
-            }
+        /* 分数表示用のスタイル */
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 4px;
+            font-size: 17px;
+        }
+        .num { border-bottom: 1px solid #333; padding-bottom: 2px; }
+        .den { padding-top: 2px; }
+        .matrix {
+            display: inline-block;
+            border-left: 2px solid #333;
+            border-right: 2px solid #333;
+            padding: 0 5px;
+            border-radius: 4px;
+            vertical-align: middle;
+        }
 
-            @page {
-                size: A4 portrait;
-                margin: 0; /* ブラウザ標準のヘッダー・フッター（URLや日付）を完全に削除 */
-            }
+        @media print {
+            html, body { width: 210mm; height: 297mm; background-color: #fff; }
+            .admin-header { display: none; }
+            .print-area { padding: 0; gap: 0; display: block; }
+            .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; padding: 15mm 15mm; page-break-after: always; }
+            .quiz-item { border-bottom: none; font-size: 17px; }
+            @page { size: A4 portrait; margin: 0; }
         }
     </style>
 </head>
 <body>
 
     <div class="admin-header">
-        <h2>中学数学 プリント自動生成システム</h2>
+        <h2>中学数学 発展プリント自動生成</h2>
         
         <select id="unit-selector" onchange="generatePrint()">
-            <optgroup label="中学1年">
-                <option value="pos_neg">正負の数の四則計算（3つの数）</option>
-                <option value="linear_expr">文字式の同類項をまとめる</option>
-                <option value="equation" selected>1次方程式</option>
-            </optgroup>
-            <optgroup label="中学3年">
-                <option value="expansion">展開（乗法公式）</option>
-                <option value="factorization">因数分解</option>
-            </optgroup>
+            <option value="hard_pos_neg">中1：正負の数（累乗・分数・四則混合）</option>
+            <option value="frac_linear">中2：文字式（分数の通分・多項式）</option>
+            <option value="frac_equation">中1：1次方程式（分数形）</option>
+            <option value="simultaneous">中2：連立方程式（加減・代入発展）</option>
+            <option value="hard_expansion">中3：展開・因数分解（分数・共通因数）</option>
         </select>
 
         <button class="btn btn-primary" onclick="generatePrint()">🔢 問題を新しくする</button>
@@ -190,17 +149,10 @@
     </div>
 
     <div class="print-area">
-        
         <div class="page">
             <h1 class="print-title" id="title-q">プリント</h1>
-            <div class="print-subtitle">※ 途中の計算も余白に書きましょう。</div>
-            
-            <div class="student-info">
-                <div>年  組  番</div>
-                <div class="name-box">氏名：</div>
-                <div>得点：   ／100</div>
-            </div>
-
+            <div class="print-subtitle">※ 途中の計算も余白にきれいに書きましょう。</div>
+            <div class="student-info"><div>年  組  番</div><div class="name-box">氏名：</div><div>得点：   ／100</div></div>
             <div class="grid-container" id="question-box"></div>
         </div>
 
@@ -208,14 +160,11 @@
             <h1 class="print-title" id="title-a" style="color: #dc3545;">【解答】プリント</h1>
             <div class="print-subtitle">丸付けに利用してください。</div>
             <div style="height: 20px;"></div>
-
             <div class="grid-container" id="answer-box"></div>
         </div>
-
     </div>
 
     <script>
-        // （JavaScriptロジックは変更なしのため割愛せずそのまま保持）
         function getRandomInt(min, max, excludeZero = true) {
             let num = Math.floor(Math.random() * (max - min + 1)) + min;
             if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
@@ -236,84 +185,154 @@
             return `${sign}${coefStr}x`;
         }
 
-        function makePosNeg() {
-            const n1 = getRandomInt(-9, 9);
-            const n2 = getRandomInt(-9, 9);
-            const n3 = getRandomInt(-9, 9);
-            const op = Math.random() > 0.5 ? '×' : '＋';
-            let ans = 0; let formula = "";
-            const n1Str = n1 < 0 ? `(${n1})` : `${n1}`;
-            const n2Str = n2 < 0 ? `(${n2})` : `${n2}`;
-            const n3Str = n3 < 0 ? `(${n3})` : `${n3}`;
-            if (op === '×') { ans = n1 * n2 + n3; formula = `${n1Str} × ${n2Str} ＋ ${n3Str}`; } 
-            else { ans = n1 + n2 * n3; formula = `${n1Str} ＋ ${n2Str} × ${n3Str}`; }
-            return { q: formula, a: `＝ ${ans}` };
+        // 最大公約数（約分用）
+        function gcd(a, b) {
+            return b === 0 ? Math.abs(a) : gcd(b, a % b);
         }
 
-        function makeLinearExpr() {
-            const a1 = getRandomInt(-9, 9); const b1 = getRandomInt(-9, 9);
-            const a2 = getRandomInt(-9, 9); const b2 = getRandomInt(-9, 9);
-            const ansA = a1 + a2; const ansB = b1 + b2;
-            const q = `${formatXTerm(a1, true)} ${formatTerm(b1)} ${formatXTerm(a2)} ${formatTerm(b2)}`;
-            const a = `＝ ${formatXTerm(ansA, true)} ${formatTerm(ansB)}`;
-            return { q: q, a: ansA === 0 && ansB === 0 ? "＝ 0" : a };
+        // ==========================================
+        // 1. 正負の数（発展：累乗・分数混じり）
+        // ==========================================
+        function makeHardPosNeg() {
+            // 例: (-2)^2 * 3 - (-12) / 4
+            const base = getRandomInt(-4, 4);
+            const rui = 2; // 2乗に固定
+            const ruiAns = Math.pow(base, rui);
+            
+            const n2 = getRandomInt(-5, 5);
+            const ans1 = ruiAns * n2;
+
+            const n3 = getRandomInt(-3, 3);
+            const den = getRandomInt(2, 5);
+            const num = n3 * den; // 割り切れるように設定
+
+            const ans = ans1 - n3;
+            
+            const q = `(-${Math.abs(base)})² × ${n2 >= 0 ? n2 : `(${n2})`} － <div class="frac"><div class="num">${num}</div><div class="den">${den}</div></div>`;
+            return { q: q, a: `＝ ${ans}` };
         }
 
-        function makeEquation() {
-            const pattern = getRandomInt(1, 4, false);
-            let x = getRandomInt(-9, 9); let a = getRandomInt(-9, 9); let b = getRandomInt(-15, 15); let c = getRandomInt(-9, 9); let d = getRandomInt(-15, 15);
-            if (a === 0) a = 2; if (c === 0) c = -2; if (a === c) c = a + 1;
-            let left = "", right = "";
-            switch(pattern) {
-                case 1: d = a * x + b; left = `${formatXTerm(a, true)} ${formatTerm(b)}`; right = `${d}`; break;
-                case 2: d = (a - c) * x; left = `${formatXTerm(a, true)}`; right = `${formatXTerm(c, true)} ${formatTerm(d)}`; break;
-                case 3: b = (c - a) * x; left = `${formatXTerm(a, true)} ${formatTerm(b)}`; right = `${formatXTerm(c, true)}`; break;
-                default: d = (a - c) * x + b; left = `${formatXTerm(a, true)} ${formatTerm(b)}`; right = `${formatXTerm(c, true)} ${formatTerm(d)}`; break;
+        // ==========================================
+        // 2. 文字式（発展：分数の通分）
+        // ==========================================
+        function makeFracLinear() {
+            // 例: (2x+y)/3 - (x-3y)/2
+            const den1 = Math.random() > 0.5 ? 2 : 3;
+            const den2 = den1 === 2 ? 3 : 2; // 2と3で通分(最小公倍数6)
+
+            const a1 = getRandomInt(-3, 3);
+            const b1 = getRandomInt(-3, 3);
+            const a2 = getRandomInt(-3, 3);
+            const b2 = getRandomInt(-3, 3);
+
+            // 分子をまとめて計算
+            const finalA = a1 * den2 - a2 * den1;
+            const finalB = b1 * den2 - b2 * den1;
+            const lcm = den1 * den2;
+
+            const q = `<div class="frac"><div class="num">${formatXTerm(a1, true)} ${formatTerm(b1)}y</div><div class="den">${den1}</div></div> － <div class="frac"><div class="num">${formatXTerm(a2, true)} ${formatTerm(b2)}y</div><div class="den">${den2}</div></div>`;
+            
+            // 答えの文字列生成
+            const topStr = `${formatXTerm(finalA, true)} ${formatTerm(finalB)}y`;
+            const a = `＝ <div class="frac"><div class="num">${topStr}</div><div class="den">${lcm}</div></div>`;
+            return { q: q, a: a };
+        }
+
+        // ==========================================
+        // 3. 1次方程式（発展：分数形）
+        // ==========================================
+        function makeFracEquation() {
+            // 例: (x - 3)/2 = (2x + 1)/3 + 1
+            let x = getRandomInt(-5, 5); 
+            const den1 = 2;
+            const den2 = 3;
+
+            const a1 = getRandomInt(1, 3);
+            const b1 = getRandomInt(-5, 5);
+            const leftVal = (a1 * x + b1) / den1;
+
+            const a2 = getRandomInt(1, 2);
+            // 右辺の辻褄が合うように定数Cを逆算
+            const b2 = getRandomInt(-4, 4);
+            const rightValPart = (a2 * x + b2) / den2;
+            const c = leftVal - rightValPart; 
+
+            // 分数にならないようにCを調整（整数にする）
+            const cInt = Math.round(c);
+            // 逆算し直してb1を再決定
+            const b1_adjusted = ((a2 * x + b2) / den2 + cInt) * den1 - a1 * x;
+            
+            const q = `<div class="frac"><div class="num">${formatXTerm(a1, true)} ${formatTerm(Math.round(b1_adjusted))}</div><div class="den">${den1}</div></div> ＝ <div class="frac"><div class="num">${formatXTerm(a2, true)} ${formatTerm(b2)}</div><div class="den">${den2}</div></div> ${formatTerm(cInt)}`;
+            return { q: q, a: `[ x ＝ ${x} ]` };
+        }
+
+        // ==========================================
+        // 4. 連立方程式（新規追加）
+        // ==========================================
+        function makeSimultaneous() {
+            // ax + by = c
+            // dx + ey = f
+            const x = getRandomInt(-4, 4);
+            const y = getRandomInt(-4, 4);
+
+            const a = getRandomInt(-4, 4);
+            const b = getRandomInt(-4, 4);
+            const d = getRandomInt(-4, 4);
+            let e = getRandomInt(-4, 4);
+            if (a*e === b*d) e += 1; // 解なし・不能を防ぐ
+
+            const c = a * x + b * y;
+            const f = d * x + e * y;
+
+            const q = `<div class="matrix"> <div>${formatXTerm(a, true)} ${formatTerm(b)}y ＝ ${c}</div> <div>${formatXTerm(d, true)} ${formatTerm(e)}y ＝ ${f}</div> </div>`;
+            return { q: q, a: `[ x ＝ ${x}, y ＝ ${y} ]` };
+        }
+
+        // ==========================================
+        // 5. 展開・因数分解（発展：分数・共通因数）
+        // ==========================================
+        function makeHardExpansion() {
+            if (Math.random() > 0.5) {
+                // パターンA: 分数の展開 (x + 1/2)(x - 1/2) = x^2 - 1/4
+                const dens = [2, 3, 4];
+                const den = dens[Math.floor(Math.random() * dens.length)];
+                const q = `( x ＋ <div class="frac"><div class="num">1</div><div class="den">${den}</div></div> )( x － <div class="frac"><div class="num">1</div><div class="den">${den}</div></div> )`;
+                const a = `＝ x² － <div class="frac"><div class="num">1</div><div class="den">${den * den}</div></div>`;
+                return { q: q, a: a };
+            } else {
+                // パターンB: 共通因数のある因数分解 3x^2 - 12 = 3(x+2)(x-2)
+                const k = getRandomInt(2, 5); // 共通因数
+                const originalA = getRandomInt(1, 4);
+                const qStr = `${k}x² － ${k * originalA * originalA}`;
+                const aStr = `＝ ${k}(x ＋ ${originalA})(x － ${originalA})`;
+                return { q: qStr, a: aStr };
             }
-            return { q: `${left} ＝ ${right}`, a: `[ x ＝ ${x} ]` };
         }
 
-        function makeExpansion() {
-            const a = getRandomInt(-9, 9); let b = getRandomInt(-9, 9);
-            if (a === b && Math.random() > 0.5) b = getRandomInt(-9, 9);
-            const sum = a + b; const prod = a * b;
-            const q = `(x ${formatTerm(a)})(x ${formatTerm(b)})`;
-            let ansStr = `＝ x²`;
-            if (sum !== 0) ansStr += ` ${formatXTerm(sum)}`;
-            if (prod !== 0) ansStr += ` ${formatTerm(prod)}`;
-            return { q: q, a: ansStr };
-        }
-
-        function makeFactorization() {
-            const a = getRandomInt(-9, 9); const b = getRandomInt(-9, 9);
-            const sum = a + b; const prod = a * b;
-            let qStr = `x²`;
-            if (sum !== 0) qStr += ` ${formatXTerm(sum)}`;
-            if (prod !== 0) qStr += ` ${formatTerm(prod)}`;
-            const aStr = `＝ (x ${formatTerm(a)})(x ${formatTerm(b)})`;
-            return { q: qStr, a: aStr };
-        }
-
+        // ==========================================
+        // メイン制御
+        // ==========================================
         function generatePrint() {
             const selector = document.getElementById('unit-selector');
             const selectedUnit = selector.value;
             const selectedText = selector.options[selector.selectedIndex].text;
 
-            document.getElementById('title-q').innerText = selectedText + " テスト";
-            document.getElementById('title-a').innerText = "【解答】" + selectedText + " テスト";
+            document.getElementById('title-q').innerText = selectedText.split('：')[1] + " 演習";
+            document.getElementById('title-a').innerText = "【解答】" + selectedText.split('：')[1];
 
             const questionBox = document.getElementById('question-box');
             const answerBox = document.getElementById('answer-box');
             questionBox.innerHTML = '';
             answerBox.innerHTML = '';
 
-            for (let i = 1; i <= 20; i++) {
+            // 複雑化したため、1ページにゆったり収まる10問に変更
+            for (let i = 1; i <= 10; i++) {
                 let data;
-                if (selectedUnit === 'pos_neg') data = makePosNeg();
-                else if (selectedUnit === 'linear_expr') data = makeLinearExpr();
-                else if (selectedUnit === 'equation') data = makeEquation();
-                else if (selectedUnit === 'expansion') data = makeExpansion();
-                else if (selectedUnit === 'factorization') data = makeFactorization();
+                if (selectedUnit === 'hard_pos_neg') data = makeHardPosNeg();
+                else if (selectedUnit === 'frac_linear') data = makeFracLinear();
+                else if (selectedUnit === 'frac_equation') data = makeFracEquation();
+                else if (selectedUnit === 'simultaneous') data = makeSimultaneous();
+                else if (selectedUnit === 'hard_expansion') data = makeHardExpansion();
 
                 const qItem = document.createElement('div');
                 qItem.className = 'quiz-item';
