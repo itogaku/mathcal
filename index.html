@@ -1,1 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>中学1年 数学：1次方程式 自動生成プリント</title>
+    <style>
+        /* ==========================================
+           1. 画面表示用の共通スタイル（ブラウザ閲覧用）
+           ========================================== */
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        
+        /* 操作用ヘッダー */
+        .admin-header {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .admin-header h2 { margin: 0; font-size: 18px; color: #444; margin-right: auto; }
+        .btn {
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover { background-color: #218838; }
 
+        /* プリント台紙（A4サイズ再現） */
+        .print-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            padding: 30px 0;
+        }
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+            padding: 20mm 15mm;
+            position: relative;
+        }
+
+        /* プリント内のパーツデザイン */
+        .print-title {
+            text-align: center;
+            font-size: 26px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .print-subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .student-info {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+        .student-info div {
+            border-bottom: 1px solid #333;
+            width: 150px;
+            text-align: right;
+            padding-bottom: 5px;
+        }
+        .student-info .name-box { width: 250px; }
+
+        /* 問題のグリッド配置（2列・10行で計20問） */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(10, 1fr);
+            gap: 22mm 15mm; /* 縦の間隔を広くして途中計算スペースを確保 */
+        }
+        .quiz-item {
+            font-size: 18px;
+            display: flex;
+            align-items: flex-start;
+            line-height: 1.5;
+        }
+        .quiz-num {
+            font-weight: bold;
+            margin-right: 10px;
+            width: 35px;
+        }
+        .quiz-formula {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+        .answer-text {
+            color: #dc3545;
+            font-weight: bold;
+            margin-left: 15px;
+            font-family: Arial, sans-serif;
+        }
+
+        /* ==========================================
+           2. 印刷用（PDF出力時）のスタイル設定
+           ========================================== */
+        @media print {
+            body { background-color: #fff; }
+            .admin-header { display: none; } /* 操作ボタンを非表示に */
+            .print-area { padding: 0; gap: 0; }
+            .page {
+                box-shadow: none;
+                margin: 0;
+                padding: 15mm 15mm;
+                page-break-after: always; /* 綺麗にページを分ける */
+            }
+            @page {
+                size: A4;
+                margin: 0; /* ブラウザ標準のヘッダー・フッターを消す */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-header">
+        <h2>1次方程式 プリント自動生成システム</h2>
+        <button class="btn btn-primary" onclick="generateData()">🔢 数字を変えて新しい問題にする</button>
+        <button class="btn btn-success" onclick="window.print()">📄 PDFとして保存・印刷する</button>
+    </div>
+
+    <div class="print-area">
+        
+        <div class="page">
+            <h1 class="print-title">1次方程式 計算テスト</h1>
+            <div class="print-subtitle">※ 答はすべて整数になります。</div>
+            
+            <div class="student-info">
+                <div>年  組  番</div>
+                <div class="name-box">氏名：</div>
+                <div>得点：   ／100</div>
+            </div>
+
+            <div class="grid-container" id="question-box">
+                </div>
+        </div>
+
+        <div class="page">
+            <h1 class="print-title" style="color: #dc3545;">【解答】1次方程式 計算テスト</h1>
+            <div class="print-subtitle">丸付けに利用してください。</div>
+            <div style="height: 45px;"></div><div class="grid-container" id="answer-box">
+                </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 指定した範囲のランダムな整数を返す（0は除外する設定つき）
+        function getRandomInt(min, max, excludeZero = true) {
+            let num = Math.floor(Math.random() * (max - min + 1)) + min;
+            if (excludeZero && num === 0) {
+                return getRandomInt(min, max, excludeZero); // 0なら再帰的にやり直し
+            }
+            return num;
+        }
+
+        // 数式を綺麗な文字列に整形する関数（「+ -5」を「- 5」に直すなど）
+        function formatTerm(value, isFirst = false) {
+            if (value === 0) return "";
+            if (value > 0) {
+                return isFirst ? `${value}` : `+ ${value}`;
+            } else {
+                return isFirst ? `-${Math.abs(value)}` : `- ${Math.abs(value)}`;
+            }
+        }
+
+        function formatXTerm(coef, isFirst = false) {
+            if (coef === 0) return "";
+            let sign = coef > 0 ? (isFirst ? "" : "+ ") : "- ";
+            let absCoef = Math.abs(coef);
+            let coefStr = absCoef === 1 ? "" : absCoef; // 係数が1の時は表示しない(1xではなくx)
+            return `${sign}${coefStr}x`;
+        }
+
+        // 20問分のデータ（問題の数式と答え）を生成するメイン関数
+        function generateData() {
+            const questionBox = document.getElementById('question-box');
+            const answerBox = document.getElementById('answer-box');
+            
+            // 表示をクリア
+            questionBox.innerHTML = '';
+            answerBox.innerHTML = '';
+
+            const totalQuestions = 20;
+
+            for (let i = 1; i <= totalQuestions; i++) {
+                // パターンをランダムに変えて飽きさせない（4パターン）
+                const pattern = getRandomInt(1, 4, false);
+                
+                let x = getRandomInt(-9, 9);       // 答え（整数）
+                let a = getRandomInt(-9, 9);       // 係数
+                let b = getRandomInt(-15, 15);     // 定数
+                let c = getRandomInt(-9, 9);       // パターン用係数2
+                let d = getRandomInt(-15, 15);     // パターン用定数2
+
+                // 係数が0または1次方程式が成立しない条件を回避
+                if (a === 0) a = 2;
+                if (c === 0) c = -2;
+                if (a === c) c = a + 1; 
+
+                let leftSideText = "";
+                let rightSideText = "";
+
+                switch(pattern) {
+                    case 1:
+                        // パターン1: ax + b = d  (例: 2x + 3 = 11)
+                        // 右辺のdを逆算して決定
+                        d = a * x + b;
+                        leftSideText = `${formatXTerm(a, true)} ${formatTerm(b)}`;
+                        rightSideText = `${d}`;
+                        break;
+                    
+                    case 2:
+                        // パターン2: ax = cx + d (例: 5x = 2x + 9)
+                        d = (a - c) * x;
+                        leftSideText = `${formatXTerm(a, true)}`;
+                        rightSideText = `${formatXTerm(c, true)} ${formatTerm(d)}`;
+                        break;
+
+                    case 3:
+                        // パターン3: ax + b = cx (例: 3x - 8 = -x)
+                        b = (c - a) * x;
+                        leftSideText = `${formatXTerm(a, true)} ${formatTerm(b)}`;
+                        rightSideText = `${formatXTerm(c, true)}`;
+                        break;
+
+                    case 4:
+                    default:
+                        // パターン4: ax + b = cx + d (例: 4x - 3 = 2x + 7)
+                        d = (a - c) * x + b;
+                        leftSideText = `${formatXTerm(a, true)} ${formatTerm(b)}`;
+                        rightSideText = `${formatXTerm(c, true)} ${formatTerm(d)}`;
+                        break;
+                }
+
+                // 数式の文字列を合体
+                const formulaHtml = `${leftSideText} ＝ ${rightSideText}`;
+
+                // --- 1. 問題用紙用の要素作成 ---
+                const qItem = document.createElement('div');
+                qItem.className = 'quiz-item';
+                qItem.innerHTML = `
+                    <div class="quiz-num">(${i})</div>
+                    <div class="quiz-formula">${formulaHtml}</div>
+                `;
+                questionBox.appendChild(qItem);
+
+                // --- 2. 解答用紙用の要素作成 ---
+                const aItem = document.createElement('div');
+                aItem.className = 'quiz-item';
+                aItem.innerHTML = `
+                    <div class="quiz-num">(${i})</div>
+                    <div class="quiz-formula">${formulaHtml}</div>
+                    <div class="answer-text">[ x ＝ ${x} ]</div>
+                `;
+                answerBox.appendChild(aItem);
+            }
+        }
+
+        // ページを開いた瞬間に一回目の問題を自動生成する
+        window.onload = generateData;
+    </script>
+</body>
+</html>
