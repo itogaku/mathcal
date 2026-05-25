@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>中学1年 数学：1次方程式 自動生成プリント</title>
+    <title>中学数学 プリント自動生成システム</title>
     <style>
         /* ==========================================
            1. 画面表示用の共通スタイル（ブラウザ閲覧用）
@@ -27,7 +27,17 @@
             gap: 15px;
             align-items: center;
         }
-        .admin-header h2 { margin: 0; font-size: 18px; color: #444; margin-right: auto; }
+        .admin-header h2 { margin: 0; font-size: 16px; color: #444; margin-right: auto; }
+        
+        select {
+            padding: 8px 12px;
+            font-size: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        
         .btn {
             padding: 10px 20px;
             font-size: 15px;
@@ -94,7 +104,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: repeat(10, 1fr);
-            gap: 22mm 15mm; /* 縦の間隔を広くして途中計算スペースを確保 */
+            gap: 22mm 15mm; /* 縦の間隔を広げて計算スペースを確保 */
         }
         .quiz-item {
             font-size: 18px;
@@ -130,11 +140,11 @@
                 box-shadow: none;
                 margin: 0;
                 padding: 15mm 15mm;
-                page-break-after: always; /* 綺麗にページを分ける */
+                page-break-after: always;
             }
             @page {
                 size: A4;
-                margin: 0; /* ブラウザ標準のヘッダー・フッターを消す */
+                margin: 0;
             }
         }
     </style>
@@ -142,16 +152,29 @@
 <body>
 
     <div class="admin-header">
-        <h2>1次方程式 プリント自動生成システム</h2>
-        <button class="btn btn-primary" onclick="generateData()">🔢 数字を変えて新しい問題にする</button>
+        <h2>中学数学 プリント自動生成システム</h2>
+        
+        <select id="unit-selector" onchange="generatePrint()">
+            <optgroup label="中学1年">
+                <option value="pos_neg">正負の数の四則計算（3つの数）</option>
+                <option value="linear_expr">文字式の同類項をまとめる</option>
+                <option value="equation" selected>1次方程式</option>
+            </optgroup>
+            <optgroup label="中学3年">
+                <option value="expansion">展開（乗法公式）</option>
+                <option value="factorization">因数分解</option>
+            </optgroup>
+        </select>
+
+        <button class="btn btn-primary" onclick="generatePrint()">🔢 問題を新しくする</button>
         <button class="btn btn-success" onclick="window.print()">📄 PDFとして保存・印刷する</button>
     </div>
 
     <div class="print-area">
         
         <div class="page">
-            <h1 class="print-title">1次方程式 計算テスト</h1>
-            <div class="print-subtitle">※ 答はすべて整数になります。</div>
+            <h1 class="print-title" id="title-q">プリント</h1>
+            <div class="print-subtitle">※ 途中の計算も余白に書きましょう。</div>
             
             <div class="student-info">
                 <div>年  組  番</div>
@@ -159,134 +182,190 @@
                 <div>得点：   ／100</div>
             </div>
 
-            <div class="grid-container" id="question-box">
-                </div>
+            <div class="grid-container" id="question-box"></div>
         </div>
 
         <div class="page">
-            <h1 class="print-title" style="color: #dc3545;">【解答】1次方程式 計算テスト</h1>
+            <h1 class="print-title" id="title-a" style="color: #dc3545;">【解答】プリント</h1>
             <div class="print-subtitle">丸付けに利用してください。</div>
-            <div style="height: 45px;"></div><div class="grid-container" id="answer-box">
-                </div>
+            <div style="height: 45px;"></div>
+
+            <div class="grid-container" id="answer-box"></div>
         </div>
 
     </div>
 
     <script>
-        // 指定した範囲のランダムな整数を返す（0は除外する設定つき）
+        // ==========================================
+        // 共通の便利関数（ランダム・表記整形）
+        // ==========================================
         function getRandomInt(min, max, excludeZero = true) {
             let num = Math.floor(Math.random() * (max - min + 1)) + min;
-            if (excludeZero && num === 0) {
-                return getRandomInt(min, max, excludeZero); // 0なら再帰的にやり直し
-            }
+            if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
             return num;
         }
 
-        // 数式を綺麗な文字列に整形する関数（「+ -5」を「- 5」に直すなど）
         function formatTerm(value, isFirst = false) {
             if (value === 0) return "";
-            if (value > 0) {
-                return isFirst ? `${value}` : `+ ${value}`;
-            } else {
-                return isFirst ? `-${Math.abs(value)}` : `- ${Math.abs(value)}`;
-            }
+            if (value > 0) return isFirst ? `${value}` : `+ ${value}`;
+            return isFirst ? `-${Math.abs(value)}` : `- ${Math.abs(value)}`;
         }
 
         function formatXTerm(coef, isFirst = false) {
             if (coef === 0) return "";
             let sign = coef > 0 ? (isFirst ? "" : "+ ") : "- ";
             let absCoef = Math.abs(coef);
-            let coefStr = absCoef === 1 ? "" : absCoef; // 係数が1の時は表示しない(1xではなくx)
+            let coefStr = absCoef === 1 ? "" : absCoef;
             return `${sign}${coefStr}x`;
         }
 
-        // 20問分のデータ（問題の数式と答え）を生成するメイン関数
-        function generateData() {
+        // ==========================================
+        // 単元ごとの問題生成ロジック
+        // ==========================================
+        
+        // 1. 正負の数（3項の加減乗除混じり）
+        function makePosNeg() {
+            // 例: (-3) * 4 + (-8) 
+            const n1 = getRandomInt(-9, 9);
+            const n2 = getRandomInt(-9, 9);
+            const n3 = getRandomInt(-9, 9);
+            const op = Math.random() > 0.5 ? '×' : '＋';
+            
+            let ans = 0;
+            let formula = "";
+            
+            const n1Str = n1 < 0 ? `(${n1})` : `${n1}`;
+            const n2Str = n2 < 0 ? `(${n2})` : `${n2}`;
+            const n3Str = n3 < 0 ? `(${n3})` : `${n3}`;
+
+            if (op === '×') {
+                ans = n1 * n2 + n3;
+                formula = `${n1Str} × ${n2Str} ＋ ${n3Str}`;
+            } else {
+                ans = n1 + n2 * n3;
+                formula = `${n1Str} ＋ ${n2Str} × ${n3Str}`;
+            }
+            return { q: formula, a: `＝ ${ans}` };
+        }
+
+        // 2. 文字式の計算（同類項をまとめる）
+        function makeLinearExpr() {
+            // 例: 3x - 5 - 7x + 2 = -4x - 3
+            const a1 = getRandomInt(-9, 9);
+            const b1 = getRandomInt(-9, 9);
+            const a2 = getRandomInt(-9, 9);
+            const b2 = getRandomInt(-9, 9);
+
+            const ansA = a1 + a2;
+            const ansB = b1 + b2;
+
+            const q = `${formatXTerm(a1, true)} ${formatTerm(b1)} ${formatXTerm(a2)} ${formatTerm(b2)}`;
+            const a = `＝ ${formatXTerm(ansA, true)} ${formatTerm(ansB)}`;
+            return { q: q, a: ansA === 0 && ansB === 0 ? "＝ 0" : a };
+        }
+
+        // 3. 1次方程式（前回のロジック）
+        function makeEquation() {
+            const pattern = getRandomInt(1, 4, false);
+            let x = getRandomInt(-9, 9);
+            let a = getRandomInt(-9, 9);
+            let b = getRandomInt(-15, 15);
+            let c = getRandomInt(-9, 9);
+            let d = getRandomInt(-15, 15);
+
+            if (a === 0) a = 2; if (c === 0) c = -2; if (a === c) c = a + 1;
+
+            let left = "", right = "";
+            switch(pattern) {
+                case 1: d = a * x + b; left = `${formatXTerm(a, true)} ${formatTerm(b)}`; right = `${d}`; break;
+                case 2: d = (a - c) * x; left = `${formatXTerm(a, true)}`; right = `${formatXTerm(c, true)} ${formatTerm(d)}`; break;
+                case 3: b = (c - a) * x; left = `${formatXTerm(a, true)} ${formatTerm(b)}`; right = `${formatXTerm(c, true)}`; break;
+                default: d = (a - c) * x + b; left = `${formatXTerm(a, true)} ${formatTerm(b)}`; right = `${formatXTerm(c, true)} ${formatTerm(d)}`; break;
+            }
+            return { q: `${left} ＝ ${right}`, a: `[ x ＝ ${x} ]` };
+        }
+
+        // 4. 展開（乗法公式）
+        function makeExpansion() {
+            // (x + a)(x + b) = x^2 + (a+b)x + ab
+            const a = getRandomInt(-9, 9);
+            let b = getRandomInt(-9, 9);
+            if (a === b && Math.random() > 0.5) b = getRandomInt(-9, 9); // なるべく(x+a)^2とばらす
+
+            const sum = a + b;
+            const prod = a * b;
+
+            const q = `(x ${formatTerm(a)})(x ${formatTerm(b)})`;
+            
+            let ansStr = `＝ x²`;
+            if (sum !== 0) ansStr += ` ${formatXTerm(sum)}`;
+            if (prod !== 0) ansStr += ` ${formatTerm(prod)}`;
+            
+            return { q: q, a: ansStr };
+        }
+
+        // 5. 因数分解
+        function makeFactorization() {
+            // x^2 + (a+b)x + ab -> (x + a)(x + b)
+            const a = getRandomInt(-9, 9);
+            const b = getRandomInt(-9, 9);
+            
+            const sum = a + b;
+            const prod = a * b;
+
+            let qStr = `x²`;
+            if (sum !== 0) qStr += ` ${formatXTerm(sum)}`;
+            if (prod !== 0) qStr += ` ${formatTerm(prod)}`;
+
+            const aStr = `＝ (x ${formatTerm(a)})(x ${formatTerm(b)})`;
+            return { q: qStr, a: aStr };
+        }
+
+        // ==========================================
+        // 全体制御・描画システム
+        // ==========================================
+        function generatePrint() {
+            const selector = document.getElementById('unit-selector');
+            const selectedUnit = selector.value;
+            const selectedText = selector.options[selector.selectedIndex].text;
+
+            // タイトルの書き換え
+            document.getElementById('title-q').innerText = selectedText + " テスト";
+            document.getElementById('title-a').innerText = "【解答】" + selectedText + " テスト";
+
             const questionBox = document.getElementById('question-box');
             const answerBox = document.getElementById('answer-box');
-            
-            // 表示をクリア
             questionBox.innerHTML = '';
             answerBox.innerHTML = '';
 
             const totalQuestions = 20;
 
             for (let i = 1; i <= totalQuestions; i++) {
-                // パターンをランダムに変えて飽きさせない（4パターン）
-                const pattern = getRandomInt(1, 4, false);
+                let data;
                 
-                let x = getRandomInt(-9, 9);       // 答え（整数）
-                let a = getRandomInt(-9, 9);       // 係数
-                let b = getRandomInt(-15, 15);     // 定数
-                let c = getRandomInt(-9, 9);       // パターン用係数2
-                let d = getRandomInt(-15, 15);     // パターン用定数2
+                // 選択された単元に応じて関数を呼び出す
+                if (selectedUnit === 'pos_neg') data = makePosNeg();
+                else if (selectedUnit === 'linear_expr') data = makeLinearExpr();
+                else if (selectedUnit === 'equation') data = makeEquation();
+                else if (selectedUnit === 'expansion') data = makeExpansion();
+                else if (selectedUnit === 'factorization') data = makeFactorization();
 
-                // 係数が0または1次方程式が成立しない条件を回避
-                if (a === 0) a = 2;
-                if (c === 0) c = -2;
-                if (a === c) c = a + 1; 
-
-                let leftSideText = "";
-                let rightSideText = "";
-
-                switch(pattern) {
-                    case 1:
-                        // パターン1: ax + b = d  (例: 2x + 3 = 11)
-                        // 右辺のdを逆算して決定
-                        d = a * x + b;
-                        leftSideText = `${formatXTerm(a, true)} ${formatTerm(b)}`;
-                        rightSideText = `${d}`;
-                        break;
-                    
-                    case 2:
-                        // パターン2: ax = cx + d (例: 5x = 2x + 9)
-                        d = (a - c) * x;
-                        leftSideText = `${formatXTerm(a, true)}`;
-                        rightSideText = `${formatXTerm(c, true)} ${formatTerm(d)}`;
-                        break;
-
-                    case 3:
-                        // パターン3: ax + b = cx (例: 3x - 8 = -x)
-                        b = (c - a) * x;
-                        leftSideText = `${formatXTerm(a, true)} ${formatTerm(b)}`;
-                        rightSideText = `${formatXTerm(c, true)}`;
-                        break;
-
-                    case 4:
-                    default:
-                        // パターン4: ax + b = cx + d (例: 4x - 3 = 2x + 7)
-                        d = (a - c) * x + b;
-                        leftSideText = `${formatXTerm(a, true)} ${formatTerm(b)}`;
-                        rightSideText = `${formatXTerm(c, true)} ${formatTerm(d)}`;
-                        break;
-                }
-
-                // 数式の文字列を合体
-                const formulaHtml = `${leftSideText} ＝ ${rightSideText}`;
-
-                // --- 1. 問題用紙用の要素作成 ---
+                // 問題要素の生成
                 const qItem = document.createElement('div');
                 qItem.className = 'quiz-item';
-                qItem.innerHTML = `
-                    <div class="quiz-num">(${i})</div>
-                    <div class="quiz-formula">${formulaHtml}</div>
-                `;
+                qItem.innerHTML = `<div class="quiz-num">(${i})</div><div class="quiz-formula">${data.q}</div>`;
                 questionBox.appendChild(qItem);
 
-                // --- 2. 解答用紙用の要素作成 ---
+                // 解答要素の生成
                 const aItem = document.createElement('div');
                 aItem.className = 'quiz-item';
-                aItem.innerHTML = `
-                    <div class="quiz-num">(${i})</div>
-                    <div class="quiz-formula">${formulaHtml}</div>
-                    <div class="answer-text">[ x ＝ ${x} ]</div>
-                `;
+                aItem.innerHTML = `<div class="quiz-num">(${i})</div><div class="quiz-formula">${data.q}</div><div class="answer-text">${data.a}</div>`;
                 answerBox.appendChild(aItem);
             }
         }
 
-        // ページを開いた瞬間に一回目の問題を自動生成する
-        window.onload = generateData;
+        // 初回読み込み
+        window.onload = generatePrint;
     </script>
 </body>
 </html>
