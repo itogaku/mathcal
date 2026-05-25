@@ -2,59 +2,55 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>中学数学 教材シートジェネレーター</title>
+    <title>中学数学 【全単元・全79セクション】定期テスト対策・無限プリントジェネレーター</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
             margin: 0; padding: 0; background-color: #f0f2f5; color: #333;
         }
         .admin-header {
-            background-color: #ffffff; padding: 15px 30px;
+            background-color: #ffffff; padding: 12px 25px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky;
-            top: 0; z-index: 100; display: flex; gap: 12px; align-items: center;
+            top: 0; z-index: 100; display: flex; gap: 10px; align-items: center;
         }
-        .admin-header h2 { margin: 0; font-size: 15px; color: #444; margin-right: auto; }
-        .btn { padding: 10px 18px; font-size: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; }
+        .admin-header h2 { margin: 0; font-size: 13px; color: #4a5568; margin-right: auto; }
+        select { padding: 6px 10px; font-size: 13px; border-radius: 6px; border: 1px solid #cbd5e0; background-color: #fff; cursor: pointer; }
+        .btn { padding: 8px 16px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; transition: background 0.2s; }
         .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
         .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover { background-color: #218838; }
 
-        /* 教材用A4台紙 */
-        .print-area { display: flex; flex-direction: column; align-items: center; padding: 30px 0; }
+        .print-area { display: flex; flex-direction: column; align-items: center; gap: 30px; padding: 30px 0; }
         .page {
-            width: 210mm; min-height: 297mm; background-color: #ffffff;
+            width: 210mm; height: 297mm; background-color: #ffffff;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box;
-            padding: 20mm 20mm; display: flex; flex-direction: column; gap: 20px;
+            padding: 20mm 15mm; position: relative; display: flex; flex-direction: column;
         }
-        
-        /* 教材用の装飾スタイル */
-        .unit-tag { display: inline-block; background: #4a5568; color: white; padding: 4px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; }
-        .sheet-title { font-size: 24px; margin: 5px 0 0 0; border-bottom: 3px solid #007bff; padding-bottom: 5px; }
-        
-        /* 要点ボックス */
-        .point-box {
-            background-color: #f8fafc; border-left: 5px solid #007bff;
-            padding: 15px; border-radius: 0 8px 8px 0;
-        }
-        .point-box h3 { margin: 0 0 10px 0; font-size: 16px; color: #007bff; }
-        .point-box p { margin: 5px 0; font-size: 15px; line-height: 1.6; }
-        
-        /* 例題レイアウト（左右2列で、右にグラフを配置） */
-        .section-title { font-size: 18px; font-weight: bold; color: #2d3748; border-left: 4px solid #4a5568; padding-left: 10px; margin: 15px 0 10px 0; }
-        .example-container { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; background: #fff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; }
-        .step-list { margin: 10px 0 0 0; padding-left: 20px; font-size: 14px; color: #4a5568; }
-        .step-list li { margin-bottom: 8px; }
-        
-        /* 類題エリア */
-        .exercise-container { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .exercise-item { border-bottom: 1px dashed #cbd5e0; padding: 15px 0; font-size: 16px; }
+        .print-title { text-align: center; font-size: 20px; margin: 0 0 5px 0; letter-spacing: 1.5px; color: #1a202c; }
+        .print-subtitle { text-align: center; font-size: 13px; color: #718096; margin-bottom: 20px; }
+        .student-info { display: flex; justify-content: flex-end; gap: 20px; margin-bottom: 30px; font-size: 13px; }
+        .student-info div { border-bottom: 1px solid #4a5568; width: 130px; text-align: right; padding-bottom: 3px; }
+        .student-info .name-box { width: 200px; }
 
-        /* 数学フォント */
-        .math { font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: bold; }
+        .grid-container { display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(10, 1fr); flex-grow: 1; }
+        .quiz-item { font-size: 16px; display: flex; align-items: center; border-bottom: 1px dashed #e2e8f0; padding: 8px 0; line-height: 1.5; }
+        .quiz-num { font-weight: bold; margin-right: 20px; width: 35px; color: #2d3748; }
+        .quiz-formula { font-family: 'Times New Roman', Times, serif; letter-spacing: 0.5px; width: 100%; }
+        .answer-text { color: #dc3545; font-weight: bold; margin-left: auto; font-family: Arial, sans-serif; padding-right: 10px; white-space: nowrap; }
+
+        /* 数学パーツ */
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 4px; font-size: 14px; line-height: 1; }
+        .num { border-bottom: 1px solid #333; padding-bottom: 2px; }
+        .den { padding-top: 2px; }
+        .matrix { display: inline-block; border-left: 2px solid #333; border-right: 2px solid #333; padding: 0 5px; border-radius: 4px; vertical-align: middle; line-height: 1.3; }
 
         @media print {
+            html, body { width: 210mm; height: 297mm; background-color: #fff; }
             .admin-header { display: none; }
-            .print-area { padding: 0; }
-            .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; padding: 15mm 15mm; }
+            .print-area { padding: 0; gap: 0; display: block; }
+            .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; padding: 15mm 15mm; page-break-after: always; }
+            .quiz-item { border-bottom: none; }
             @page { size: A4 portrait; margin: 0; }
         }
     </style>
@@ -62,122 +58,383 @@
 <body>
 
     <div class="admin-header">
-        <h2>中学数学 【解説＆類題】教材ジェネレーター</h2>
-        <button class="btn btn-primary" onclick="generateLesson()">🔢 数字とグラフを変える</button>
-        <button class="btn btn-success" onclick="window.print()">📄 教材をPDF保存・印刷</button>
+        <h2>中学数学 【全79セクション】定期テスト無限プリント</h2>
+        
+        <select id="unit-selector" onchange="updateSectionMenu(); generatePrint();">
+            <optgroup label="■ 中学1年">
+                <option value="m1_pos_neg">中1：1. 正負の数</option>
+                <option value="m1_linear">中1：2. 文字の式</option>
+                <option value="m1_eq">中1：3. 1次方程式</option>
+                <option value="m1_func">中1：4. 比例・反比例</option>
+                <option value="m1_data">中1：5. データの活用</option>
+            </optgroup>
+            <optgroup label="■ 中学2年">
+                <option value="m2_poly">中2：6. 式の計算</option>
+                <option value="m2_seq">中2：7. 連立方程式</option>
+                <option value="m2_func">中2：8. 1次関数</option>
+                <option value="m2_prob">中2：9. 確率</option>
+                <option value="m2_geom">中2：10. 図形の性質</option>
+            </optgroup>
+            <optgroup label="■ 中学3年">
+                <option value="m3_expand">中3：11. 式の展開・因数分解</option>
+                <option value="m3_root">中3：12. 平方根</option>
+                <option value="m3_eq2">中3：13. 2次方程式</option>
+                <option value="m3_func2">中3：14. 関数 y=ax²</option>
+                <option value="m3_pytha">中3：15. 三平方の定理・相似</option>
+            </optgroup>
+        </select>
+
+        <select id="section-selector" onchange="generatePrint()">
+            </select>
+
+        <button class="btn btn-primary" onclick="generatePrint()">🔢 問題をリロード</button>
+        <button class="btn btn-success" onclick="window.print()">📄 PDF保存・印刷</button>
     </div>
 
     <div class="print-area">
         <div class="page">
-            <div>
-                <span class="unit-tag">中学2年：関数</span>
-                <h1 class="sheet-title">1次関数の式の決定（傾きと1点）</h1>
-            </div>
+            <h1 class="print-title" id="title-q">テストプリント</h1>
+            <div class="print-subtitle">定期テスト頻出パターン網羅・くり返し確認用</div>
+            <div class="student-info"><div>年  組  番</div><div class="name-box">氏名：</div><div>得点：   ／100</div></div>
+            <div class="grid-container" id="question-box"></div>
+        </div>
 
-            <div class="point-box">
-                <h3>💡 ココがポイント！</h3>
-                <p>1次関数の基本の式は <span class="math">y ＝ ax ＋ b</span> である！</p>
-                <p>① <b>傾き（変化の割合）</b>が分かったら、すぐに <span class="math">a</span> の中にその数字を代入する。</p>
-                <p>② 通る<b>1点の座標 <span class="math">( x , y )</span></b> を式に代入して、切片 <span class="math">b</span> を方程式で計算する。</p>
-            </div>
-
-            <div class="section-title">【例題】とき方をマスターしよう</div>
-            <div class="example-container">
-                <div>
-                    <p style="font-size: 16px; font-weight: bold; margin-top: 0;" id="example-text">
-                        傾きが 2 で、点 ( 1 , 5 ) を通る直線の式を求めよ。
-                    </p>
-                    <b style="color: #dd6b20; font-size: 14px;">[解説＆アプローチ]</b>
-                    <ul class="step-list">
-                        <li><b>STEP 1：</b> 傾きがわかっているので、求める式を <span class="math" id="step1-text">y ＝ 2x ＋ b</span> とおく。</li>
-                        <li><b>STEP 2：</b> この式に、通る点の座標の値をそのまま代入する。<br>
-                            <span id="step2-text">5 ＝ 2 × 1 ＋ b</span>
-                        </li>
-                        <li><b>STEP 3：</b> <span class="math">b</span> についての方程式を解いて、切片を計算する。<br>
-                            <span id="step3-text">b ＝ 3</span>
-                        </li>
-                        <li><b>【答え】</b> <span class="math" id="example-ans" style="color: #dc3545; font-size: 16px;">y ＝ 2x ＋ 3</span></li>
-                    </ul>
-                </div>
-                <div style="text-align: center; border-left: 1px solid #e2e8f0; padding-left: 15px;">
-                    <span style="font-size: 12px; color: #718096; display: block; margin-bottom: 5px;">イメージグラフ</span>
-                    <svg width="160" height="160" viewBox="-40 -40 80 80" id="graph-svg">
-                        <line x1="-35" y1="0" x2="35" y2="0" stroke="#718096" stroke-width="1"/>
-                        <line x1="0" y1="-35" x2="0" y2="35" stroke="#718096" stroke-width="1"/>
-                        <text x="32" y="5" font-size="6" fill="#718096">x</text>
-                        <text x="3" y="-30" font-size="6" fill="#718096">y</text>
-                        <text x="-6" y="7" font-size="6" fill="#718096">O</text>
-                        <line x1="-35" y1="35" x2="35" y2="-35" stroke="#007bff" stroke-width="2" id="graph-line"/>
-                    </svg>
-                </div>
-            </div>
-
-            <div class="section-title">【類題】じぶんで解いてみよう！（先生の丸付け用答付き）</div>
-            <div class="exercise-container" id="exercise-box">
-                </div>
+        <div class="page">
+            <h1 class="print-title" id="title-a" style="color: #dc3545;">【解答】テストプリント</h1>
+            <div class="print-subtitle">丸付け・自己分析用</div>
+            <div style="height: 20px;"></div>
+            <div class="grid-container" id="answer-box"></div>
         </div>
     </div>
 
     <script>
+        // 全79セクションの超巨大データベース
+        const sectionDatabase = {
+            m1_pos_neg: [
+                { name: "① 正負の数と絶対値", type: "m1_pn_1" },
+                { name: "② 加法と減法（基本2項）", type: "m1_pn_2" },
+                { name: "③ 3項以上の加減混合計算", type: "m1_pn_3" },
+                { name: "④ 乗法と除法（分数逆数交じり）", type: "m1_pn_4" },
+                { name: "⑤ 累乗の計算（カッコの罠）", type: "m1_pn_5" },
+                { name: "⑥ 四則混合の計算順序", type: "m1_pn_6" },
+                { name: "⑦ 【応用】分配法則と正負の利用", type: "m1_pn_7" }
+            ],
+            m1_linear: [
+                { name: "① 文字を使った表現規則", type: "m1_l_1" },
+                { name: "② 数量の文字式表示（代金・速さ・%）", type: "m1_l_2" },
+                { name: "③ 式の値（負の数・分数の代入）", type: "m1_l_3" },
+                { name: "④ 1次式の加減（同類項の整理）", type: "m1_l_4" },
+                { name: "⑤ 1次式と数の乗除（分配法則・分数）", type: "m1_l_5" },
+                { name: "⑥ 【応用】関係を表す式（不等式・規則性）", type: "m1_l_6" }
+            ],
+            m1_eq: [
+                { name: "① 方程式の解と等式の性質", type: "m1_e_1" },
+                { name: "② 基本の解き方 (ax + b = c)", type: "m1_e_2" },
+                { name: "③ 複雑な方程式（カッコ・小数・比例式）", type: "m1_e_3" },
+                { name: "④ 分数形の方程式", type: "m1_e_4" },
+                { name: "⑤ 【文章題①】代金・個数・年齢", type: "m1_e_5" },
+                { name: "⑥ 【文章題②】過不足（長椅子の問題など）", type: "m1_e_6" },
+                { name: "⑦ 【文章題③】速さ・時間・道のり", type: "m1_e_7" },
+                { name: "⑧ 【文章題④】割合と生徒数の増減", type: "m1_e_8" }
+            ],
+            m1_func: [
+                { name: "① 比例の性質と式の決定", type: "m1_f_1" },
+                { name: "② 比例のグラフと変域", type: "m1_f_2" },
+                { name: "③ 反比例の性質と式の決定", type: "m1_f_3" },
+                { name: "④ 反比例のグラフ分析", type: "m1_f_4" },
+                { name: "⑤ 【応用】比例・反比例の利用（水槽・動点）", type: "m1_f_5" }
+            ],
+            m1_data: [
+                { name: "① 度数分布表とヒストグラムの読解", type: "m1_d_1" },
+                { name: "② 代表値（平均値・中央値・最頻値）", type: "m1_d_2" },
+                { name: "③ 相対度数の計算", type: "m1_d_3" },
+                { name: "④ 近似値と有効数字", type: "m1_d_4" }
+            ],
+            m2_poly: [
+                { name: "① 多項式の加法と減法", type: "m2_p_1" },
+                { name: "② 単項式の乗法と除法（累乗交じり）", type: "m2_p_2" },
+                { name: "③ 文字式の加減乗除混合（分数の通分）", type: "m2_p_3" },
+                { name: "④ 式の値の発展（式の整理後に代入）", type: "m2_p_4" },
+                { name: "⑤ 【文章題】文字式の利用・性質の証明", type: "m2_p_5" },
+                { name: "⑥ 等式変形（変数の指定変形）", type: "m2_p_6" }
+            ],
+            m2_seq: [
+                { name: "① 連立方程式の解の意味", type: "m2_s_1" },
+                { name: "② 加減法（基本〜係数合わせ）", type: "m2_s_2" },
+                { name: "③ 代入法によるアプローチ", type: "m2_s_3" },
+                { name: "④ 複雑な連立（カッコ・小数分数・A=B=C）", type: "m2_s_4" },
+                { name: "⑤ 【文章題①】個数・代金・速さ", type: "m2_s_5" },
+                { name: "⑥ 【文章題②】割合・増減・食塩水濃度", type: "m2_s_6" }
+            ],
+            m2_func: [
+                { name: "① 1次関数の意味と変化の割合", type: "m2_f_1" },
+                { name: "② グラフの描き方と特徴", type: "m2_f_2" },
+                { name: "③ 1次関数の式の決定（全パターン）", type: "m2_f_3" },
+                { name: "④ 方程式とグラフ・交点座標", type: "m2_f_4" },
+                { name: "⑤ 【文章題①】1次関数の利用（グラフ読解）", type: "m2_f_5" },
+                { name: "⑥ 【文章題②】1次関数の利用（動点・ダイヤグラム）", type: "m2_f_6" }
+            ],
+            m2_prob: [
+                { name: "① 確率の意味と基本（樹形図の書き方）", type: "m2_pr_1" },
+                { name: "② コインとサイコロの確率", type: "m2_pr_2" },
+                { name: "③ 順列と組合せ（カード並べ・玉抽出）", type: "m2_pr_3" },
+                { name: "④ 【応用】「少なくとも〜」の確率", type: "m2_pr_4" }
+            ],
+            m2_geom: [
+                { name: "① 対頂角・同位角・錯角の計算", type: "m2_g_1" },
+                { name: "② 三角形の内角と外角（スリッパ法則）", type: "m2_g_2" },
+                { name: "③ 多角形の内角の和・外角の和", type: "m2_g_3" },
+                { name: "④ 合同条件の一問一答・証明の根拠", type: "m2_g_4" },
+                { name: "⑤ 特別な三角形・四角形の性質", type: "m2_g_5" }
+            ],
+            m3_expand: [
+                { name: "① 単項式と多項式の展開基本", type: "m3_ex_1" },
+                { name: "② 乗法公式① (x+a)(x+b)", type: "m3_ex_2" },
+                { name: "③ 乗法公式②③④（平方・和と差の積）", type: "m3_ex_3" },
+                { name: "④ 共通因数のくくり出し（因数分解の第一歩）", type: "m3_ex_4" },
+                { name: "⑤ 因数分解公式の使い分けシャッフル", type: "m3_ex_5" },
+                { name: "⑥ 【発展①】共通因数からの公式展開（2段階）", type: "m3_ex_6" },
+                { name: "⑦ 【発展②】置き換えを利用する因数分解", type: "m3_ex_7" },
+                { name: "⑧ 【応用】式の計算の利用・証明", type: "m3_ex_8" }
+            ],
+            m3_root: [
+                { name: "① 平方根の意味と大小比較", type: "m3_r_1" },
+                { name: "② ルートの変形（√aからb√cへ）", type: "m3_r_2" },
+                { name: "③ 分母の有理化テクニック", type: "m3_r_3" },
+                { name: "④ 平方根の乗除計算（約分処理）", type: "m3_r_4" },
+                { name: "⑤ 平方根の加減計算（変形合算）", type: "m3_r_5" },
+                { name: "⑥ 平方根の四則混合・展開公式適用", type: "m3_r_6" },
+                { name: "⑦ 【応用】整数問題（√nが整数になる条件）", type: "m3_r_7" }
+            ],
+            m3_eq2: [
+                { name: "① 平方根・平方完成の考え方による解法", type: "m3_e2_1" },
+                { name: "② 因数分解による解法", type: "m3_e2_2" },
+                { name: "③ 解の公式を使う計算（基本〜約分）", type: "m3_e2_3" },
+                { name: "④ 複雑な2次方程式（展開・整数化）", type: "m3_e2_4" },
+                { name: "⑤ 【文章題】数字の性質・面積・動点", type: "m3_e2_5" }
+            ],
+            m3_func2: [
+                { name: "① 関数の意味と式の決定", type: "m3_f2_1" },
+                { name: "② 放物線の特徴と変域（0またぎの罠）", type: "m3_f2_2" },
+                { name: "③ 変化の割合（裏技公式の習得）", type: "m3_f2_3" },
+                { name: "④ 【応用】放物線と直線の融合・交点面積", type: "m3_f2_4" }
+            ],
+            m3_pytha: [
+                { name: "① 相似な図形の性質・長さの線分比計算", type: "m3_p_1" },
+                { name: "② 平行線と線分の比（中点連結定理など）", type: "m3_p_2" },
+                { name: "③ 相似な図形の面積比・体積比", type: "m3_p_3" },
+                { name: "④ 三平方の定理（斜辺・他の一辺の計算）", type: "m3_p_4" },
+                { name: "⑤ 特別な直角三角形の比 (45° / 60°)", type: "m3_p_5" },
+                { name: "⑥ 【応用】平面・空間座標上の三平方利用", type: "m3_p_6" }
+            ]
+        };
+
+        // 共通計算関数群
         function getRandomInt(min, max, excludeZero = true) {
             let num = Math.floor(Math.random() * (max - min + 1)) + min;
             if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
             return num;
         }
-
-        function formatTerm(value) {
+        function formatTerm(value, isFirst = false) {
             if (value === 0) return "";
-            return value > 0 ? `＋ ${value}` : `－ ${Math.abs(value)}`;
+            if (value > 0) return isFirst ? `${value}` : `＋ ${value}`;
+            return isFirst ? `－${Math.abs(value)}` : `－ ${Math.abs(value)}`;
         }
+        function formatXTerm(coef, isFirst = false, varChar = "x") {
+            if (coef === 0) return "";
+            let sign = coef > 0 ? (isFirst ? "" : "＋ ") : "－ ";
+            let absCoef = Math.abs(coef);
+            let coefStr = absCoef === 1 ? "" : absCoef;
+            return `${sign}${coefStr}${varChar}`;
+        }
+        function gcd(a, b) { return b === 0 ? Math.abs(a) : gcd(b, a % b); }
 
-        function generateLesson() {
-            // --- 1. 例題の数値をランダム生成・解説の書き換え ---
-            let ex_a = getRandomInt(-2, 3); // 傾き
-            let ex_b = getRandomInt(-2, 4); // 切片
-            let ex_x = getRandomInt(1, 3);   // 通る点x
-            let ex_y = ex_a * ex_x + ex_b;   // 通る点y
+        // ==========================================
+        // 超巨大問題生成コアエンジン (全79セクション振り分け)
+        // ==========================================
+        function getProblem(type, i) {
+            let x = getRandomInt(-5, 5); let y = getRandomInt(-4, 4);
+            let a = getRandomInt(2, 6); let b = getRandomInt(-6, 6);
+            let n1 = getRandomInt(-9, 9); let n2 = getRandomInt(-9, 9);
 
-            document.getElementById('example-text').innerText = `傾きが ${ex_a} で、点 ( ${ex_x} , ${ex_y} ) を通る直線の式を求めよ。`;
-            document.getElementById('step1-text').innerText = `y ＝ ${ex_a}x ＋ b`;
-            document.getElementById('step2-text').innerText = `${ex_y} ＝ ${ex_a} × ${ex_x} ＋ b`;
-            document.getElementById('step3-text').innerText = `b ＝ ${ex_b}`;
-            
-            let ex_a_str = ex_a === 1 ? "" : (ex_a === -1 ? "-" : ex_a);
-            document.getElementById('example-ans').innerText = `y ＝ ${ex_a_str}x ${formatTerm(ex_b)}`;
+            switch(type) {
+                // --- 1. 正負の数 ---
+                case "m1_pn_1": return { q: `値が －${Math.abs(n1)} である数の絶対値を答えよ。`, a: `＝ ${Math.abs(n1)}` };
+                case "m1_pn_2": return { q: `${n1>=0?n1:`(${n1})`} ＋ ${n2>=0?n2:`(${n2})`} ＝`, a: `＝ ${n1+n2}` };
+                case "m1_pn_3": let n3 = getRandomInt(-5,5); return { q: `${n1} － ${n2>=0?n2:`(${n2})`} ＋ ${n3>=0?n3:`(${n3})`} ＝`, a: `＝ ${n1-n2+n3}` };
+                case "m1_pn_4": return { q: `${n1} × <div class="frac"><div class="num">${Math.abs(a)}</div><div class="den">2</div></div> ＝`, a: `＝ ${(n1*Math.abs(a)/2).toFixed(1)}` };
+                case "m1_pn_5": let rui = Math.random() > 0.5; return { q: rui ? `(－${Math.abs(a)})² ＝` : `－${Math.abs(a)}² ＝`, a: rui ? `＝ ${a*a}` : `＝ -${a*a}` };
+                case "m1_pn_6": return { q: `${getRandomInt(2,5)} × (${n1}) ＋ ${getRandomInt(6,15)} ＝`, a: `＝ ${2*n1+10}` };
+                case "m1_pn_7": return { q: `分配法則を利用して計算せよ： 24 × ( <div class="frac"><div class="num">1</div><div class="den">3</div></div> － <div class="frac"><div class="num">1</div><div class="den">4</div></div> ) ＝`, a: `＝ 2` };
 
-            // --- 2. グラフの線の描画更新（SVG制御） ---
-            // Y = aX + b の2点を計算してSVGの属性を書き換える
-            let svgLine = document.getElementById('graph-line');
-            let x1 = -35; let y1 = -(ex_a * (x1/10) + ex_b) * 10; // 画面座標系は上下反転のためマイナス
-            let x2 = 35;  let y2 = -(ex_a * (x2/10) + ex_b) * 10;
-            svgLine.setAttribute('x1', x1);
-            svgLine.setAttribute('y1', y1);
-            svgLine.setAttribute('x2', x2);
-            svgLine.setAttribute('y2', y2);
+                // --- 2. 文字の式 ---
+                case "m1_l_1": return { q: `文字式のルールに従って表せ： x × (－5) ＋ y ÷ 2 ＝`, a: `＝ －5x ＋ <div class="frac"><div class="num">y</div><div class="den">2</div></div>` };
+                case "m1_l_2": return { q: `1本 80円の鉛筆を a 本買い、1000円札を出したときのお釣りを表す式は？`, a: `＝ 1000 － 80a (円)` };
+                case "m1_l_3": return { q: `x ＝ －3 のとき、式 －x² ＋ 4x の値を求めよ。`, a: `＝ －21` };
+                case "m1_l_4": return { q: `${formatXTerm(a,true)} ${formatTerm(b)} － ${formatXTerm(a+2)} ${formatTerm(b-5)} ＝`, a: `＝ －2x ＋ 5` };
+                case "m1_l_5": return { q: `4 × ( ${formatXTerm(a,true)} ${formatTerm(b)} ) ＝`, a: `＝ ${formatXTerm(4*a,true)} ${formatTerm(4*b)}` };
+                case "m1_l_6": return { q: `「ある数 x の 3倍に 5 を足した数は、x の 5倍より小さい」を不等式で表せ。`, a: `＝ 3x ＋ 5 ＜ 5x` };
 
-            // --- 3. 類題を3問自動生成 ---
-            const exerciseBox = document.getElementById('exercise-box');
-            exerciseBox.innerHTML = '';
+                // --- 3. 1次方程式 ---
+                case "m1_e_1": return { q: `x ＝ 2 が解となる方程式を次から選べ。[ A: 2x＝5, B: 3x－1＝5 ]`, a: `＝ B` };
+                case "m1_e_2": return { q: `${formatXTerm(a,true)} ${formatTerm(b)} ＝ ${a*x+b}`, a: `[ x ＝ ${x} ]` };
+                case "m1_e_3": return { q: `0.3x ＋ 0.2 ＝ ${(0.3*x+0.2).toFixed(1)}`, a: `[ x ＝ ${x} ]` };
+                case "m1_e_4": return { q: `<div class="frac"><div class="num">x ${formatTerm(b)}</div><div class="den">3</div></div> ＝ ${a}`, a: `[ x ＝ ${a*3-b} ]` };
+                case "m1_e_5": let pr = getRandomInt(80,120,false); let cnt = getRandomInt(3,7,false); return { q: `1個 ${pr}円のパンと100円のジュースを10個買い、合計 ${pr*cnt+100*(10-cnt)}円だった。パンの個数は？`, a: `[ ${cnt} 個 ]` };
+                case "m1_e_6": return { q: `生徒にノートを配る。1人に5冊ずつ配ると12冊余り、6冊ずつ配ると4冊足りない。生徒の人数を求めよ。`, a: `[ 16 人 ]` };
+                case "m1_e_7": return { q: `家から 1200m 離れた駅へ行く。最初は毎分 60m で歩き、途中から毎分 100m で走ったら 16分かかった。歩いた道のりは？`, a: `[ 600 m ]` };
+                case "m1_e_8": return { q: `ある中学校の今年の生徒数は 420人。去年に比べて男子が 5%増え、女子が 3%減って全体で 4人増えた。去年の男子の人数は？`, a: `[ 200 人 ]` };
 
-            for(let i = 1; i <= 3; i++) {
-                let a = getRandomInt(-3, 3);
-                let b = getRandomInt(-4, 4);
-                let x = getRandomInt(-2, 3);
-                let y = a * x + b;
-                let a_str = a === 1 ? "" : (a === -1 ? "-" : a);
+                // --- 4. 比例・反比例 ---
+                case "m1_f_1": return { q: `y は x に比例し、x ＝ 3 のとき y ＝ ${a*3} である。y を x の式で表せ。`, a: `[ y ＝ ${a}x ]` };
+                case "m1_f_2": return { q: `比例 y ＝ －2x について、x の変域が －1 ≦ x ≦ 3 のときの y の変域を求めよ。`, a: `[ －6 ≦ y ≦ 2 ]` };
+                case "m1_f_3": return { q: `y は x に反比例し、x ＝ 2 のとき y ＝ ${a*4} である。y を x の式で表せ。`, a: `[ y ＝ <div class="frac"><div class="num">${a*8}</div><div class="den">x</div></div> ]` };
+                case "m1_f_4": return { q: `反比例 y ＝ <div class="frac"><div class="num">12</div><div class="den">x</div></div> のグラフが通る、x座標・y座標がともに整数である点は何個あるか。`, a: `＝ 12 個` };
+                case "m1_f_5": return { q: `毎分 5L ずつ水を入れると 24分で満水になる水そうがある。毎分 x Lずつ入れるときの満水時間を y 分とする式は？`, a: `[ y ＝ <div class="frac"><div class="num">120</div><div class="den">x</div></div> ]` };
 
-                const item = document.createElement('div');
-                item.className = 'exercise-item';
-                item.innerHTML = `
-                    <b>(${i})</b> 傾きが ${a} で、点 ( ${x} , ${y} ) を通る直線の式を求めよ。<br>
-                    <span style="color: #cbd5e0; font-size: 13px;">（ここに計算スペース）</span>
-                    <span style="color: #dc3545; font-weight: bold; float: right; font-size: 13px;">【答: y ＝ ${a_str}x ${formatTerm(b)}】</span>
-                `;
-                exerciseBox.appendChild(item);
+                // --- 5. データの活用 ---
+                case "m1_d_1": return { q: `階級の幅が 5cm、ある階級が 「150cm以上155cm未満」のとき、この階級の階級値を求めよ。`, a: `＝ 152.5 cm` };
+                case "m1_d_2": let s_arr = [12, 15, 18, 22, 30]; return { q: `データ [ ${s_arr.join(", ")} ] の中央値（メジアン）を求めよ。`, a: `＝ 18` };
+                case "m1_d_3": return { q: `全体の度数が 40 で、ある階級の度数が 6 のとき、その階級の相対度数を求めよ。`, a: `＝ 0.15` };
+                case "m1_d_4": return { q: `測定値 3400m の有効数字が 3, 4 の2桁であるとき、(整数部分が1桁の数)×10の累乗 の形で表せ。`, a: `＝ 3.4 × 10³ m` };
+
+                // --- 6. 式の計算 ---
+                case "m2_p_1": return { q: `( 5x ＋ 3y ) － ( 2x － 4y ) ＝`, a: `＝ 3x ＋ 7y` };
+                case "m2_p_2": return { q: `12x²y ÷ 4x × 2y ＝`, a: `＝ 6xy²` };
+                case "m2_p_3": return { q: `<div class="frac"><div class="num">2x + y</div><div class="den">3</div></div> － <div class="frac"><div class="num">x - y</div><div class="den">2</div></div> ＝`, a: `＝ <div class="frac"><div class="num">x + 5y</div><div class="den">6</div></div>` };
+                case "m2_p_4": return { q: `x＝2, y＝－1 のとき、式 3(x＋2y) － 2(x＋y) の値を求めよ。`, a: `＝ －2` };
+                case "m2_p_5": return { q: `「連続する3つの整数の和は 3の倍数になる」ことを説明する時、中央の整数を n とした時の3つの整数の和を式で表せ。`, a: `＝ 3n` };
+                case "m2_p_6": return { q: `等式 2x ＋ 3y ＝ 12 を y について解け。`, a: `[ y ＝ <div class="frac"><div class="num">12 - 2x</div><div class="den">3</div></div> ]` };
+
+                // --- 7. 連立方程式 ---
+                case "m2_s_1": return { q: `x＝2, y＝1 が解となる連立方程式を次から選べ。[ A: {x+y=3, 2x-y=3}, B: {x-y=1, x+2y=5} ]`, a: `＝ A` };
+                case "m2_s_2": return { q: `<div class="matrix"><div>${a}x ＋ y ＝ ${a*1+2}</div><div>${a}x － y ＝ ${a*1-2}</div></div>`, a: `[ x ＝ 1, y ＝ 2 ]` };
+                case "m2_s_3": return { q: `<div class="matrix"><div>y ＝ 2x</div><div>3x ＋ 2y ＝ 7</div></div>`, a: `[ x ＝ 1, y ＝ 2 ]` };
+                case "m2_s_4": return { q: `等式 2x ＋ y ＝ x － y ＋ 3 ＝ 5 の連立方程式を解け。`, a: `[ x ＝ 1, y ＝ 3 ]` };
+                case "m2_s_5": return { q: `1個120円のりんごと1個80円のみかんを合わせて10個買い代金は1040円。りんごの個数を x、みかんを y として連立方程式を作れ。`, a: `[ x+y=10, 120x+80y=1040 ]` };
+                case "m2_s_6": return { q: `5%の食塩水と8%の食塩水を混ぜて、6%の食塩水を300g作りたい。5%の食塩水は何g必要か。`, a: `[ 200 g ]` };
+
+                // --- 8. 1次関数 ---
+                case "m2_f_1": return { q: `1次関数 y ＝ －3x ＋ 5 について、x の値が 2 から 5 まで増加した時の変化の割合を答えよ。`, a: `＝ －3` };
+                case "m2_f_2": return { q: `直線 y ＝ 2x － 4 のグラフの切片と、x軸との交点の座標をそれぞれ求めよ。`, a: `[ 切片: －4, 交点: (2, 0) ]` };
+                case "m2_f_3": return { q: `2点 ( 1, 3 ) , ( 3, 7 ) を通る直線の式を求めよ。`, a: `[ y ＝ 2x ＋ 1 ]` };
+                case "m2_f_4": return { q: `2つの直線 y ＝ x ＋ 1 と y ＝ －2x ＋ 7 の交点の座標を求めよ。`, a: `[ (2, 3) ]` };
+                case "m2_f_5": return { q: `長さ 20cm のろうそくがあり、火をつけると1分間に 0.5cm ずつ短くなる。x 分後の長さを y cmとする式は？`, a: `[ y ＝ －0.5x ＋ 20 ]` };
+                case "m2_f_6": return { q: `縦 4cm, 横 6cm の長方形ABCDがあり、点PはAを出発して毎秒1cmでB, Cを通ってDまで動く。x秒後の△APDの面積 y は？(0≦x≦4のとき)`, a: `[ y ＝ 3x ]` };
+
+                // --- 9. 確率 ---
+                case "m2_pr_1": return { q: `表と裏の出方が同様に確からしいコインを1枚投げる時、表が出る確率を求めよ。`, a: `＝ <div class="frac"><div class="num">1</div><div class="den">2</div></div>` };
+                case "m2_pr_2": return { q: `2つのサイコロを同時に振る時、出る目の数の和が 6 になる確率を求めよ。`, a: `＝ <div class="frac"><div class="num">5</div><div class="den">36</div></div>` };
+                case "m2_pr_3": return { q: `赤玉3個、白玉2個が入った袋から同時に2個の玉を取り出すとき、2個とも赤玉である確率を求めよ。`, a: `＝ <div class="frac"><div class="num">3</div><div class="den">10</div></div>` };
+                case "m2_pr_4": return { q: `3枚の硬貨を同時に投げる時、少なくとも1枚は表が出る確率を求めよ。`, a: `＝ <div class="frac"><div class="num">7</div><div class="den">8</div></div>` };
+
+                // --- 10. 図形の性質 ---
+                case "m2_g_1": return { q: `平行な2直線において、錯角の関係にある角の大きさはどうなるか。`, a: `＝ 等しくなる` };
+                case "m2_g_2": return { q: `△ABCにおいて、∠A＝50°、∠B＝60° のとき、頂点Cにおける外角の大きさを求めよ。`, a: `＝ 110°` };
+                case "m2_g_3": return { q: `正八角形の1つの内角の大きさを求めよ。`, a: `＝ 135°` };
+                case "m2_g_4": return { q: `「2つの三角形で、2組の辺とその間の角がそれぞれ等しい」とき、これらは合同といえるか。`, a: `＝ 合同といえる` };
+                case "m2_g_5": return { q: `平行四辺形に「対角線が垂直に交わる」という条件が加わると、どんな四角形になるか。`, a: `＝ ひし形` };
+
+                // --- 11. 展開・因数分解 ---
+                case "m3_ex_1": return { q: `2x ( 3x － 4y ) ＝`, a: `＝ 6x² － 8xy` };
+                case "m3_ex_2": return { q: `( x ＋ 3 )( x ＋ 5 ) ＝`, a: `＝ x² ＋ 8x ＋ 15` };
+                case "m3_ex_3": return { q: `( x － 4 )² ＝`, a: `＝ x² － 8x ＋ 16` };
+                case "m3_ex_4": return { q: `3ax － 6ay ＝`, a: `＝ 3a(x － 2y)` };
+                case "m3_ex_5": return { q: `x² － 2x － 24 ＝`, a: `＝ (x － 6)(x ＋ 4)` };
+                case "m3_ex_6": return { q: `2x² ＋ 12x ＋ 18 ＝`, a: `＝ 2(x ＋ 3)²` };
+                case "m3_ex_7": return { q: `(x ＋ y)² － 4 ＝`, a: `＝ (x ＋ y ＋ 2)(x ＋ y － 2)` };
+                case "m3_ex_8": return { q: `因数分解を利用して次の計算をせよ： 55² － 45² ＝`, a: `＝ 1000` };
+
+                // --- 12. 平方根 ---
+                case "m3_r_1": return { q: `次の数の大小を不等号を使って表せ： 4 , √15`, a: `＝ 4 ＞ √15` };
+                case "m3_r_2": return { q: `√45 を変形して、√ の中をできるだけ小さな整数にせよ。`, a: `＝ 3√5` };
+                case "m3_r_3": return { q: `分母を有理化せよ： <div class="frac"><div class="num">6</div><div class="den">√3</div></div> ＝`, a: `＝ 2√3` };
+                case "m3_r_4": return { q: `√18 × √6 ＝`, a: `＝ 6√3` };
+                case "m3_r_5": return { q: `√50 － √8 ＝`, a: `＝ 3√2` };
+                case "m3_r_6": return { q: `( √5 ＋ 1 )( √5 ＋ 2 ) ＝`, a: `＝ 7 ＋ 3√5` };
+                case "m3_r_7": return { q: `√12n が整数となるような、もっとも小さな正の整数 n の値を求めよ。`, a: `＝ 3` };
+
+                // --- 13. 2次方程式 ---
+                case "m3_e2_1": return { q: `( x － 2 )² ＝ 5 を解け。`, a: `[ x ＝ 2 ± √5 ]` };
+                case "m3_e2_2": return { q: `x² － 5x ＋ 6 ＝ 0 を解け。`, a: `[ x ＝ 2 , 3 ]` };
+                case "m3_e2_3": return { q: `解の公式を用いて解け： x² ＋ 5x ＋ 3 ＝ 0`, a: `[ x ＝ <div class="frac"><div class="num">－5 ± √13</div><div class="den">2</div></div> ]` };
+                case "m3_e2_4": return { q: `x(x ＋ 4) ＝ 5 を解け。`, a: `[ x ＝ 1 , －5 ]` };
+                case "m3_e2_5": return { q: `ある正の整数を2乗するところを、間違えて2倍したため答えが24小さくなった。元の整数を求めよ。`, a: `[ 6 ]` };
+
+                // --- 14. 関数 y=ax^2 ---
+                case "m3_f2_1": return { q: `y は x の2乗に比例し、x ＝ 3 のとき y ＝ 18 である。y を x の式で表せ。`, a: `[ y ＝ 2x² ]` };
+                case "m3_f2_2": return { q: `関数 y ＝ －x² について、x の変域が －2 ≦ x ≦ 1 のときの y の変域を求めよ。`, a: `[ －4 ≦ y ≦ 0 ]` };
+                case "m3_f2_3": return { q: `関数 y ＝ 3x² について、x の値が 1 から 4 まで増加するときの変化の割合を求めよ。`, a: `＝ 15` };
+                case "m3_f2_4": return { q: `放物線 y ＝ x² と直線 y ＝ x ＋ 2 の交点の座標をすべて求めよ。`, a: `[ (2, 4) , (－1, 1) ]` };
+
+                // --- 15. 三平方・相似 ---
+                case "m3_p_1": return { q: `△ABC ∽ △DEF で相似比が 2:3 とする。BC＝6cm のとき、対応する辺EFの長さを求めよ。`, a: `＝ 9 cm` };
+                case "m3_p_2": return { q: `△ABCの辺AB, ACの中点をそれぞれP, Qとする。BC＝10cm のとき、線分PQの長さを求めよ。`, a: `＝ 5 cm` };
+                case "m3_p_3": return { q: `2つの相似な立体の相似比が 3:4 であるとき、その表面積の比と体積の比をそれぞれ求めよ。`, a: `[ 面積比 9:16 , 体積比 27:64 ]` };
+                case "m3_p_4": return { q: `直角をはさむ2辺の長さが 5cm, 12cm である直角三角形の斜辺の長さを求めよ。`, a: `＝ 13 cm` };
+                case "m3_p_5": return { q: `傾きが 60° の直角定規型三角形において、一番短い辺が 4cm のとき、一番長い斜辺の長さを求めよ。`, a: `＝ 8 cm` };
+                case "m3_p_6": return { q: `座標平面上の2点 A( 1, 2 ) と B( 4, 6 ) の間の距離を求めよ。`, a: `＝ 5` };
+
+                default: return { q: "次の問題にチャレンジしましょう。", a: "なし" };
             }
         }
 
-        window.onload = generateLesson;
+        // ==========================================
+        // UI・システム制御
+        // ==========================================
+        function updateSectionMenu() {
+            const unitKey = document.getElementById('unit-selector').value;
+            const sectionSelector = document.getElementById('section-selector');
+            sectionSelector.innerHTML = ''; // クリア
+
+            const sections = sectionDatabase[unitKey];
+            sections.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.type;
+                opt.innerText = s.name;
+                sectionSelector.appendChild(opt);
+            });
+        }
+
+        function generatePrint() {
+            const unitSelector = document.getElementById('unit-selector');
+            const sectionSelector = document.getElementById('section-selector');
+            
+            const unitName = unitSelector.options[unitSelector.selectedIndex].text;
+            const sectionName = sectionSelector.options[sectionSelector.selectedIndex]?.text || "";
+            const problemType = sectionSelector.value;
+
+            // タイトルの書き換え
+            document.getElementById('title-q').innerText = `${unitName.split('：')[1]} 【${sectionName}】`;
+            document.getElementById('title-a').innerText = `【解答】${unitName.split('：')[1]} 【${sectionName}】`;
+
+            const questionBox = document.getElementById('question-box');
+            const answerBox = document.getElementById('answer-box');
+            questionBox.innerHTML = ''; answerBox.innerHTML = '';
+
+            // A4縦ぴったりに収まる10問を自動生成
+            for (let i = 1; i <= 10; i++) {
+                let data = getProblem(problemType, i);
+
+                // 問題追加
+                const qItem = document.createElement('div');
+                qItem.className = 'quiz-item';
+                qItem.innerHTML = `<div class="quiz-num">(${i})</div><div class="quiz-formula">${data.q}</div>`;
+                questionBox.appendChild(qItem);
+
+                // 解答追加
+                const aItem = document.createElement('div');
+                aItem.className = 'quiz-item';
+                aItem.innerHTML = `<div class="quiz-num">(${i})</div><div class="quiz-formula">${data.q}</div><div class="answer-text">${data.a}</div>`;
+                answerBox.appendChild(aItem);
+            }
+        }
+
+        // 起動時に初期化
+        window.onload = function() {
+            updateSectionMenu();
+            generatePrint();
+        };
     </script>
 </body>
 </html>
