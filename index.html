@@ -2,76 +2,90 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>視覚直感型・数学教材シート</title>
+    <title>【数英統合】視覚直感型・無限プリントジェネレーター</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
             margin: 0; padding: 0; background-color: #f0f2f5; color: #333;
         }
+        /* 管理画面ヘッダー */
         .admin-header {
-            background-color: #ffffff; padding: 15px 30px;
+            background-color: #ffffff; padding: 12px 25px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky;
-            top: 0; z-index: 100; display: flex; gap: 12px; align-items: center;
+            top: 0; z-index: 100; display: flex; gap: 15px; align-items: center;
         }
-        .admin-header h2 { margin: 0; font-size: 14px; color: #444; margin-right: auto; }
-        .btn { padding: 10px 18px; font-size: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; }
+        .admin-header h2 { margin: 0; font-size: 14px; color: #4a5568; margin-right: auto; }
+        
+        /* 教科切り替えタブ */
+        .subject-tabs { display: flex; gap: 5px; background: #edf2f7; padding: 4px; border-radius: 8px; }
+        .tab-btn {
+            padding: 8px 16px; font-size: 13px; font-weight: bold; border: none;
+            border-radius: 6px; cursor: pointer; background: transparent; color: #4a5568;
+        }
+        .tab-btn.active { background: #fff; color: #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        select { padding: 6px 10px; font-size: 13px; border-radius: 6px; border: 1px solid #cbd5e0; background-color: #fff; cursor: pointer; }
+        .btn { padding: 8px 16px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; }
         .btn-primary { background-color: #007bff; color: white; }
         .btn-success { background-color: #28a745; color: white; }
 
+        /* A4印刷レイアウト */
         .print-area { display: flex; flex-direction: column; align-items: center; padding: 30px 0; }
         .page {
             width: 210mm; min-height: 297mm; background-color: #ffffff;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box;
-            padding: 20mm 20mm; display: flex; flex-direction: column; gap: 25px;
+            padding: 20mm 20mm; display: flex; flex-direction: column; gap: 20px;
         }
         
         .sheet-header { border-bottom: 3px solid #333; padding-bottom: 5px; display: flex; justify-content: space-between; align-items: flex-end;}
-        .sheet-title { font-size: 22px; margin: 0; font-weight: bold; letter-spacing: 1px; }
+        .sheet-title { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 1px; }
         .sheet-code { font-size: 14px; color: #718096; font-family: monospace; }
-        
-        .section-title { font-size: 16px; font-weight: bold; background: #333; color: white; padding: 4px 12px; border-radius: 4px; display: inline-block; }
+        .section-title { font-size: 14px; font-weight: bold; background: #333; color: white; padding: 4px 12px; border-radius: 4px; display: inline-block; }
 
-        /* ビジュアル解説ボード */
+        /* ビジュアル解説ボード（共通） */
         .visual-board {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 20px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 25px;
+            display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px;
+            background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px;
         }
         
-        /* 数式のステップ配置 */
-        .math-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 28px;
-            font-style: italic;
-        }
-        .step-row { display: flex; align-items: center; gap: 15px; }
-        .step-arrow { color: #cbd5e0; font-size: 20px; font-family: sans-serif; font-style: normal; }
+        /* 数学・英語のステップ表示 */
+        .steps-container { display: flex; flex-direction: column; gap: 15px; font-size: 26px; }
+        .math-style { font-family: 'Times New Roman', Times, serif; font-style: italic; }
+        .english-style { font-family: 'Century Gothic', Arial, sans-serif; }
         
-        /* 変化を強調するカラー */
+        .step-row { display: flex; align-items: center; gap: 12px; }
+        .step-arrow { color: #cbd5e0; font-size: 18px; font-family: sans-serif; font-style: normal; }
         .diff { color: #dc3545; font-weight: bold; font-style: normal; }
         .focus { background-color: #fef3c7; border-radius: 4px; padding: 0 4px; }
+        .jp-sub { font-size: 13px; color: #718096; font-family: sans-serif; margin-top: -3px; }
 
-        /* 類題エリア */
-        .exercise-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .exercise-item {
-            border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;
-            font-family: 'Times New Roman', Times, serif; font-size: 22px; font-style: italic;
-            min-height: 100px; position: relative;
+        /* 練習問題エリア */
+        .exercise-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .exercise-item { border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; position: relative; }
+        .ex-num { font-family: sans-serif; font-weight: bold; font-size: 14px; color: #718096; margin-bottom: 8px; }
+        .ex-q-text { font-size: 20px; }
+        
+        /* 英語用4線（罫線） */
+        .four-line-box {
+            height: 45px; background-image: linear-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 100% 12px; margin-top: 10px; position: relative;
         }
-        .ex-num { font-family: sans-serif; font-style: normal; font-weight: bold; font-size: 16px; color: #718096; margin-bottom: 10px; }
-        .ex-ans { color: #dc3545; font-weight: bold; font-family: Arial, sans-serif; font-style: normal; font-size: 14px; position: absolute; right: 20px; bottom: 15px; }
+        .four-line-box::after { content: ''; position: absolute; left: 0; right: 0; top: 24px; border-top: 1px dashed #fca5a5; }
+
+        /* 数学用計算スペースの薄い点線 */
+        .math-space { height: 60px; border-bottom: 1px dashed #edf2f7; margin-top: 10px; }
+
+        .ex-ans { color: #dc3545; font-weight: bold; font-size: 14px; position: absolute; right: 20px; bottom: 15px; }
+
+        /* 分数表記 */
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 4px; font-size: 15px; line-height: 1; }
+        .num { border-bottom: 1px solid #333; padding-bottom: 2px; }
+        .den { padding-top: 2px; }
 
         @media print {
             .admin-header { display: none; }
             .print-area { padding: 0; }
-            .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; padding: 15mm 15mm; }
+            .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; padding: 15mm 15mm; page-break-after: always; }
             .visual-board { background: #fff; }
             @page { size: A4 portrait; margin: 0; }
         }
@@ -80,108 +94,191 @@
 <body>
 
     <div class="admin-header">
-        <h2>中学数学 【視覚直感型】文字を読まない解説＆類題シート</h2>
-        <button class="btn btn-primary" onclick="generateVisualLesson()">🔢 例題の数値をシャッフル</button>
-        <button class="btn btn-success" onclick="window.print()">📄 教材をPDF保存・印刷</button>
+        <h2>数英統合・直感型無限プリント基盤</h2>
+        
+        <!-- 教科選択タブ -->
+        <div class="subject-tabs">
+            <button class="tab-btn active" id="tab-math" onclick="switchSubject('math')">🔢 数学</button>
+            <button class="tab-btn" id="tab-english" onclick="switchSubject('english')">🔤 英語</button>
+        </div>
+
+        <!-- 単元選択（JSで中身を入れ替える） -->
+        <select id="unit-selector" onchange="generatePrint()"></select>
+
+        <button class="btn btn-primary" onclick="generatePrint()">🔢 単語・数値をシャッフル</button>
+        <button class="btn btn-success" onclick="window.print()">📄 PDF保存・印刷</button>
     </div>
 
     <div class="print-area">
         <div class="page">
             <div class="sheet-header">
-                <h1 class="sheet-title">1次方程式のとき方：移項 (いこう)</h1>
-                <span class="sheet-code">MATH-1EQ-01</span>
+                <h1 class="sheet-title" id="sheet-title">タイトル</h1>
+                <span class="sheet-code" id="sheet-code">CODE-01</span>
             </div>
 
+            <!-- ① ビジュアル解説ボード -->
             <div class="section-title">【例題】プロセスの変化をみる</div>
-            
             <div class="visual-board">
-                <div class="math-steps">
-                    <div class="step-row">
-                        <span id="ex-step0">3x + 5 ＝ 17</span>
-                    </div>
-                    <div class="step-row">
-                        <span class="step-arrow">↳</span>
-                        <span id="ex-step1">3x ＝ 17 <span class="diff">－ 5</span></span>
-                    </div>
-                    <div class="step-row">
-                        <span class="step-arrow">↳</span>
-                        <span id="ex-step2">3x ＝ <span class="diff">12</span></span>
-                    </div>
-                    <div class="step-row">
-                        <span class="step-arrow">↳</span>
-                        <span id="ex-step3">x ＝ <span class="diff focus">4</span></span>
-                    </div>
-                </div>
-
-                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; border-left: 2px solid #e2e8f0; padding-left: 20px;">
-                    <svg width="180" height="120" viewBox="0 0 180 120">
-                        <text x="30" y="40" font-size="14" font-weight="bold" fill="#718096">左辺</text>
-                        <text x="130" y="40" font-size="14" font-weight="bold" fill="#718096">右辺</text>
-                        
-                        <path d="M 45 60 Q 90 20 135 60" fill="none" stroke="#dc3545" stroke-width="3" stroke-dasharray="4"/>
-                        <polygon points="135,60 132,52 127,57" fill="#dc3545" />
-                        
-                        <circle cx="90" cy="35" r="15" fill="#fff" stroke="#dc3545" stroke-width="2"/>
-                        <text x="83" y="40" font-size="16" font-weight="bold" fill="#dc3545">＋ → －</text>
-                        
-                        <text x="25" y="85" font-size="12" fill="#4a5568">数字を右へ</text>
-                    </svg>
-                </div>
+                <div class="steps-container" id="steps-box"></div>
+                <div style="display: flex; justify-content: center; align-items: center; border-left: 2px solid #e2e8f0; padding-left: 20px;" id="graphic-box"></div>
             </div>
 
-            <div class="section-title">【類題】おなじようにやってみよう</div>
-            
-            <div class="exercise-grid" id="exercise-box">
-                </div>
+            <!-- ② 練習問題エリア -->
+            <div class="section-title">【練習】例題のまねをして、したにかこう</div>
+            <div class="exercise-grid" id="exercise-box"></div>
         </div>
     </div>
 
     <script>
+        // ==========================================
+        // データベース（数学・英語の共通管理）
+        // ==========================================
+        const appDatabase = {
+            math: {
+                units: [
+                    { id: "m_eq", name: "中1：1次方程式（移項）", code: "MATH-1EQ-01" },
+                    { id: "m_factor", name: "中3：因数分解（二乗の差）", code: "MATH-3FA-01" }
+                ]
+            },
+            english: {
+                units: [
+                    { id: "e_3s", name: "中1：一般動詞の三人称単数（sの追加）", code: "ENG-3S-01" },
+                    { id: "e_neg", name: "中1：一般動詞の否定文（doesn't）", code: "ENG-NEG-01" }
+                ]
+            }
+        };
+
+        let currentSubject = "math";
+
+        // 基本関数
         function getRandomInt(min, max, excludeZero = true) {
             let num = Math.floor(Math.random() * (max - min + 1)) + min;
             if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
             return num;
         }
 
-        function formatTerm(value) {
-            return value > 0 ? `＋ ${value}` : `－ ${Math.abs(value)}`;
+        // ==========================================
+        // 教科・UI切り替え制御
+        // ==========================================
+        function switchSubject(subject) {
+            currentSubject = subject;
+            document.getElementById('tab-math').classList.toggle('active', subject === 'math');
+            document.getElementById('tab-english').classList.toggle('active', subject === 'english');
+            
+            // セレクトボックスの中身書き換え
+            const selector = document.getElementById('unit-selector');
+            selector.innerHTML = '';
+            appDatabase[subject].units.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.id;
+                opt.innerText = u.name;
+                selector.appendChild(opt);
+            });
+            generatePrint();
         }
 
-        function generateVisualLesson() {
-            // --- 1. 例題の数値を完全逆算で固定生成 ---
-            let x = getRandomInt(2, 6); // 必ず綺麗な正の整数
-            let a = getRandomInt(2, 4); // 係数
-            let b = getRandomInt(2, 8); // 移行する数（必ずプラスにして、移行後にマイナスになる視覚効果を固定）
-            let c = a * x + b;          // 初期右辺
-
-            // 各ステップをHTMLに直感的に反映
-            document.getElementById('ex-step0').innerHTML = `${a}x ＋ ${b} ＝ ${c}`;
-            document.getElementById('ex-step1').innerHTML = `${a}x ＝ ${c} <span class="diff">－ ${b}</span>`;
-            document.getElementById('ex-step2').innerHTML = `${a}x ＝ <span class="diff">${c - b}</span>`;
-            document.getElementById('ex-step3').innerHTML = `x ＝ <span class="diff focus">${x}</span>`;
-
-            // --- 2. 類題を同じパターンで3問生成 ---
+        // ==========================================
+        // メイン描画エンジン（数英の出し分け）
+        // ==========================================
+        function generatePrint() {
+            const unitKey = document.getElementById('unit-selector').value;
+            const stepsBox = document.getElementById('steps-box');
+            const graphicBox = document.getElementById('graphic-box');
             const exerciseBox = document.getElementById('exercise-box');
-            exerciseBox.innerHTML = '';
 
-            for (let i = 1; i <= 3; i++) {
-                let rx = getRandomInt(2, 6);
-                let ra = getRandomInt(2, 5);
-                let rb = getRandomInt(2, 9);
-                let rc = ra * rx + rb;
+            // 1. 基本設定の反映
+            const currentUnit = appDatabase[currentSubject].units.find(u => u.id === unitKey) || appDatabase[currentSubject].units[0];
+            document.getElementById('sheet-title').innerText = currentUnit.name;
+            document.getElementById('sheet-code').innerText = currentUnit.code;
 
-                const item = document.createElement('div');
-                item.className = 'exercise-item';
-                item.innerHTML = `
-                    <div class="ex-num">類題 (${i})</div>
-                    <div>${ra}x ＋ ${rb} ＝ ${rc}</div>
-                    <div style="height: 60px;"></div> <span class="ex-ans">答: x ＝ ${rx}</span>
+            // スタイルの切り替え（フォントなど）
+            stepsBox.className = "steps-container " + (currentSubject === "math" ? "math-style" : "english-style");
+
+            // 2. 数学・英語それぞれの個別ロジック生成
+            if (unitKey === "m_eq") {
+                // --- 【数学】1次方程式移項 ---
+                let x = getRandomInt(2, 6); let a = getRandomInt(2, 4); let b = getRandomInt(2, 8); let c = a * x + b;
+                stepsBox.innerHTML = `
+                    <div class="step-row"><span>${a}x ＋ ${b} ＝ ${c}</span></div>
+                    <div class="step-row"><span class="step-arrow">↳</span><span>${a}x ＝ ${c} <span class="diff">－ ${b}</span></span></div>
+                    <div class="step-row"><span class="step-arrow">↳</span><span>${a}x ＝ <span class="diff">${c-b}</span></span></div>
+                    <div class="step-row"><span class="step-arrow">↳</span><span>x ＝ <span class="diff focus">${x}</span></span></div>
                 `;
-                exerciseBox.appendChild(item);
+                graphicBox.innerHTML = `<svg width="150" height="100"><path d="M 30 50 Q 75 20 120 50" fill="none" stroke="#dc3545" stroke-width="2" stroke-dasharray="3"/><text x="65" y="25" font-size="12" fill="#dc3545" font-family="sans-serif">＋ → －</text><text x="25" y="75" font-size="12" fill="#4a5568" font-family="sans-serif">数字を右へ移項</text></svg>`;
+                
+                exerciseBox.innerHTML = '';
+                for(let i=1; i<=3; i++) {
+                    let rx = getRandomInt(2,6); let ra = getRandomInt(2,4); let rb = getRandomInt(2,8); let rc = ra*rx+rb;
+                    exerciseBox.appendChild(createExerciseItem(i, `${ra}x ＋ ${rb} ＝ ${rc}`, `x ＝ ${rx}`, false));
+                }
+            } 
+            else if (unitKey === "m_factor") {
+                // --- 【数学】因数分解（二乗の差） ---
+                let a = getRandomInt(2, 9, false);
+                stepsBox.innerHTML = `
+                    <div class="step-row"><span>x² － ${a*a}</span></div>
+                    <div class="step-row"><span class="step-arrow">↳</span><span>x² － <span class="diff">${a}²</span></span></div>
+                    <div class="step-row"><span class="step-arrow">↳</span><span>( x <span class="diff">＋ ${a}</span> )( x <span class="diff">－ ${a}</span> )</span></div>
+                `;
+                graphicBox.innerHTML = `<svg width="150" height="100"><circle cx="75" cy="50" r="20" fill="none" stroke="#dc3545" stroke-width="2"/><text x="62" y="55" font-size="14" fill="#dc3545" font-family="sans-serif">平方数</text></svg>`;
+                
+                exerciseBox.innerHTML = '';
+                for(let i=1; i<=3; i++) {
+                    let ra = getRandomInt(2,9,false);
+                    exerciseBox.appendChild(createExerciseItem(i, `x² － ${ra*ra}`, `(x ＋ ${ra})(x － ${ra})`, false));
+                }
+            }
+            else if (unitKey === "e_3s") {
+                // --- 【英語】三人称単数 ---
+                let verbs = [{b:"play", s:"plays", t:"tennis"}, {b:"like", s:"likes", t:"soccer"}][getRandomInt(0,1,false)];
+                stepsBox.innerHTML = `
+                    <div><span>I <span class="focus">${verbs.b}</span> ${verbs.t}.</span><div class="jp-sub">私は${verbs.t === 'tennis'?'テニス':'サッカー'}をします。</div></div>
+                    <div class="step-row"><span class="step-arrow">↳</span><div><span><span class="focus">He</span> ${verbs.b}<span class="diff">s</span> ${verbs.t}.</span><div class="jp-sub">彼は${verbs.t === 'tennis'?'テニス':'サッカー'}をします。</div></div></div>
+                `;
+                graphicBox.innerHTML = `<svg width="150" height="100"><path d="M 20 40 Q 60 70 100 42" fill="none" stroke="#dc3545" stroke-width="2"/><text x="110" y="45" font-size="14" fill="#dc3545" font-weight="bold">＋s</text></svg>`;
+                
+                exerciseBox.innerHTML = '';
+                let list = [{b:"like", s:"likes", t:"apples", sub:"She"}, {b:"cook", s:"cooks", t:"dinner", sub:"Ken"}];
+                list.forEach((v, idx) => {
+                    exerciseBox.appendChild(createExerciseItem(idx+1, `I ${v.b} ${v.t}. &nbsp;<span style="font-size:13px; font-family:sans-serif; color:#718096;">[主語を ${v.sub} に]</span>`, `${v.sub} ${v.s} ${v.t}.`, true));
+                });
+            }
+            else if (unitKey === "e_neg") {
+                // --- 【英語】doesn't否定文 ---
+                stepsBox.innerHTML = `
+                    <div><span>She <span class="focus">likes</span> cats.</span><div class="jp-sub">彼女は猫が好きです。</div></div>
+                    <div class="step-row"><span class="step-arrow">↳</span><div><span>She <span class="diff">doesn't</span> <span class="focus">like</span> cats.</span><div class="jp-sub">彼女は猫が好きではありません。</div></div></div>
+                `;
+                graphicBox.innerHTML = `<svg width="150" height="100"><text x="30" y="50" font-size="12" fill="#dc3545" font-weight="bold">doesn't ＋ 動詞の原形</text></svg>`;
+                
+                exerciseBox.innerHTML = '';
+                exerciseBox.appendChild(createExerciseItem(1, `He plays baseball. &nbsp;<span style="font-size:13px; font-family:sans-serif; color:#718096;">[否定の文に]</span>`, `He doesn't play baseball.`, true));
+                exerciseBox.appendChild(createExerciseItem(2, `Tom has a dog. &nbsp;<span style="font-size:13px; font-family:sans-serif; color:#718096;">[否定の文に]</span>`, `Tom doesn't have a dog.`, true));
             }
         }
 
-        window.onload = generateVisualLesson;
+        // 練習問題のHTMLブロックを生成する共通ヘルパー
+        function createExerciseItem(index, questionText, answerText, isEnglish) {
+            const item = document.createElement('div');
+            item.className = 'exercise-item';
+            
+            // 英語なら4線ボックス、数学ならフリー計算スペースを適用
+            const spaceClass = isEnglish ? 'four-line-box' : 'math-space';
+            const fontClass = isEnglish ? 'english-style' : 'math-style';
+
+            item.innerHTML = `
+                <div class="ex-num">類題 (${index})</div>
+                <div class="ex-q-text ${fontClass}">${questionText}</div>
+                <div class="${spaceClass}"></div>
+                <span class="ex-ans">答: ${answerText}</span>
+            `;
+            return item;
+        }
+
+        // 初回起動
+        window.onload = function() {
+            switchSubject('math'); // 最初は数学を開く
+        };
     </script>
 </body>
 </html>
