@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>【数英】A4横・途中式書き写し＆自力チェックテスト無限生成システム</title>
+    <title>【数英】3段階トレース教材＆別紙チェックテスト無限生成システム</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
@@ -28,12 +28,12 @@
         .btn-primary { background-color: #007bff; color: white; }
         .btn-success { background-color: #28a745; color: white; }
 
-        /* A4横向きのレイアウト設定 */
+        /* A4横向きレイアウト */
         .print-area { display: flex; flex-direction: column; align-items: center; padding: 30px 0; gap: 30px; }
         .page {
-            width: 297mm; height: 210mm; background-color: #ffffff; /* A4横サイズ */
+            width: 297mm; height: 210mm; background-color: #ffffff;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box;
-            padding: 12mm 15mm; display: flex; flex-direction: column; gap: 10px;
+            padding: 10mm 15mm; display: flex; flex-direction: column; gap: 8px;
             page-break-after: always;
         }
         
@@ -42,50 +42,51 @@
         .student-info { display: flex; gap: 15px; font-size: 12px; }
         .student-info div { border-bottom: 1px solid #4a5568; width: 100px; text-align: right; }
 
-        /* 横型・2段組グリッド配置 */
+        /* グリッド配置 */
         .exercise-grid { display: flex; flex-direction: column; flex-grow: 1; border: 1px solid #cbd5e0; }
-        .grid-header { display: grid; grid-template-columns: 45px 1.1fr 1.1fr; background: #edf2f7; font-weight: bold; font-size: 13px; text-align: center; border-bottom: 1px solid #cbd5e0; padding: 6px 0; }
+        .grid-header { display: grid; grid-template-columns: 45px 1.1fr 1.1fr; background: #edf2f7; font-weight: bold; font-size: 12px; text-align: center; border-bottom: 1px solid #cbd5e0; padding: 4px 0; }
         
         .quiz-row { display: grid; grid-template-columns: 45px 1.1fr 1.1fr; flex-grow: 1; border-bottom: 1px solid #e2e8f0; }
         .quiz-row:last-child { border-bottom: none; }
         
-        .cell-num { display: flex; align-items: center; justify-content: center; font-weight: bold; background: #f7fafc; border-right: 1px solid #cbd5e0; font-size: 14px; }
-        .cell-model { padding: 8px 15px; border-right: 1px solid #cbd5e0; display: flex; flex-direction: column; justify-content: center; background: #fafbfe; }
-        .cell-work { padding: 8px 15px; display: flex; flex-direction: column; justify-content: center; position: relative; }
-
-        /* テストモード用（おなじ形だけど、お手本が隠れる） */
-        .test-mode { background: #fff5f5 !important; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #e53e3e; font-weight: bold; border-right: 1px solid #fca5a5; }
+        .cell-num { display: flex; align-items: center; justify-content: center; font-weight: bold; background: #f7fafc; border-right: 1px solid #cbd5e0; font-size: 13px; }
+        .cell-model { padding: 4px 12px; border-right: 1px solid #cbd5e0; display: flex; flex-direction: column; justify-content: center; background: #fafbfe; }
+        .cell-work { padding: 4px 12px; display: flex; flex-direction: column; justify-content: center; position: relative; }
 
         /* 数式・英語のフォント */
-        .math-style { font-family: 'Times New Roman', Times, serif; font-style: italic; font-size: 18px; line-height: 1.4; }
-        .english-style { font-family: 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.3; }
+        .math-style { font-family: 'Times New Roman', Times, serif; font-style: italic; font-size: 17px; line-height: 1.3; }
+        .english-style { font-family: 'Century Gothic', Arial, sans-serif; font-size: 17px; line-height: 1.2; }
         
         .diff { color: #dc3545; font-weight: bold; font-style: normal; }
         .focus { background-color: #fef3c7; border-radius: 4px; padding: 0 2px; }
         .jp-sub { font-size: 11px; color: #718096; font-family: sans-serif; margin-top: 1px; }
 
-        /* 英語用4線（行の高さに完全フィット） */
-        .four-line-container { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        /* 穴埋めの箱表示 */
+        .hole { display: inline-block; width: 30px; height: 18px; border: 1px solid #4a5568; border-radius: 3px; background: #fff; vertical-align: middle; margin: 0 2px; }
+        .hole-sm { width: 16px; }
+
+        /* 英語用4線 */
+        .four-line-container { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
         .four-line-item {
-            height: 24px; background-image: linear-gradient(#edf2f7 1px, transparent 1px);
-            background-size: 100% 6px; position: relative; width: 95%;
+            height: 16px; background-image: linear-gradient(#edf2f7 1px, transparent 1px);
+            background-size: 100% 4px; position: relative; width: 95%;
         }
-        .four-line-item::after { content: ''; position: absolute; left: 0; right: 0; top: 12px; border-top: 1px dashed #fca5a5; }
+        .four-line-item::after { content: ''; position: absolute; left: 0; right: 0; top: 8px; border-top: 1px dashed #fca5a5; }
 
-        /* 数学の行間・解答 */
-        .math-line { margin: 2px 0; }
+        /* テスト用紙用（1段組み） */
+        .test-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); flex-grow: 1; border: 1px solid #cbd5e0; }
+        .test-item { border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 15px; position: relative; }
+        .test-item:nth-child(2n) { border-right: none; }
+        .test-item:nth-child(7), .test-item:nth-child(8) { border-bottom: none; }
+
+        .math-line { margin: 1px 0; }
         .ex-ans { color: #dc3545; font-weight: bold; font-size: 12px; position: absolute; right: 15px; bottom: 8px; font-family: Arial, sans-serif; }
-
-        /* パーツ */
-        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 2px; font-size: 13px; line-height: 1; }
-        .num { border-bottom: 1px solid #333; padding-bottom: 1px; }
-        .den { padding-top: 1px; }
 
         @media print {
             .admin-header { display: none; }
             .print-area { padding: 0; gap: 0; }
             .page { box-shadow: none; margin: 0; width: 297mm; height: 210mm; padding: 10mm 12mm; }
-            .test-mode { border-right: 1px solid #cbd5e0 !important; color: #fff !important; background: #fff !important; } /* 印刷時は「テスト」の文字を消す */
+            .hole { background: #fff !important; }
             @page { size: A4 landscape; margin: 0; }
         }
     </style>
@@ -93,7 +94,7 @@
 <body>
 
     <div class="admin-header">
-        <h2>数英統合 【A4横・途中式トレース＆チェックテスト】</h2>
+        <h2>数英統合 【3段階スモールステップ教材 ＆ 別紙テスト】</h2>
         
         <div class="subject-tabs">
             <button class="tab-btn active" id="tab-math" onclick="switchSubject('math')">🔢 数学</button>
@@ -103,17 +104,17 @@
         <select id="unit-selector" onchange="updateSectionMenu(); generatePrint();"></select>
         <select id="section-selector" onchange="generatePrint()"></select>
 
-        <button class="btn btn-primary" onclick="generatePrint()">🔢 問題をシャffle</button>
-        <button class="btn btn-success" onclick="window.print()">📄 PDF保存・印刷</button>
+        <button class="btn btn-primary" onclick="generatePrint()">🔢 問題をシャッフル</button>
+        <button class="btn btn-success" onclick="window.print()">📄 PDF保存・まとめて印刷</button>
     </div>
 
     <div class="print-area">
+        <!-- 📄 1枚目：3段階トレーニング教材シート -->
         <div class="page">
             <div class="sheet-header">
                 <h1 class="sheet-title" id="sheet-title">タイトル</h1>
                 <div class="student-info"><div>組</div><div>番</div><div style="width:150px;">氏名：</div></div>
             </div>
-            
             <div class="exercise-grid">
                 <div class="grid-header">
                     <div>番</div>
@@ -124,18 +125,21 @@
             </div>
         </div>
 
+        <!-- 📄 2枚目：【別紙】チェックテスト（ヒント一切なし・完全自力） -->
         <div class="page">
             <div class="sheet-header">
-                <h1 class="sheet-title" id="sheet-title-ans" style="color: #dc3545;">【解答】</h1>
+                <h1 class="sheet-title" id="sheet-title-test" style="color:#1a202c;">【別紙】チェックテスト</h1>
+                <div class="student-info"><div>組</div><div>番</div><div style="width:150px;">氏名：</div></div>
             </div>
-            <div class="exercise-grid">
-                <div class="grid-header" style="background:#fff5f5;">
-                    <div>番</div>
-                    <div>見本側の問題の答え</div>
-                    <div>みんなが解く練習側の答え</div>
-                </div>
-                <div id="answer-box" style="display:flex; flex-direction:column; flex-grow:1;"></div>
+            <div class="test-grid" id="test-box"></div>
+        </div>
+
+        <!-- 📄 3枚目：丸付け用・完全解答シート -->
+        <div class="page">
+            <div class="sheet-header">
+                <h1 class="sheet-title" id="sheet-title-ans" style="color: #dc3545;">【解答】教材＆チェックテスト</h1>
             </div>
+            <div class="exercise-grid" id="answer-box"></div>
         </div>
     </div>
 
@@ -146,9 +150,6 @@
                     m1_e: { name: "中1：1次方程式", sections: [
                         { name: "① 基本の解き方 (ax + b = c)", id: "m1_e_1" },
                         { name: "② カッコのある方程式", id: "m1_e_2" }
-                    ]},
-                    m3_ex: { name: "中3：因数分解", sections: [
-                        { name: "① 二乗の差の公式 (x² - a²)", id: "m3_fa_1" }
                     ]}
                 }
             },
@@ -169,7 +170,6 @@
             if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
             return num;
         }
-        function formatTerm(value) { return value > 0 ? `＋ ${value}` : `－ ${Math.abs(value)}`; }
 
         function switchSubject(subject) {
             currentSubject = subject;
@@ -198,139 +198,157 @@
         }
 
         // ==========================================
-        // 横型特化・見本と練習のペアデータ生成エンジン
+        // 1項目ずつの数式データ生成
         // ==========================================
-        function getPairData(type) {
-            // お手本(Model)用数値
-            let mx = getRandomInt(2, 5); let ma = getRandomInt(2, 4); let mb = getRandomInt(2, 6); let mc = ma * mx + mb;
-            // 生徒練習(Work)用数値
-            let wx = getRandomInt(2, 5); let wa = getRandomInt(2, 4); let wb = getRandomInt(2, 6); while(ma===wa&&mb===wb) { wb = getRandomInt(2,6); } let wc = wa * wx + wb;
-
-            switch(type) {
-                case "m1_e_1":
-                    return {
-                        isEng: false,
-                        mQ: `${ma}x ＋ ${mb} ＝ ${mc}`,
-                        mSteps: [`${ma}x ＝ ${mc} <span class="diff">－ ${mb}</span>`, `${ma}x ＝ <span class="diff">${mc-mb}</span>`, `x ＝ <span class="diff focus">${mx}</span>`],
-                        wQ: `${wa}x ＋ ${wb} ＝ ${wc}`,
-                        wAns: `x ＝ ${wx}`,
-                        mAns: `x ＝ ${mx}`
-                    };
-                case "m1_e_2":
-                    let mk = getRandomInt(2,3); let wk = getRandomInt(2,3);
-                    return {
-                        isEng: false,
-                        mQ: `${mk}( x ＋ ${mb} ) ＝ ${mk*mx + mk*mb}`,
-                        mSteps: [`${mk}x ＋ ${mk*mb} ＝ ${mk*mx + mk*mb}`, `${mk}x ＝ ${mk*mx + mk*mb} <span class="diff">－ ${mk*mb}</span>`, `${mk}x ＝ <span class="diff">${mk*mx}</span>`, `x ＝ <span class="diff focus">${mx}</span>`],
-                        wQ: `${wk}( x ＋ ${wb} ) ＝ ${wk*wx + wk*wb}`,
-                        wAns: `x ＝ ${wx}`,
-                        mAns: `x ＝ ${mx}`
-                    };
-                case "m3_fa_1":
-                    let mf = getRandomInt(2, 9, false); let wf = getRandomInt(2, 9, false); while(mf===wf) wf = getRandomInt(2,9,false);
-                    return {
-                        isEng: false,
-                        mQ: `x² － ${mf*mf}`,
-                        mSteps: [`x² － <span class="diff">${mf}²</span>`, `( x <span class="diff">＋ ${mf}</span> )( x <span class="diff">－ ${mf}</span> )`],
-                        wQ: `x² － ${wf*wf}`,
-                        wAns: `＝ (x ＋ ${wf})(x － ${wf})`,
-                        mAns: `＝ (x ＋ ${mf})(x － ${mf})`
-                    };
-                case "e_3s":
-                    let vList = [{b:"play", s:"plays", t:"tennis"}, {b:"like", s:"likes", t:"soccer"}, {b:"cook", s:"cooks", t:"dinner"}];
-                    let mv = vList[getRandomInt(0,2,false)]; let wv = vList[getRandomInt(0,2,false)];
-                    return {
-                        isEng: true,
-                        mQ: `I ${mv.b} ${mv.t}. &nbsp;<span class="jp-sub">[主語を He に]</span>`,
-                        mSteps: [`<span class="focus">He</span> ${mv.b}<span class="diff">s</span> ${mv.t}.<div class="jp-sub">彼は${mv.t === 'tennis'?'テニス':'サッカー'}をします。</div>`],
-                        wQ: `I ${wv.b} ${wv.t}. &nbsp;<span class="jp-sub">[主語を She に]</span>`,
-                        wAns: `She ${wv.s} ${wv.t}.`,
-                        mAns: `He ${mv.s} ${mv.t}.`
-                    };
-                case "e_neg":
-                    let nv = [{b:"play", s:"plays", t:"baseball"}, {b:"like", s:"likes", t:"milk"}][getRandomInt(0,1,false)];
-                    return {
-                        isEng: true,
-                        mQ: `He ${nv.s} ${nv.t}. &nbsp;<span class="jp-sub">[否定文に]</span>`,
-                        mSteps: [`He <span class="diff">doesn't</span> <span class="focus">${nv.b}</span> ${nv.t}.<div class="jp-sub">彼は${nv.t === 'milk'?'牛乳が好きではありません':'野球をしません'}。</div>`],
-                        wQ: `She ${nv.s} ${nv.t}. &nbsp;<span class="jp-sub">[否定文に]</span>`,
-                        wAns: `She doesn't ${nv.b} ${nv.t}.`,
-                        mAns: `He doesn't ${nv.b} ${nv.t}.`
-                    };
+        function generateSingleData(type) {
+            let x = getRandomInt(2, 5); let a = getRandomInt(2, 4); let b = getRandomInt(2, 6); let c = a * x + b;
+            if (type === "m1_e_1") {
+                return {
+                    isEng: false, q: `${a}x ＋ ${b} ＝ ${c}`, ans: `x ＝ ${x}`,
+                    steps: [`${a}x ＝ ${c} － ${b}`, `${a}x ＝ ${c-b}`, `x ＝ ${x}`],
+                    holes: [
+                        `${a}x ＝ ${c} <span class="hole hole-sm"></span> ${b}`, // 4番用: 符号だけ穴
+                        `${a}x ＝ <span class="hole"></span>`,                     // 5番用: 計算結果だけ穴
+                        `<span class="hole" style="width:80px;"></span>`           // 6番用: 後半まるごと穴
+                    ]
+                };
+            }
+            if (type === "m1_e_2") {
+                let k = getRandomInt(2,3);
+                return {
+                    isEng: false, q: `${k}( x ＋ ${b} ) ＝ ${k*x + k*b}`, ans: `x ＝ ${x}`,
+                    steps: [`${k}x ＋ ${k*b} ＝ ${k*x + k*b}`, `${k}x ＝ ${k*x + k*b} － ${k*b}`, `${k}x ＝ ${k*x}`, `x ＝ ${x}`],
+                    holes: [
+                        `${k}x ＋ ${k*b} ＝ ${k*x + k*b}<br>↳ ${k}x ＝ ${k*x + k*b} <span class="hole hole-sm"></span> ${k*b}`,
+                        `${k}x ＋ ${k*b} ＝ ${k*x + k*b}<br>↳ ${k}x ＝ <span class="hole"></span>`,
+                        `<span class="hole" style="width:100px;"></span>`
+                    ]
+                };
+            }
+            if (type === "e_3s") {
+                let v = [{b:"play", s:"plays", t:"tennis"}, {b:"like", s:"likes", t:"soccer"}][getRandomInt(0,1,false)];
+                let sub = ["He", "She", "Ken"][getRandomInt(0,2,false)];
+                return {
+                    isEng: true, q: `I ${v.b} ${v.t}. &nbsp;<span class="jp-sub">[主語を ${sub} に]</span>`, ans: `${sub} ${v.s} ${v.t}.`,
+                    steps: [`${sub} ${v.s} ${v.t}.<div class="jp-sub">彼は${v.t==='tennis'?'テニス':'サッカー'}をします。</div>`],
+                    holes: [
+                        `${sub} ${v.b}<span class="hole hole-sm"></span> ${v.t}.`,
+                        `${sub} <span class="hole" style="width:60px;"></span> ${v.t}.`,
+                        `<span class="hole" style="width:120px;"></span>`
+                    ]
+                };
+            }
+            if (type === "e_neg") {
+                let nv = [{b:"play", s:"plays", t:"baseball"}, {b:"like", s:"likes", t:"milk"}][getRandomInt(0,1,false)];
+                return {
+                    isEng: true, q: `He ${nv.s} ${nv.t}. &nbsp;<span class="jp-sub">[否定文に]</span>`, ans: `He doesn't ${nv.b} ${nv.t}.`,
+                    steps:  [`He doesn't ${nv.b} ${nv.t}.`],
+                    holes: [
+                        `He <span class="hole" style="width:60px;"></span> ${nv.b} ${nv.t}.`,
+                        `He doesn't <span class="hole" style="width:50px;"></span> ${nv.t}.`,
+                        `<span class="hole" style="width:150px;"></span>`
+                    ]
+                };
             }
         }
 
         // ==========================================
-        // プリント生成処理
+        // メイン生成エンジン
         // ==========================================
         function generatePrint() {
             const sectionSelector = document.getElementById('section-selector');
             const problemType = sectionSelector.value;
             const printName = sectionSelector.options[sectionSelector.selectedIndex]?.text || "";
 
-            document.getElementById('sheet-title').innerText = printName + " トレース＆チェックテスト";
-            document.getElementById('sheet-title-ans').innerText = "【解答】" + printName;
+            document.getElementById('sheet-title').innerText = printName + " 【3段階ステップワーク】";
+            document.getElementById('sheet-title-test').innerText = "【別紙チェックテスト】 " + printName;
 
             const questionBox = document.getElementById('question-box');
+            const testBox = document.getElementById('test-box');
             const answerBox = document.getElementById('answer-box');
-            questionBox.innerHTML = ''; answerBox.innerHTML = '';
 
-            // A4横サイズに美しく収まる「5問構成」
-            for (let i = 1; i <= 5; i++) {
-                let data = getPairData(problemType);
-                let isTestRow = (i >= 5); // ★5本目（最後の問題）は自動で自力チェックテストに化ける設定
+            questionBox.innerHTML = ''; testBox.innerHTML = ''; answerBox.innerHTML = '';
 
-                let fontClass = data.isEng ? 'english-style' : 'math-style';
+            let fontClass = (currentSubject === "math") ? 'math-style' : 'english-style';
 
-                // --- ① 問題ページの組み立て ---
-                const qRow = document.createElement('div');
-                qRow.className = 'quiz-row';
-                
-                // 左側：お手本セクションの制御
-                let modelContent = "";
-                if (isTestRow) {
-                    modelContent = `<div class="cell-model test-mode">🔥 自力チェックテスト（見本なし）</div>`;
-                } else {
+            // --- 📄 1枚目＆3枚目：教材と解答の8問構成ループ ---
+            for (let i = 1; i <= 8; i++) {
+                let mData = generateSingleData(problemType); // 見本用
+                let wData = generateSingleData(problemType); // 練習用
+
+                // 難易度の段階（ステージ）判定
+                let stageTag = "";
+                let workAreaContent = "";
+
+                if (i <= 3) {
+                    stageTag = "全部書き写す";
                     let stepsHtml = "";
-                    data.mSteps.forEach(s => { stepsHtml += `<div class="math-line">↳ ${s}</div>`; });
-                    modelContent = `
-                        <div class="cell-model ${fontClass}">
-                            <div style="font-weight:bold; color:#4a5568; font-size:14px; margin-bottom:4px;">例： ${data.mQ}</div>
-                            ${stepsHtml}
-                        </div>
-                    `;
+                    wData.steps.forEach(s => { stepsHtml += `<div class="math-line">↳ ${s}</div>`; });
+                    workAreaContent = stepsHtml; // 解答付き状態（なぞり書き用）
+                } else if (i <= 6) {
+                    stageTag = "穴埋めドリル";
+                    workAreaContent = `<div class="math-line">↳ ${wData.holes[i - 4]}</div>`; // 穴埋め表示
+                } else {
+                    stageTag = "自分で全部移す";
+                    workAreaContent = wData.isEng ? `<div class="four-line-container"><div class="four-line-item"></div></div>` : `<div style="height:35px;"></div>`; // 白紙
                 }
 
-                // 右側：生徒が書き込むセクションの制御
-                let workLines = data.isEng ? 
-                    `<div class="four-line-container"><div class="four-line-item"></div><div class="four-line-item"></div></div>` : 
-                    `<div style="height:10px;"></div>`;
+                // 見本側のステップテキスト化
+                let mStepsHtml = "";
+                mData.steps.forEach(s => { mStepsHtml += `<div class="math-line">↳ ${s}</div>`; });
 
+                const qRow = document.createElement('div');
+                qRow.className = 'quiz-row';
                 qRow.innerHTML = `
-                    <div class="cell-num">${i}</div>
-                    ${modelContent}
+                    <div class="cell-num">${i}<br><span style="font-size:8px;color:#999;font-weight:normal;">${stageTag}</span></div>
+                    <div class="cell-model ${fontClass}">
+                        <div style="font-weight:bold; color:#718096; font-size:12px;">見本: ${mData.q}</div>
+                        ${mStepsHtml}
+                    </div>
                     <div class="cell-work ${fontClass}">
-                        <div style="font-weight:bold; color:#2d3748;">問： ${data.wQ}</div>
-                        ${workLines}
+                        <div style="font-weight:bold; color:#1a202c;">問: ${wData.q}</div>
+                        ${workAreaContent}
                     </div>
                 `;
                 questionBox.appendChild(qRow);
 
-                // --- ② 解答ページ（2ページ目）の組み立て ---
+                // 解答ページへの反映
+                let wAnsHtml = "";
+                wData.steps.forEach(s => { wAnsHtml += `<div class="math-line" style="color:#dc3545;">↳ ${s}</div>`; });
+
                 const aRow = document.createElement('div');
                 aRow.className = 'quiz-row';
                 aRow.innerHTML = `
                     <div class="cell-num">${i}</div>
-                    <div class="cell-model ${fontClass}">
-                        <div style="font-size:12px; color:#718096;">見本側の問題： ${data.mQ}</div>
-                        <div style="color:#666; margin-top:5px;">答： ${data.mAns}</div>
-                    </div>
-                    <div class="cell-work ${fontClass}">
-                        <div style="font-size:12px; color:#718096;">みんなの問題： ${data.wQ}</div>
-                        <div class="ex-ans">答： ${data.wAns}</div>
-                    </div>
+                    <div class="cell-model ${fontClass}"><div>答: ${mData.ans}</div></div>
+                    <div class="cell-work ${fontClass}"><div>${wAnsHtml}</div></div>
                 `;
                 answerBox.appendChild(aRow);
+            }
+
+            // --- 📄 2枚目：別紙チェックテスト用（8問の完全白紙独立問題） ---
+            for (let t = 1; t <= 8; t++) {
+                let tData = generateSingleData(problemType);
+                let lines = tData.isEng ? `<div class="four-line-container"><div class="four-line-item"></div></div>` : `<div style="height:80px;"></div>`;
+
+                const tItem = document.createElement('div');
+                tItem.className = `test-item ${fontClass}`;
+                tItem.innerHTML = `
+                    <div class="ex-num">テスト (${t})</div>
+                    <div style="font-weight:bold; color:#1a202c; font-size:18px;">${tData.q}</div>
+                    ${lines}
+                `;
+                testBox.appendChild(tItem);
+
+                // 解答ページの一番下へチェックテストの答えも結合
+                const testAnsRow = document.createElement('div');
+                testAnsRow.className = 'quiz-row';
+                testAnsRow.innerHTML = `
+                    <div class="cell-num">テ-${t}</div>
+                    <div class="cell-model ${fontClass}"><div>テスト問 ${t}: ${tData.q}</div></div>
+                    <div class="cell-work ${fontClass}"><div style="color:#dc3545;font-weight:bold;">答: ${tData.ans}</div></div>
+                `;
+                answerBox.appendChild(testAnsRow);
             }
         }
 
