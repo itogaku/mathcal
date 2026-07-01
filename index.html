@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>【中学数学・計算特化】途中式プロセス付き・無限プリントジェネレーター</title>
+    <title>【中学数学・計算特化】大問・小問形式・無限プリントジェネレーター</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
@@ -15,25 +15,26 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: sticky;
             top: 0; z-index: 100; border-bottom: 2px solid #e2e8f0;
         }
-        .admin-title { font-size: 16px; font-weight: bold; color: #2d3748; margin-bottom: 15px; }
-        .grade-group { margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
+        .admin-title { font-size: 15px; font-weight: bold; color: #2d3748; margin-bottom: 12px; }
+        .grade-group { margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; }
         .grade-label { font-size: 13px; font-weight: bold; color: #4a5568; width: 80px; padding-top: 2px; }
         .checkbox-container { display: flex; flex-wrap: wrap; gap: 12px; flex-grow: 1; }
         .checkbox-container label { font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
         
-        .action-bar { margin-top: 15px; padding-top: 15px; border-top: 1px solid #edf2f7; display: flex; gap: 15px; }
+        .action-bar { margin-top: 15px; padding-top: 15px; border-top: 1px solid #edf2f7; display: flex; gap: 15px; align-items: center; }
         .btn { padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; }
         .btn-primary { background-color: #3182ce; color: white; }
         .btn-primary:hover { background-color: #2b6cb0; }
         .btn-success { background-color: #38a169; color: white; }
         .btn-success:hover { background-color: #2f855a; }
+        select { padding: 6px 10px; font-size: 13px; border-radius: 6px; border: 1px solid #cbd5e0; }
 
-        /* A4印刷エリア設定（途中式が入るため、1ページ10問にして余白を確保） */
+        /* A4印刷エリア設定 */
         .print-area { display: flex; flex-direction: column; align-items: center; padding: 40px 0; gap: 40px; }
         .page {
             width: 210mm; min-height: 297mm; background-color: #ffffff;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box;
-            padding: 20mm 20mm; display: flex; flex-direction: column; gap: 20px;
+            padding: 20mm 20mm; display: flex; flex-direction: column; gap: 25px;
             page-break-after: always; position: relative;
         }
         
@@ -42,38 +43,36 @@
         .student-info { display: flex; gap: 15px; font-size: 13px; }
         .student-info div { border-bottom: 1px solid #4a5568; width: 100px; text-align: right; padding-bottom: 2px; }
 
-        /* 縦一列・10問配置（途中式スペースを確保するためゆったり配置） */
-        .math-list {
-            display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;
-        }
-        .math-item {
-            display: flex; flex-direction: column; font-family: 'Times New Roman', Times, serif;
-            font-size: 22px; font-style: italic; border-bottom: 1px dashed #edf2f7; padding: 15px 5px; position: relative;
-        }
+        /* 大問（セクション）スタイル */
+        .big-question { margin-bottom: 20px; }
+        .big-question-title { font-size: 16px; font-weight: bold; color: #1a202c; background-color: #f7fafc; padding: 6px 12px; border-radius: 4px; border-left: 4px solid #2d3748; margin-bottom: 12px; font-family: sans-serif; }
+        
+        /* 小問リスト */
+        .sub-question-list { display: flex; flex-direction: column; gap: 15px; padding-left: 10px; }
+        .sub-question-item { display: flex; flex-direction: column; font-family: 'Times New Roman', Times, serif; font-size: 20px; font-style: italic; position: relative; }
+        
         .item-main { display: flex; align-items: center; width: 100%; }
-        .num-tag { font-family: sans-serif; font-size: 14px; color: #2d3748; font-style: normal; font-weight: bold; width: 40px; }
-        .unit-tag { font-family: sans-serif; font-size: 11px; background: #e2e8f0; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-style: normal; font-weight: bold; margin-left: 10px; }
-        .formula { flex-grow: 1; display: flex; align-items: center; margin-left: 10px; }
+        .num-tag { font-family: sans-serif; font-size: 14px; color: #2d3748; font-style: normal; font-weight: bold; width: 35px; }
+        .formula { flex-grow: 1; display: flex; align-items: center; }
         
         /* 解答ページ用の途中式エリア */
-        .steps-area {
-            font-size: 18px; color: #4a5568; margin-left: 50px; margin-top: 8px; display: flex; flex-direction: column; gap: 4px;
-        }
-        .step-line { display: flex; align-items: center; gap: 8px; }
-        .step-arrow { color: #cbd5e0; font-family: sans-serif; font-style: normal; font-size: 14px; }
-        .diff { color: #dc3545; font-weight: bold; font-style: normal; } /* 変化した部分 */
+        .steps-area { font-size: 17px; color: #4a5568; margin-left: 35px; margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+        .step-line { display: flex; align-items: center; gap: 6px; }
+        .step-arrow { color: #cbd5e0; font-family: sans-serif; font-style: normal; font-size: 13px; }
+        .diff { color: #dc3545; font-weight: bold; font-style: normal; }
         .final-ans { color: #e53e3e; font-weight: bold; font-style: normal; background-color: #fef3c7; padding: 0 4px; border-radius: 4px; }
 
         /* 数学特殊表記 */
-        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 4px; font-size: 15px; line-height: 1; }
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 4px; font-size: 14px; line-height: 1; }
         .num { border-bottom: 1px solid #333; padding-bottom: 1px; }
         .den { padding-top: 1px; }
-        .matrix { display: inline-block; border-left: 1px solid #333; border-right: 1px solid #333; padding: 0 5px; border-radius: 3px; vertical-align: middle; line-height: 1.3; font-size: 18px; }
+        .matrix { display: inline-block; border-left: 1px solid #333; border-right: 1px solid #333; padding: 0 5px; border-radius: 3px; vertical-align: middle; line-height: 1.3; font-size: 16px; }
 
         @media print {
             .admin-panel { display: none; }
             .print-area { padding: 0; gap: 0; }
             .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; padding: 15mm 15mm; }
+            .big-question-title { background-color: #fff; border-bottom: 1px solid #ccc; border-radius: 0; padding-left: 0; }
             @page { size: A4 portrait; margin: 0; }
         }
     </style>
@@ -81,62 +80,63 @@
 <body>
 
     <div class="admin-panel">
-        <div class="admin-title">🛠 出題したい単元を選んでください（複数選ぶと混ざって10問出題されます）</div>
+        <div class="admin-title">🛠 単元を選んでください（選んだ単元が「大問」として綺麗に並びます）</div>
         
         <div class="grade-group">
             <div class="grade-label">【中学1年】</div>
             <div class="checkbox-container">
-                <label><input type="checkbox" class="calc-unit" value="m1_pn" checked> 正負の数（四則・累乗）</label>
-                <label><input type="checkbox" class="calc-unit" value="m1_linear"> 文字の式（同類項・分配）</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_pn" checked> 正負の数</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_linear"> 文字の式</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_eq"> 1次方程式</label>
-                <label><input type="checkbox" class="calc-unit" value="m1_func"> 比例・反比例(式決定)</label>
             </div>
         </div>
-
         <div class="grade-group">
             <div class="grade-label">【中学2年】</div>
             <div class="checkbox-container">
-                <label><input type="checkbox" class="calc-unit" value="m2_poly"> 式の計算(分数通分)</label>
+                <label><input type="checkbox" class="calc-unit" value="m2_poly"> 多項式の計算</label>
                 <label><input type="checkbox" class="calc-unit" value="m2_seq"> 連立方程式</label>
-                <label><input type="checkbox" class="calc-unit" value="m2_func"> 1次関数(式決定)</label>
             </div>
         </div>
-
         <div class="grade-group">
             <div class="grade-label">【中学3年】</div>
             <div class="checkbox-container">
-                <label><input type="checkbox" class="calc-unit" value="m3_expand"> 展開・因数分解</label>
+                <label><input type="checkbox" class="calc-unit" value="m3_expand"> 因数分解</label>
                 <label><input type="checkbox" class="calc-unit" value="m3_root"> 平方根</label>
                 <label><input type="checkbox" class="calc-unit" value="m3_eq2"> 2次方程式</label>
-                <label><input type="checkbox" class="calc-unit" value="m3_func2"> 関数 y=ax²(式決定)</label>
-                <label><input type="checkbox" class="calc-unit" value="m3_pytha"> 三平方の定理</label>
             </div>
         </div>
 
         <div class="action-bar">
+            <span>【大問あたりの問題数】</span>
+            <select id="sub-count-select" onchange="generatePrint()">
+                <option value="2">2問ずつ</option>
+                <option value="3" selected>3問ずつ</option>
+                <option value="4">4問ずつ</option>
+            </select>
             <button class="btn btn-primary" onclick="generatePrint()">🔄 数値を変えて無限再生成</button>
-            <button class="btn btn-success" onclick="window.print()">📄 印刷・PDF保存（問題・解説つき解答の2枚出力）</button>
+            <button class="btn btn-success" onclick="window.print()">📄 印刷・PDF保存（問題・解答一挙出力）</button>
         </div>
     </div>
 
     <div class="print-area">
         <div class="page">
             <div class="sheet-header">
-                <h1 class="sheet-title">数学計算テスト（問題）</h1>
+                <h1 class="sheet-title">数学計算確認テスト（問題）</h1>
                 <div class="student-info"><div>組</div><div>番</div><div style="width:150px;">氏名：</div></div>
             </div>
-            <div class="math-list" id="grid-q"></div>
+            <div id="container-q" style="display: flex; flex-direction: column; flex-grow: 1;"></div>
         </div>
 
         <div class="page">
             <div class="sheet-header">
-                <h1 class="sheet-title" style="color: #e53e3e;">数学計算テスト（途中式・解答）</h1>
+                <h1 class="sheet-title" style="color: #e53e3e;">数学計算確認テスト（途中式・解答）</h1>
             </div>
-            <div class="math-list" id="grid-a"></div>
+            <div id="container-a" style="display: flex; flex-direction: column; flex-grow: 1;"></div>
         </div>
     </div>
 
     <script>
+        // 数字・数式整形用ヘルパー
         function getRandomInt(min, max, excludeZero = true) {
             let num = Math.floor(Math.random() * (max - min + 1)) + min;
             if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
@@ -156,191 +156,157 @@
         }
 
         // ==========================================
-        // 各単元の計算問題 ＆ 詳細途中式生成ロジック
+        // 各単元の問題・途中式データ生成カタログ
         // ==========================================
-        function makeProblem(unitKey) {
-            let x = getRandomInt(-4, 4); let y = getRandomInt(-3, 3);
-            let a = getRandomInt(2, 5);  let b = getRandomInt(-6, 6);
-            
-            switch(unitKey) {
-                case "m1_pn": // ★正負の数のバリエーション強化（引き算・掛け算・割り算・累乗）
-                    let pnType = getRandomInt(1, 4, false);
+        const unitCatalog = {
+            m1_pn: {
+                title: "正負の数の計算をしなさい。",
+                engine: function() {
+                    let type = getRandomInt(1, 3, false);
                     let n1 = getRandomInt(-8, 8); let n2 = getRandomInt(-6, 6);
-                    if (pnType === 1) { // 引き算
-                        return { 
-                            name: "正負の数（減法）", 
-                            q: `${n1>=0?n1:`(${n1})`} － ${n2>=0?n2:`(${n2})`} ＝`, 
-                            steps: [`＝ ${n1} <span class="diff">＋ (${-n2})</span>`, `＝ <span class="final-ans">${n1 - n2}</span>`] 
-                        };
-                    } else if (pnType === 2) { // 掛け算
-                        return { 
-                            name: "正負の数（乗法）", 
-                            q: `${n1>=0?n1:`(${n1})`} × ${n2>=0?n2:`(${n2})`} ＝`, 
-                            steps: [`＝ <span class="final-ans">${n1 * n2}</span>`] 
-                        };
-                    } else if (pnType === 3) { // 割り算
-                        let d2 = getRandomInt(-4, 4); let dAns = getRandomInt(-5, 5); let d1 = d2 * dAns;
-                        return { 
-                            name: "正負の数（除法）", 
-                            q: `${d1>=0?d1:`(${d1})`} ÷ ${d2>=0?d2:`(${d2})`} ＝`, 
-                            steps: [`＝ <span class="final-ans">${dAns}</span>`] 
-                        };
-                    } else { // 累乗・四則混合
+                    if (type === 1) {
+                        return { q: `${n1>=0?n1:`(${n1})`} － ${n2>=0?n2:`(${n2})`} ＝`, steps: [`＝ ${n1} <span class="diff">＋ (${-n2})</span>`, `＝ <span class="final-ans">${n1 - n2}</span>`] };
+                    } else if (type === 2) {
+                        let d2 = getRandomInt(-4, 4); let dAns = getRandomInt(-4, 4);
+                        return { q: `${d2 * dAns>=0?d2*dAns:`(${d2*dAns})`} ÷ ${d2>=0?d2:`(${d2})`} ＝`, steps: [`＝ <span class="final-ans">${dAns}</span>`] };
+                    } else {
                         let base = getRandomInt(-3, -2);
-                        return { 
-                            name: "正負の数（累乗・四則）", 
-                            q: `(${base})² × 2 ＝`, 
-                            steps: [`＝ <span class="diff">${base*base}</span> × 2`, `＝ <span class="final-ans">${base*base*2}</span>`] 
-                        };
+                        return { q: `(${base})² × 3 ＝`, steps: [`＝ <span class="diff">${base*base}</span> × 3`, `＝ <span class="final-ans">${base*base*3}</span>`] };
                     }
-                
-                case "m1_linear": // 文字の式
-                    let la = getRandomInt(2, 5); let lb = getRandomInt(-4, 4);
-                    return { 
-                        name: "文字の式（分配・同類項）", 
-                        q: `2( ${formatXTerm(la, true)} ${formatTerm(lb)} ) － 3x ＝`, 
-                        steps: [`＝ <span class="diff">${2*la}x ${formatTerm(2*lb)}</span> － 3x`, `＝ <span class="diff">${2*la-3}x</span> ${formatTerm(2*lb)}`, `＝ <span class="final-ans">${formatXTerm(2*la-3, true)} ${formatTerm(2*lb)}</span>`] 
-                    };
-                
-                case "m1_eq": // 1次方程式
-                    return { 
-                        name: "1次方程式", 
-                        q: `${formatXTerm(a, true)} ${formatTerm(b)} ＝ ${a*x+b}`, 
-                        steps: [`${a}x ＝ ${a*x+b} <span class="diff">－ (${b})</span>`, `${a}x ＝ <span class="diff">${a*x}</span>`, `<span class="final-ans">x ＝ ${x}</span>`] 
-                    };
-                
-                case "m1_func": // 比例・反比例
-                    let px = getRandomInt(2, 4); let py = getRandomInt(6, 12);
-                    return { 
-                        name: "比例・反比例（式の決定）", 
-                        q: `yはxに反比例し、x ＝ ${px} のとき y ＝ ${py} である。式を求めよ。`, 
-                        steps: [`y ＝ <span>a / x</span> に代入する`, `${py} ＝ a / ${px} &nbsp; ↳ &nbsp; a ＝ ${py} × ${px}`, `a ＝ <span class="diff">${px*py}</span>`, `<span class="final-ans">y ＝ ${px*py} / x</span>`] 
-                    };
-                
-                case "m2_poly": // 式の計算（分数の通分）
-                    return { 
-                        name: "多項式の計算（分数通分）", 
-                        q: `<div class="frac"><div class="num">x ＋ y</div><div class="den">2</div></div> － <div class="frac"><div class="num">x － y</div><div class="den">3</div></div> ＝`, 
-                        steps: [`＝ <div class="frac"><div class="num"><span class="diff">3(x ＋ y) － 2(x － y)</span></div><div class="den">6</div></div>`, `＝ <div class="frac"><div class="num"><span class="diff">3x ＋ 3y － 2x ＋ 2y</span></div><div class="den">6</div></div>`, `＝ <span class="final-ans"><div class="frac"><div class="num">x ＋ 5y</div><div class="den">6</div></div></span>`] 
-                    };
-                
-                case "m2_seq": // 連立方程式
-                    return { 
-                        name: "連立方程式", 
-                        q: `<div class="matrix"><div>x ＋ y ＝ ${x+y}</div><div>x － y ＝ ${x-y}</div></div>`, 
-                        steps: [`2つの式を縦に足し算（加減法）する`, `(x ＋ y) ＋ (x － y) ＝ ${x+y} ＋ (${x-y})`, `2x ＝ <span class="diff">${2*x}</span> &nbsp; ↳ &nbsp; <span class="diff">x ＝ ${x}</span>`, `x を上の式に代入して、y ＝ <span class="diff">${y}</span>`, `<span class="final-ans">x ＝ ${x}, y ＝ ${y}</span>`] 
-                    };
-                
-                case "m2_func": // 1次関数
-                    return { 
-                        name: "1次関数（式の決定）", 
-                        q: `2点 ( 1, ${a+b} ) , ( 3, ${a*3+b} ) を通る直線の式を求めよ。`, 
-                        steps: [`変化の割合(傾きa) ＝ <div class="frac"><div class="num">${(a*3+b) - (a+b)}</div><div class="den">3 － 1</div></div> ＝ <span class="diff">${a}</span>`, `y ＝ ${a}x ＋ b に ( 1, ${a+b} ) を代入する`, `${a+b} ＝ ${a} × 1 ＋ b &nbsp; ↳ &nbsp; b ＝ <span class="diff">${b}</span>`, `<span class="final-ans">y ＝ ${formatXTerm(a, true)} ${formatTerm(b)}</span>`] 
-                    };
-                
-                case "m2_geom": // 図形（角度計算）
-                    let polyN = getRandomInt(5, 6, false);
-                    return { 
-                        name: "図形の性質（多角形の内角）", 
-                        q: `正 ${polyN} 角形の1つの内角の大きさを求めよ。`, 
-                        steps: [`外角の合計 360° から1つの外角を出す`, `1つの外角 ＝ 360° ÷ ${polyN} ＝ <span class="diff">${360/polyN}°</span>`, `1つの内角 ＝ 180° － 外角`, `180° － ${360/polyN}° ＝ <span class="final-ans">${180 - (360/polyN)}°</span>`] 
-                    };
-                
-                case "m3_expand": // 因数分解
-                    let fa = getRandomInt(2, 6);
-                    return { 
-                        name: "因数分解（公式の適用）", 
-                        q: `x² － ${fa*fa} ＝`, 
-                        steps: [`＝ x² － <span class="diff">${fa}²</span> &nbsp; <span>[公式: a²－b²＝(a+b)(a-b)]</span>`, `＝ <span class="final-ans">( x ＋ ${fa} )( x － ${fa} )</span>`] 
-                    };
-                
-                case "m3_root": // 平方根
-                    return { 
-                        name: "平方根（√の加減変形）", 
-                        q: `√20 ＋ √45 ＝`, 
-                        steps: [`＝ <span class="diff">2√5</span> ＋ <span class="diff">3√5</span>`, `＝ (2 ＋ 3)√5`, `＝ <span class="final-ans">5√5</span>`] 
-                    };
-                
-                case "m3_eq2": // 2次方程式
-                    let e2a = getRandomInt(1, 3); let e2b = getRandomInt(4, 5, false);
-                    return { 
-                        name: "2次方程式（因数分解利用）", 
-                        q: `x² － ${e2a+e2b}x ＋ ${e2a*e2b} ＝ 0`, 
-                        steps: [`かけて ${e2a*e2b}、たして －${e2a+e2b} になる2つの数を探す`, `( x － ${e2a} )( x － ${e2b} ) ＝ 0`, `<span class="final-ans">x ＝ ${e2a}, ${e2b}</span>`] 
-                    };
-                
-                case "m3_func2": // 関数 y=ax^2
-                    let f2a = getRandomInt(-3, 3);
-                    return { 
-                        name: "関数 y=ax²（式の決定）", 
-                        q: `yはx²に比例し、x ＝ 3 のとき y ＝ ${f2a*9} である。yをxの式で表せ。`, 
-                        steps: [`y ＝ ax² に x ＝ 3 , y ＝ ${f2a*9} を代入する`, `${f2a*9} ＝ a × 3² &nbsp; ↳ &nbsp; ${f2a*9} ＝ 9a`, `a ＝ <span class="diff">${f2a}</span>`, `<span class="final-ans">y ＝ ${f2a}x²</span>`] 
-                    };
-                
-                case "m3_pytha": // 三平方の定理
-                    return { 
-                        name: "三平方の定理（斜辺計算）", 
-                        q: `直角をはさむ2辺が 3cm, 4cm である直角三角形の斜辺の長さを求めよ。`, 
-                        steps: [`斜辺を x cm とすると、 三平方の定理 [a² ＋ b² ＝ c²] より`, `3² ＋ 4² ＝ x² &nbsp; ↳ &nbsp; 9 ＋ 16 ＝ x²`, `x² ＝ <span class="diff">25</span> &nbsp; ↳ &nbsp; x ＝ ±5`, `x ＞ 0 より`, `<span class="final-ans">5 cm</span>`] 
-                    };
+                }
+            },
+            m1_linear: {
+                title: "文字の式の計算をしなさい。",
+                engine: function() {
+                    let la = getRandomInt(2, 4); let lb = getRandomInt(-3, 3);
+                    return { q: `2( ${formatXTerm(la, true)} ${formatTerm(lb)} ) － 4x ＝`, steps: [`＝ <span class="diff">${2*la}x ${formatTerm(2*lb)}</span> － 4x`, `＝ <span class="final-ans">${formatXTerm(2*la-4, true)} ${formatTerm(2*lb)}</span>`] };
+                }
+            },
+            m1_eq: {
+                title: "次の方程式を解きなさい。",
+                engine: function() {
+                    let x = getRandomInt(-4, 4); let a = getRandomInt(2, 5); let b = getRandomInt(-6, 6);
+                    return { q: `${formatXTerm(a, true)} ${formatTerm(b)} ＝ ${a*x+b}`, steps: [`${a}x ＝ ${a*x+b} <span class="diff">－ (${b})</span>`, `${a}x ＝ <span class="diff">${a*x}</span>`, `<span class="final-ans">x ＝ ${x}</span>`] };
+                }
+            },
+            m2_poly: {
+                title: "次の多項式の計算をしなさい。",
+                engine: function() {
+                    return { q: `<div class="frac"><div class="num">x ＋ y</div><div class="den">2</div></div> － <div class="frac"><div class="num">x － y</div><div class="den">3</div></div> ＝`, steps: [`＝ <div class="frac"><div class="num"><span class="diff">3(x ＋ y) － 2(x － y)</span></div><div class="den">6</div></div>`, `＝ <div class="frac"><div class="num"><span class="diff">3x ＋ 3y － 2x ＋ 2y</span></div><div class="den">6</div></div>`, `＝ <span class="final-ans"><div class="frac"><div class="num">x ＋ 5y</div><div class="den">6</div></div></span>`] };
+                }
+            },
+            m2_seq: {
+                title: "次の連立方程式を解きなさい。",
+                engine: function() {
+                    let x = getRandomInt(-3, 3); let y = getRandomInt(-3, 3);
+                    return { q: `<div class="matrix"><div>x ＋ y ＝ ${x+y}</div><div>x － y ＝ ${x-y}</div></div>`, steps: [`加減法により上下の式を足すと`, `2x ＝ <span class="diff">${2*x}</span> &nbsp; ↳ &nbsp; x ＝ ${x}`, `x を代入して y を求めると`, `<span class="final-ans">x ＝ ${x}, y ＝ ${y}</span>`] };
+                }
+            },
+            m3_expand: {
+                title: "次の式を因数分解しなさい。",
+                engine: function() {
+                    let fa = getRandomInt(2, 7);
+                    return { q: `x² － ${fa*fa} ＝`, steps: [`＝ x² － <span class="diff">${fa}²</span>`, `＝ <span class="final-ans">( x ＋ ${fa} )( x － ${fa} )</span>`] };
+                }
+            },
+            m3_root: {
+                title: "次の平方根の計算をしなさい。",
+                engine: function() {
+                    return { q: `√18 ＋ √50 ＝`, steps: [`＝ <span class="diff">3√2</span> ＋ <span class="diff">5√2</span>`, `＝ (3 ＋ 5)√2`, `＝ <span class="final-ans">8√2</span>`] };
+                }
+            },
+            m3_eq2: {
+                title: "次の2次方程式を解きなさい。",
+                engine: function() {
+                    let ea = getRandomInt(1, 3); let eb = getRandomInt(4, 5, false);
+                    return { q: `x² － ${ea+eb}x ＋ ${ea*eb} ＝ 0`, steps: [`因数分解公式を適用して`, `( x － ${ea} )( x － ${eb} ) ＝ 0`, `<span class="final-ans">x ＝ ${ea}, ${eb}</span>`] };
+                }
             }
-        }
+        };
 
         // ==========================================
-        // 全体制御レンダリング
+        // メイン描画システム（大問・小問構造化）
         // ==========================================
         function generatePrint() {
-            let checkedUnits = [];
-            const checkboxes = document.querySelectorAll('.calc-unit');
-            checkboxes.forEach(cb => { if (cb.checked) checkedUnits.push(cb.value); });
+            const containerQ = document.getElementById('container-q');
+            const containerA = document.getElementById('container-a');
+            containerQ.innerHTML = ''; containerA.innerHTML = '';
 
-            if (checkedUnits.length === 0) {
-                alert('出題したい単元を1つ以上選んでください！');
-                checkboxes[0].checked = true;
-                checkedUnits.push(checkboxes[0].value);
+            // チェックされた単元をリストアップ
+            let selectedUnits = [];
+            document.querySelectorAll('.calc-unit').forEach(cb => {
+                if (cb.checked) selectedUnits.push(cb.value);
+            });
+
+            if (selectedUnits.length === 0) {
+                alert('単元を1つ以上選んでください！');
+                document.querySelectorAll('.calc-unit')[0].checked = true;
+                selectedUnits.push(document.querySelectorAll('.calc-unit')[0].value);
             }
 
-            const gridQ = document.getElementById('grid-q');
-            const gridA = document.getElementById('grid-a');
-            gridQ.innerHTML = ''; gridA.innerHTML = '';
+            const subCount = parseInt(document.getElementById('sub-count-select').value);
+            let bigQIndex = 1;
 
-            // 1ページにゆったり途中式を収めるため、厳選の10問構成
-            for (let i = 1; i <= 10; i++) {
-                let randomUnitKey = checkedUnits[Math.floor(Math.random() * checkedUnits.length)];
-                let data = makeProblem(randomUnitKey);
-
-                // --- ① 問題用紙の出力 ---
-                const itemQ = document.createElement('div');
-                itemQ.className = 'math-item';
-                itemQ.innerHTML = `
-                    <div class="item-main">
-                        <span class="num-tag">(${i})</span>
-                        <span class="unit-tag">${data.name}</span>
-                        <span class="formula">${data.q}</span>
-                    </div>
+            // 選ばれた各単元を「大問」としてループ生成
+            selectedUnits.forEach(unitKey => {
+                const targetUnit = unitCatalog[unitKey];
+                
+                // --- 問題用紙用の大問ブロック枠 ---
+                const bigQBlockQ = document.createElement('div');
+                bigQBlockQ.className = 'big-question';
+                bigQBlockQ.innerHTML = `
+                    <div class="big-question-title">大問 ${bigQIndex} &nbsp; ${targetUnit.title}</div>
+                    <div class="sub-question-list" id="bq-q-${bigQIndex}"></div>
                 `;
-                gridQ.appendChild(itemQ);
+                containerQ.appendChild(bigQBlockQ);
 
-                // --- ② 解答用紙（詳細な途中式ステップ付き）の出力 ---
-                let stepsHtml = "";
-                data.steps.forEach(step => {
-                    stepsHtml += `<div class="step-line"><span class="step-arrow">↳</span><span>${step}</span></div>`;
-                });
-
-                const itemA = document.createElement('div');
-                itemA.className = 'math-item';
-                itemA.innerHTML = `
-                    <div class="item-main">
-                        <span class="num-tag">(${i})</span>
-                        <span class="unit-tag">${data.name}</span>
-                        <span class="formula">${data.q}</span>
-                    </div>
-                    <div class="steps-area">
-                        ${stepsHtml}
-                    </div>
+                // --- 解答用紙用の大問ブロック枠 ---
+                const bigQBlockA = document.createElement('div');
+                bigQBlockA.className = 'big-question';
+                bigQBlockA.innerHTML = `
+                    <div class="big-question-title" style="color:#e53e3e;">大問 ${bigQIndex} &nbsp; ${targetUnit.title}</div>
+                    <div class="sub-question-list" id="bq-a-${bigQIndex}"></div>
                 `;
-                gridA.appendChild(itemA);
-            }
+                containerA.appendChild(bigQBlockA);
+
+                const listQ = document.getElementById(`bq-q-${bigQIndex}`);
+                const listA = document.getElementById(`bq-a-${bigQIndex}`);
+
+                // 各大問の下に指定された数の小問をぶら下げる
+                for (let subIndex = 1; subIndex <= subCount; subIndex++) {
+                    let problemData = targetUnit.engine();
+
+                    // 小問（問題）
+                    const itemQ = document.createElement('div');
+                    itemQ.className = 'sub-question-item';
+                    itemQ.innerHTML = `
+                        <div class="item-main">
+                            <span class="num-tag">(${subIndex})</span>
+                            <span class="formula">${problemData.q}</span>
+                        </div>
+                    `;
+                    listQ.appendChild(itemQ);
+
+                    // 小問（解答・途中式ステップ付き）
+                    let stepsHtml = "";
+                    problemData.steps.forEach(step => {
+                        stepsHtml += `<div class="step-line"><span class="step-arrow">↳</span><span>${step}</span></div>`;
+                    });
+
+                    const itemA = document.createElement('div');
+                    itemA.className = 'sub-question-item';
+                    itemA.innerHTML = `
+                        <div class="item-main">
+                            <span class="num-tag">(${subIndex})</span>
+                            <span class="formula">${problemData.q}</span>
+                        </div>
+                        <div class="steps-area">${stepsHtml}</div>
+                    `;
+                    listA.appendChild(itemA);
+                }
+
+                bigQIndex++;
+            });
         }
 
         window.onload = function() {
