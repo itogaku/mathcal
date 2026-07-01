@@ -2,10 +2,10 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>【数学計算特化】2列配置＆詳細サイドバー・無限プリントジェネレーター</title>
+    <title>【数学計算特化】サイズ完全固定版・無限プリントジェネレーター</title>
     <style>
         /* ==========================================
-           1. 画面表示用の共通スタイル（ブラウザ閲覧用）
+           1. 画面表示用の共通スタイル
            ========================================== */
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
@@ -13,92 +13,115 @@
             display: flex; height: 100vh; overflow: hidden;
         }
         
-        /* 縦型の左側サイドバーメニュー */
+        /* 左側サイドバー */
         .sidebar {
             width: 320px; background-color: #ffffff; border-right: 2px solid #e2e8f0;
             display: flex; flex-direction: column; height: 100%; box-shadow: 2px 0 8px rgba(0,0,0,0.05);
             flex-shrink: 0;
         }
-        .sidebar-title { padding: 20px 20px 10px 20px; font-size: 15px; font-weight: bold; color: #2d3748; border-bottom: 1px solid #edf2f7; }
-        
-        /* スクロール可能な単元選択エリア */
+        .sidebar-title { padding: 20px 20px 10px 20px; font-size: 14px; font-weight: bold; color: #2d3748; border-bottom: 1px solid #edf2f7; }
         .menu-scroll { flex-grow: 1; overflow-y: auto; padding: 15px 20px; }
         .menu-grade-title { font-size: 13px; font-weight: bold; color: #4a5568; margin: 15px 0 8px 0; padding-bottom: 2px; border-bottom: 2px solid #cbd5e0; }
         .menu-grade-title:first-child { margin-top: 0; }
         .menu-unit-title { font-size: 12px; font-weight: bold; color: #718096; margin: 10px 0 5px 5px; }
-        
         .checkbox-list { display: flex; flex-direction: column; gap: 8px; padding-left: 10px; margin-bottom: 15px; }
         .checkbox-list label { font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none; }
         
-        /* サイドバー下部のアクションエリア */
-        .sidebar-action { padding: 20px; border-top: 1px solid #edf2f7; display: flex; flex-direction: column; gap: 10px; background: #f8fafc; }
-        .btn { padding: 12px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; width: 100%; text-align: center; box-sizing: border-box; }
+        .sidebar-action { padding: 15px 20px; border-top: 1px solid #edf2f7; display: flex; flex-direction: column; gap: 8px; background: #f8fafc; }
+        .btn { padding: 10px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; width: 100%; text-align: center; box-sizing: border-box; }
         .btn-primary { background-color: #3182ce; color: white; }
         .btn-primary:hover { background-color: #2b6cb0; }
         .btn-success { background-color: #38a169; color: white; }
         .btn-success:hover { background-color: #2f855a; }
+        .layout-indicator { font-size: 11px; color: #718096; text-align: center; font-weight: bold; }
 
         /* プレビュー画面エリア */
-        .main-content { flex-grow: 1; overflow-y: auto; background-color: #edf2f7; display: flex; justify-content: center; }
+        .main-content { flex-grow: 1; overflow-y: auto; background-color: #edf2f7; display: flex; justify-content: center; padding: 40px 0; }
+        .print-area { display: flex; flex-direction: column; gap: 40px; }
 
         /* ==========================================
-           2. A4縦サイズ・2列配置（2段組）のレイアウト設定
+           2. 🔥 絶対に変形させないA4サイズ完全固定スタイル
            ========================================== */
-        .print-area { display: flex; flex-direction: column; gap: 40px; padding: 40px 0; }
         .page {
-            width: 210mm; height: 297mm; background-color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box;
-            padding: 15mm 15mm; display: flex; flex-direction: column;
-            page-break-after: always; position: relative;
+            width: 210mm !important; 
+            height: 297mm !important; 
+            max-width: 210mm !important;
+            max-height: 297mm !important;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            box-sizing: border-box;
+            padding: 20mm 18mm; /* 紙の余白を固定 */
+            overflow: hidden; /* 絶対にはみ出させない */
+            page-break-after: always;
+            position: relative;
         }
         
-        /* プリントヘッダー */
-        .sheet-header { border-bottom: 2px solid #2d3748; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px;}
-        .sheet-title { font-size: 18px; margin: 0; font-weight: bold; letter-spacing: 1px; }
+        .sheet-header { height: 15mm; border-bottom: 2px solid #2d3748; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5mm;}
+        .sheet-title { font-size: 18px; margin: 0; font-weight: bold; }
         .student-info { display: flex; gap: 15px; font-size: 12px; }
         .student-info div { border-bottom: 1px solid #4a5568; width: 80px; text-align: right; padding-bottom: 2px; }
 
-        /* ドキュメント本体を縦いっぱいに引き伸ばす */
-        .document-body { display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        /* 問題全体を収めるコンテナも高さをミリ単位で固定指定 */
+        .document-body { 
+            height: 235mm; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+        }
 
-        /* 大問（セクション）の枠組み */
-        .big-question { display: flex; flex-direction: column; margin-bottom: 10px; }
-        .big-question-title { font-size: 14px; font-weight: bold; color: #1a202c; border-bottom: 1px solid #2d3748; padding-bottom: 3px; margin-bottom: 8px; }
+        /* 大問枠（JavaScriptで高さを動的にミリ固定する） */
+        .big-question { 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .big-question-title { font-size: 13px; font-weight: bold; color: #1a202c; border-bottom: 1px solid #2d3748; padding-bottom: 2px; margin-bottom: 4px; height: 6mm; box-sizing: border-box; }
         
-        /* 🌟 小問を綺麗に「2列（横並び）」に配置するグリッド */
+        /* 2列配置グリッド */
         .sub-question-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* 50%ずつの2列 */
-            row-gap: 12px;
+            grid-template-columns: 1fr 1fr;
             column-gap: 30px;
+            width: 100%;
         }
-        .sub-question-item { display: flex; flex-direction: column; font-family: 'Times New Roman', Times, serif; font-size: 18px; font-style: italic; position: relative; min-height: 40px; }
         
-        .item-main { display: flex; align-items: center; width: 100%; }
+        /* 小問（JavaScriptで高さをmm単位で完全固定） */
+        .sub-question-item { 
+            display: flex; 
+            flex-direction: column; 
+            font-family: 'Times New Roman', Times, serif; 
+            font-size: 18px; 
+            font-style: italic; 
+            position: relative; 
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        .item-main { display: flex; align-items: center; width: 100%; height: 7mm; }
         .num-tag { font-family: sans-serif; font-size: 13px; color: #2d3748; font-style: normal; font-weight: bold; width: 25px; }
         .formula { flex-grow: 1; display: flex; align-items: center; }
         
         /* 解答用途中式 */
-        .steps-area { font-size: 15px; color: #4a5568; margin-left: 25px; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; }
-        .step-line { display: flex; align-items: center; gap: 4px; }
+        .steps-area { font-size: 14px; color: #4a5568; margin-left: 25px; display: flex; flex-direction: column; gap: 1px; }
+        .step-line { display: flex; align-items: center; gap: 4px; height: 5mm; }
         .step-arrow { color: #cbd5e0; font-family: sans-serif; font-style: normal; font-size: 11px; }
         .diff { color: #dc3545; font-weight: bold; font-style: normal; }
         .final-ans { color: #e53e3e; font-weight: bold; font-style: normal; background-color: #fef3c7; padding: 0 3px; border-radius: 4px; }
 
-        /* 特殊記号数式 */
-        .frac { inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 4px; font-size: 13px; line-height: 1; }
+        /* 数式特殊表記 */
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 4px; font-size: 12px; line-height: 1; }
         .num { border-bottom: 1px solid #333; padding-bottom: 1px; }
         .den { padding-top: 1px; }
-        .matrix { display: inline-block; border-left: 1px solid #333; border-right: 1px solid #333; padding: 0 4px; border-radius: 3px; vertical-align: middle; line-height: 1.3; font-size: 14px; }
+        .matrix { display: inline-block; border-left: 1px solid #333; border-right: 1px solid #333; padding: 0 4px; border-radius: 3px; vertical-align: middle; line-height: 1.2; font-size: 13px; }
 
-        /* ==========================================
-           3. 印刷時の設定（サイドバーを完全抹消）
-           ========================================== */
+        /* 印刷設定 */
         @media print {
             .sidebar { display: none; }
-            .main-content { background-color: #fff; overflow: visible; display: block; }
+            .main-content { background-color: #fff; overflow: visible; display: block; padding: 0; }
             .print-area { padding: 0; gap: 0; }
-            .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; }
+            .page { box-shadow: none; margin: 0; }
+            .big-question-title { background-color: #fff; border-bottom: 1px solid #cbd5e0; }
             @page { size: A4 portrait; margin: 0; }
         }
     </style>
@@ -110,7 +133,6 @@
         
         <div class="menu-scroll">
             <div class="menu-grade-title">■ 中学1年</div>
-            
             <div class="menu-unit-title">【正負の数】</div>
             <div class="checkbox-list">
                 <label><input type="checkbox" class="calc-unit" value="m1_pn_add" checked onchange="generatePrint()"> ① 正負の加法（足し算）</label>
@@ -147,8 +169,9 @@
         </div>
 
         <div class="sidebar-action">
+            <div class="layout-indicator" id="layout-status">大問 0 個 × 小問 0 問</div>
             <button class="btn btn-primary" onclick="generatePrint()">🔄 数値変更（無限再生成）</button>
-            <button class="btn btn-success" onclick="window.print()">📄 印刷・PDF保存（A4縦）</button>
+            <button class="btn btn-success" onclick="window.print()">📄 印刷・PDF保存（A4固定）</button>
         </div>
     </div>
 
@@ -172,7 +195,6 @@
     </div>
 
     <script>
-        // 数値整形ヘルパー関数
         function getRandomInt(min, max, excludeZero = true) {
             let num = Math.floor(Math.random() * (max - min + 1)) + min;
             if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
@@ -191,9 +213,7 @@
             return `${sign}${coefStr}${varChar}`;
         }
 
-        // ==========================================
-        // 🛠 超細分化・問題生成カタログ
-        // ==========================================
+        // 問題生成カタログ
         const sectionCatalog = {
             m1_pn_add: { title: "正負の数の加法（足し算）を計算しなさい。", engine: function() {
                 let n1 = getRandomInt(-8, 8); let n2 = getRandomInt(-8, 8);
@@ -213,7 +233,7 @@
             }},
             m1_pn_mix: { title: "四則の混じった計算をしなさい。", engine: function() {
                 let base = getRandomInt(-3, -2);
-                return { q: `(${base})² × 2 － 5 ＝`, steps: [`＝ <span class="diff">${base*base}</span> × 2 － 5`, `＝ <span class="diff">${base*base*2}</span> － 5`, `＝ <span class="final-ans">${base*base*2 - 5}</span>`] };
+                return { q: `(${base})² × 2 － 5 ＝`, steps: [`＝ <span class="diff">${base*base}</span> × 2 － 5`, `＝ <span class="final-ans">${base*base*2 - 5}</span>`] };
             }},
             m1_linear_basic: { title: "文字の式の同類項をまとめなさい。", engine: function() {
                 let la = getRandomInt(2, 5); let lb = getRandomInt(-4, 4);
@@ -229,21 +249,21 @@
             }},
             m1_eq_frac: { title: "次の分数形の方程式を解きなさい。", engine: function() {
                 let x = getRandomInt(2, 5); let b = getRandomInt(1, 4);
-                return { q: `<div class="frac"><div class="num">x ＋ ${b}</div><div class="den">3</div></div> ＝ 2`, steps: [`両辺に 3 をかけて分母を払う`, `x ＋ ${b} ＝ <span class="diff">6</span>`, `x ＝ 6 － ${b}`, `<span class="final-ans">x ＝ ${6-b}</span>`] };
+                return { q: `<div class="frac"><div class="num">x ＋ ${b}</div><div class="den">3</div></div> ＝ 2`, steps: [`両辺に 3 をかける`, `x ＋ ${b} ＝ <span class="diff">6</span>`, `<span class="final-ans">x ＝ ${6-b}</span>`] };
             }},
             m2_poly_frac: { title: "次の多項式の分数通分計算をしなさい。", engine: function() {
-                return { q: `<div class="frac"><div class="num">x ＋ y</div><div class="den">2</div></div> － <div class="frac"><div class="num">x － y</div><div class="den">3</div></div> ＝`, steps: [`＝ <div class="frac"><div class="num"><span class="diff">3(x ＋ y) － 2(x － y)</span></div><div class="den">6</div></div>`, `＝ <div class="frac"><div class="num"><span class="diff">3x ＋ 3y － 2x ＋ 2y</span></div><div class="den">6</div></div>`, `＝ <span class="final-ans"><div class="frac"><div class="num">x ＋ 5y</div><div class="den">6</div></div></span>`] };
+                return { q: `<div class="frac"><div class="num">x ＋ y</div><div class="den">2</div></div> － <div class="frac"><div class="num">x － y</div><div class="den">3</div></div> ＝`, steps: [`＝ <div class="frac"><div class="num"><span class="diff">3(x+y)－2(x－y)</span></div><div class="den">6</div></div>`, `＝ <span class="final-ans"><div class="frac"><div class="num">x ＋ 5y</div><div class="den">6</div></div></span>`] };
             }},
             m2_seq_basic: { title: "次の連立方程式を加減法で解きなさい。", engine: function() {
                 let x = getRandomInt(-3, 3); let y = getRandomInt(-2, 2);
-                return { q: `<div class="matrix"><div>x ＋ y ＝ ${x+y}</div><div>x － y ＝ ${x-y}</div></div>`, steps: [`上下の式を足すと： 2x ＝ <span class="diff">${2*x}</span> &nbsp; ↳ &nbsp; x ＝ ${x}`, `上の式に代入して： <span class="final-ans">x ＝ ${x}, y ＝ ${y}</span>`] };
+                return { q: `<div class="matrix"><div>x ＋ y ＝ ${x+y}</div><div>x － y ＝ ${x-y}</div></div>`, steps: [`上下を足す： 2x ＝ <span class="diff">${2*x}</span>`, `代入して： <span class="final-ans">x ＝ ${x}, y ＝ ${y}</span>`] };
             }},
             m2_seq_sub: { title: "次の連立方程式を代入法で解きなさい。", engine: function() {
                 let x = getRandomInt(-2, 2); let y = x * 2;
-                return { q: `<div class="matrix"><div>y ＝ 2x</div><div>x ＋ y ＝ ${x+y}</div></div>`, steps: [`上の式を下の式へ代入する`, `x ＋ <span class="diff">(2x)</span> ＝ ${x+y}`, `3x ＝ ${x+y} &nbsp; ↳ &nbsp; x ＝ ${x}`, `<span class="final-ans">x ＝ ${x}, y ＝ ${y}</span>`] };
+                return { q: `<div class="matrix"><div>y ＝ 2x</div><div>x ＋ y ＝ ${x+y}</div></div>`, steps: [`下の式へ代入： x ＋ <span class="diff">2x</span> ＝ ${x+y}`, `3x ＝ ${x+y} &nbsp; ↳ &nbsp; <span class="final-ans">x ＝ ${x}, y ＝ ${y}</span>`] };
             }},
             m3_expand: { title: "乗法公式を利用して、次の式を展開しなさい。", engine: function() {
-                let a = getRandomInt(1, 4); let b = getRandomInt(5, 7, false);
+                let a = getRandomInt(1, 4); let b = getRandomInt(5, 6, false);
                 return { q: `( x ＋ ${a} )( x ＋ ${b} ) ＝`, steps: [`＝ x² ＋ <span class="diff">(${a}＋${b})</span>x ＋ <span class="diff">${a}×${b}</span>`, `＝ <span class="final-ans">x² ＋ ${a+b}x ＋ ${a*b}</span>`] };
             }},
             m3_factor: { title: "因数分解公式を適用して、次の式を因数分解しなさい。", engine: function() {
@@ -255,12 +275,12 @@
             }},
             m3_eq2: { title: "次の2次方程式を解きなさい。", engine: function() {
                 let ea = getRandomInt(1, 2); let eb = getRandomInt(3, 4, false);
-                return { q: `x² － ${ea+eb}x ＋ ${ea*eb} ＝ 0`, steps: [`因数分解公式を適用して`, `( x － ${ea} )( x － ${eb} ) ＝ 0`, `<span class="final-ans">x ＝ ${ea}, ${eb}</span>`] };
+                return { q: `x² － ${ea+eb}x ＋ ${ea*eb} ＝ 0`, steps: [`因数分解して：`, `( x － ${ea} )( x － ${eb} ) ＝ 0`, `<span class="final-ans">x ＝ ${ea}, ${eb}</span>`] };
             }}
         };
 
         // ==========================================
-        // 🌟 A4 1枚ジャスト・2列グリッド連動エンジン
+        // 🌟 サイズ完全固定型・自動配分エンジン
         // ==========================================
         function generatePrint() {
             const containerQ = document.getElementById('container-q');
@@ -276,57 +296,87 @@
                 selectedUnits.push(document.querySelectorAll('.calc-unit')[0].value);
             }
 
-            // 選ばれた単元数（大問数）に応じて、1ページ（2段組・計12問前後）に綺麗に収まる小問数を自動計算
+            // 1枚に絶対収まる大問数と小問数の逆算
             let subCount = 2;
-            if (selectedUnits.length === 1) subCount = 10;
-            else if (selectedUnits.length === 2) subCount = 6;
-            else if (selectedUnits.length === 3) subCount = 4;
-            else if (selectedUnits.length === 4) subCount = 3;
-            else subCount = 2; // たくさん選ばれたら大問ごとに2問ずつ
+            if (selectedUnits.length === 1) subCount = 10; // 計20問
+            else if (selectedUnits.length === 2) subCount = 6; // 計12問
+            else if (selectedUnits.length === 3) subCount = 4; // 計12問
+            else if (selectedUnits.length === 4) subCount = 3; // 計12問
+            else if (selectedUnits.length <= 6) subCount = 2; // 計10〜12問
+            else {
+                alert('A4サイズ1枚に収めるため、選択する単元（大問）は最大6個までにしてください！');
+                // 7個目以降のチェックを外す安全処理
+                let count = 0;
+                document.querySelectorAll('.calc-unit').forEach(cb => {
+                    if (cb.checked) {
+                        count++;
+                        if(count > 6) cb.checked = false;
+                    }
+                });
+                return generatePrint();
+            }
+
+            document.getElementById('layout-status').innerText = `大問 ${selectedUnits.length} 個 × 小問 ${subCount} 問 (A4固定)`;
+
+            // 📄 ミリメートル単位での高さ計算ロジック（ここが最大の修正点です）
+            // 利用可能な全縦幅 235mm を、大問の数（個数）で等分して高さを厳密に固定
+            let totalAvailableHeightMM = 235; 
+            let singleBigQHeightMM = totalAvailableHeightMM / selectedUnits.length;
+            
+            // 大問タイトル(6mm)を引いた、小問リストに割り当てられる高さを計算
+            let gridHeightMM = singleBigQHeightMM - 6; 
+            
+            // 2列配置（2段組）なので、縦の行数は「小問数 ÷ 2（切り上げ）」
+            let rowCount = Math.ceil(subCount / 2);
+            let singleSubItemHeightMM = gridHeightMM / rowCount;
 
             let bigQIndex = 1;
 
             selectedUnits.forEach(unitKey => {
-                const targetUnit = sectionCatalog[unitKey] || sectionCatalog["m1_pn_add"];
+                const targetUnit = sectionCatalog[unitKey];
                 
-                // --- ① 問題用紙側ブロック ---
+                // --- ① 問題用紙側 ---
                 const bigQBlockQ = document.createElement('div');
                 bigQBlockQ.className = 'big-question';
+                bigQBlockQ.style.height = `${singleBigQHeightMM}mm`; // 大問の高さをmm固定
                 bigQBlockQ.innerHTML = `
                     <div class="big-question-title">【大問 ${bigQIndex}】 &nbsp; ${targetUnit.title}</div>
-                    <div class="sub-question-grid" id="bq-q-${bigQIndex}"></div>
+                    <div class="sub-question-grid" id="bq-q-${bigQIndex}" style="height:${gridHeightMM}mm;"></div>
                 `;
                 containerQ.appendChild(bigQBlockQ);
 
-                // --- ② 解答用紙側ブロック ---
+                // --- ② 解答用紙側 ---
                 const bigQBlockA = document.createElement('div');
                 bigQBlockA.className = 'big-question';
+                bigQBlockA.style.height = `${singleBigQHeightMM}mm`; // 解答大問の高さをmm固定
                 bigQBlockA.innerHTML = `
                     <div class="big-question-title" style="color:#e53e3e;">【大問 ${bigQIndex}】 &nbsp; ${targetUnit.title}</div>
-                    <div class="sub-question-grid" id="bq-a-${bigQIndex}"></div>
+                    <div class="sub-question-grid" id="bq-a-${bigQIndex}" style="height:${gridHeightMM}mm;"></div>
                 `;
                 containerA.appendChild(bigQBlockA);
 
                 const gridQ = document.getElementById(`bq-q-${bigQIndex}`);
                 const gridA = document.getElementById(`bq-a-${bigQIndex}`);
 
-                // 小問のループ生成
+                // 小問生成ループ
                 for (let subIndex = 1; subIndex <= subCount; subIndex++) {
                     let problemData = targetUnit.engine();
 
-                    // 小問（問題）
+                    // 問題アイテム（高さをミリ単位固定）
                     const itemQ = document.createElement('div');
                     itemQ.className = 'sub-question-item';
-                    itemQ.innerHTML = `<div class="item-main"><span class="num-tag">(${subIndex})</span><span class="formula">${problemData.q}</span></div>`;
+                    itemQ.style.height = `${singleSubItemHeightMM}mm`;
+                    itemQ.innerHTML = `<div class="item-main"><span class="num-tag">（${subIndex}）</span><span class="formula">${problemData.q}</span></div>`;
                     gridQ.appendChild(itemQ);
 
-                    // 小問（解答・途中式）
+                    // 解答アイテム（高さをミリ単位固定・途中式含む）
                     let stepsHtml = "";
                     problemData.steps.forEach(step => { stepsHtml += `<div class="step-line"><span class="step-arrow">↳</span><span>${step}</span></div>`; });
 
                     const itemA = document.createElement('div');
                     itemA.className = 'sub-question-item';
-                    itemA.innerHTML = `<div class="item-main"><span class="num-tag">(${subIndex})</span><span class="formula">${problemData.q}</span></div><div class="steps-area">${stepsHtml}</div>`;
+                    itemA.style.height = `${singleSubItemHeightMM}mm`;
+                    itemA.innerHTML = `<div class="item-main"><span class="num-tag">（${subIndex}）</span><span class="formula">${problemData.q}</span></div><div class="steps-area">${stepsHtml}</div>`;
                     gridA.appendChild(itemA);
                 }
                 bigQIndex++;
