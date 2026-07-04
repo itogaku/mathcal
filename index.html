@@ -395,11 +395,9 @@
             "m1_同類項まとめ": { title: "次の文字式の同類項をまとめなさい。", engine: function() {
                 return { q: `7x － 5 － 3x ＋ 2 ＝`, steps: [`＝ 7x － 3x － 5 ＋ 2`, `＝ <span class="final-ans">4x － 3</span>`] };
             }},
-            "m1_一次加減乗過": { title: "次の一次式の計算をしなさい。", engine: function() {
-                return { q: `－8x ÷ 4 ＝`, steps: [`＝ <span class="final-ans">－2x</span>`] };
-            }},
-            "m1_一次加減乗除": { title: "次の一次式の計算をしなさい。", engine: function() {
-                return { q: `－8x ÷ 4 ＝`, steps: [`＝ <span class="final-ans">－2x</span>`] };
+            "m1_l_一次加減乗除": { title: "次の一次式の計算をしなさい。", engine: function() {
+                let la = getRandomInt(2, 6); let l_ans = getRandomInt(-4, 4);
+                return { q: `${formatXTerm(la * l_ans, true)} ÷ ${la} ＝`, steps: [`＝ <span class="final-ans">${formatXTerm(l_ans, true)}</span>`] };
             }},
             "m1_文字分配": { title: "文字式と数の分配法則の計算をしなさい。", engine: function() {
                 return { q: `3( 3x － 2 ) ＝`, steps: [`＝ 3×3x － 3×2`, `＝ <span class="final-ans">9x － 6</span>`] };
