@@ -682,8 +682,9 @@
             });
 
             // 最後に、完成した「問題の山」を全部並べ、そのあとに「解答の山」を全部くっつけて画面に描画
-            qPages.forEach(p => previewArea.appendChild(p));
-            aPages.forEach(p => previewArea.appendChild(p));
+            const previewContainer = document.getElementById('main-preview-area');
+            qPages.forEach(p => previewContainer.appendChild(p));
+            aPages.forEach(p => previewContainer.appendChild(p));
         }
 
         window.onload = function() {
