@@ -975,32 +975,41 @@
         };
 
         function generatePrint() {
-           const previewContainer = document.getElementById('main-preview-area');
-            previewContainer.innerHTML = ''; // 🌟画面を真っ白にクリアする
+            const previewContainer = document.getElementById('main-preview-area');
+            
+            // 1. まずは右側のプレビューエリアを完全に空っぽにする
+            previewContainer.innerHTML = ''; 
 
+            // 2. チェックがついている単元（calc-unit）の値を集める
             let selectedUnits = [];
-            document.querySelectorAll('.calc-unit').forEach(cb => { if (cb.checked) selectedUnits.push(cb.value); });
+            document.querySelectorAll('.calc-unit').forEach(cb => { 
+                if (cb.checked) selectedUnits.push(cb.value); 
+            });
 
+            // 3. 🌟修正点：もし選択されている単元が0個なら、画面を確実に真っ白にして処理を終える
             if (selectedUnits.length === 0) {
                 document.getElementById('layout-status').innerText = "大問 0 個";
-                previewContainer.innerHTML = ''; // 🌟修正：選択数が0個の時、確実に画面を真っ白にする
-                return;
+                return; // ここで処理を抜けるため、古いプリントが残りません
             }
 
             let bqCount = selectedUnits.length;
-            let pageCount = Math.ceil(bqCount / 6); 
-            let subCount = 4; 
+            let pageCount = Math.ceil(bqCount / 6); // 1ページ最大6大問
+            let subCount = 4; // 1単元あたり4問固定（網羅条件保証）
 
+            // 左下のステータス表示を更新
             document.getElementById('layout-status').innerHTML = `大問: ${bqCount} 個 選出<br>用紙: 各 ${pageCount} 枚構成 (A4固定)`;
 
+            // 問題ページと解答ページの台紙（箱）を必要枚数分だけ作成
             let qPages = [];
             let aPages = [];
             for (let p = 0; p < pageCount; p++) {
-                let qPage = document.createElement('div'); qPage.className = 'page';
+                let qPage = document.createElement('div'); 
+                qPage.className = 'page';
                 qPage.innerHTML = `<div class="sheet-header"><h1 class="sheet-title">数学計算確認ドリル（問題）- P.${p+1}</h1><div class="student-info"><div>組</div><div>番</div><div style="width:120px;">氏名：</div></div></div><div class="document-body" id="page-q-${p}"></div>`;
                 qPages.push(qPage);
 
-                let aPage = document.createElement('div'); aPage.className = 'page';
+                let aPage = document.createElement('div'); 
+                aPage.className = 'page';
                 aPage.innerHTML = `<div class="sheet-header"><h1 class="sheet-title" style="color: #e53e3e;">数学計算確認ドリル（途中式解答）- P.${p+1}</h1></div><div class="document-body" id="page-a-${p}"></div>`;
                 aPages.push(aPage);
             }
@@ -1010,12 +1019,21 @@
                 let targetPageIndex = Math.floor(index / 6); 
                 let unitsInThisPage = Math.min(6, bqCount - (targetPageIndex * 6)); 
 
+                // A4の有効縦幅から、各大問に配分する高さをミリ単位で計算
                 let singleBigQHeightMM = 235 / unitsInThisPage;
-                let gridHeightMM = singleBigQHeightMM - 6;
 
-                const targetUnit = sectionCatalog[unitKey] || sectionCatalog["加法"];
+                const targetUnit = sectionCatalog[unitKey];
+                
+                // 万が一、カタログに存在しないキーが指定された場合の安全対策エラーガード
+                if (!targetUnit || typeof targetUnit.generator !== 'function') {
+                    console.error(`エラー: 単元データ「${unitKey}」が見つからないか、generatorが未定義です。`);
+                    return; 
+                }
+
+                // 4つの出題パターンが詰まった配列を取得
                 let problemSet = targetUnit.generator(); 
 
+                // 問題側の大問枠を作成
                 const bqBlockQ = document.createElement('div');
                 bqBlockQ.className = 'big-question';
                 bqBlockQ.style.minHeight = `${singleBigQHeightMM}mm`; 
@@ -1024,6 +1042,7 @@
                     <div class="sub-question-grid" id="grid-q-${bigQIndex}"></div>
                 `;
 
+                // 解答側の大問枠を作成
                 const bqBlockA = document.createElement('div');
                 bqBlockA.className = 'big-question';
                 bqBlockA.style.minHeight = `${singleBigQHeightMM}mm`; 
@@ -1032,22 +1051,28 @@
                     <div class="sub-question-grid" id="grid-a-${bigQIndex}"></div>
                 `;
 
+                // 適切な各ページの document-body の中へ大問枠を差し込む
                 qPages[targetPageIndex].querySelector('.document-body').appendChild(bqBlockQ);
                 aPages[targetPageIndex].querySelector('.document-body').appendChild(bqBlockA);
 
                 const gridQ = qPages[targetPageIndex].querySelector(`#grid-q-${bigQIndex}`);
                 const gridA = aPages[targetPageIndex].querySelector(`#grid-a-${bigQIndex}`);
 
+                // 小問4問のループ生成とHTML流し込み
                 for (let subIndex = 1; subIndex <= subCount; subIndex++) {
                     let problemData = problemSet[subIndex - 1]; 
 
+                    // 問題セルの組み立て
                     const itemQ = document.createElement('div');
                     itemQ.className = 'sub-question-item';
                     itemQ.innerHTML = `<div class="item-main"><span class="num-tag">（${subIndex}）</span><span class="formula">${problemData.q}</span></div>`;
                     gridQ.appendChild(itemQ);
 
+                    // 解答（途中式ステップ）セルの組み立て
                     let stepsHtml = "";
-                    problemData.steps.forEach(step => { stepsHtml += `<div class="step-line"><span class="step-arrow">↳</span><span>${step}</span></div>`; });
+                    problemData.steps.forEach(step => { 
+                        stepsHtml += `<div class="step-line"><span class="step-arrow">↳</span><span>${step}</span></div>`; 
+                    });
 
                     const itemA = document.createElement('div');
                     itemA.className = 'sub-question-item';
@@ -1058,6 +1083,7 @@
                 bigQIndex++;
             });
 
+            // 最後に、完成した「問題の用紙」と「解答の用紙」をすべて順番にプレビュー画面へ描画
             qPages.forEach(p => previewContainer.appendChild(p));
             aPages.forEach(p => previewContainer.appendChild(p));
         }
