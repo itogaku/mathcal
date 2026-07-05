@@ -247,7 +247,6 @@
             generatePrint();
         }
 
-        // 定義漏れしていたヘルパー関数
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
@@ -412,9 +411,15 @@
                 ];
             }},
             "m1_2_一次加減乗除": { title: "次の一次式の計算をしなさい。", generator: function() {
-                let la = getRandomInt(2, 6); let l_ans = getRandomInt(-4, 4); 
-                let term = l_ans === 0 ? "0" : (l_ans === 1 ? "x" : (l_ans === -1 ? "－x" : `${l_ans}x`));
-                let combined = (la * l_ans) === 0 ? "0" : ((la * l_ans) === 1 ? "x" : ((la * l_ans) === -1 ? "－x" : `${la * l_ans}x`));
+                // 無限ループが発生しないよう、常に割り切れる安全な数値を生成
+                let la = getRandomInt(2, 5);
+                let l_ans = getRandomInt(-4, 4);
+                if (l_ans === 0) l_ans = 2; // 安全弁
+                
+                let term = l_ans === 1 ? "x" : (l_ans === -1 ? "－x" : `${l_ans}x`);
+                let val = la * l_ans;
+                let combined = val === 1 ? "x" : (val === -1 ? "－x" : `${val}x`);
+                
                 return [
                     { q: `${combined} ÷ ${la} ＝`, steps: [`＝ <span class="final-ans">${term}</span>`] },
                     { q: `3x × 4 ＝`, steps: [`＝ <span class="final-ans">12x</span>`] },
@@ -773,7 +778,7 @@
                     { q: `( x ＋ y ＋ 3 )( x ＋ y － 3 ) ＝`, steps: [`x＋y ＝ M とおく`, `＝ M² － 9`, `＝ <span class="final-ans">(x ＋ y)² － 9</span>`] },
                     { q: `( a － b ＋ 2 )² ＝`, steps: [`a－b ＝ M とおく`, `＝ M² ＋ 4M ＋ 4`, `＝ <span class="final-ans">(a － b)² ＋ 4(a － b) ＋ 4</span>`] },
                     { q: `( x ＋ 2y － 4 )( x ＋ 2y ＋ 5 ) ＝`, steps: [`x＋2y ＝ M とおく`, `＝ M² ＋ M － 20`, `＝ <span class="final-ans">(x ＋ 2y)² ＋ (x ＋ 2y) － 20</span>`] },
-                    { q: `( a － 2b ＋ 3 )( a － 2b － 7 ) ＝`, steps: [`a－2b ＝ M とおく`, `＝ M² － 4M － 21`, `＝ <span class="final-ans">(a － 2b)² － 4(a － 2b) － 21</span>`] }
+                    { q: `( a － 2b ＋ 3 )( a － 2b － 7 ) ＝`, steps: [`a－2b ＝ M とおく`, `＝ M² － 4M － 21`, `＝ <span class="final-ans">(a － b)² － 4(a － 2b) － 21</span>`] }
                 ];
             }},
             "m3_1_展開同類": { title: "展開後に同類項をまとめなさい。", generator: function() {
@@ -1005,7 +1010,9 @@
 
                 let singleBigQHeightMM = 235 / unitsInThisPage;
 
-                const targetUnit = sectionCatalog[unitKey] || sectionCatalog["m1_1_加法"];
+                const targetUnit = sectionCatalog[unitKey];
+                if (!targetUnit) return;
+                
                 let problemSet = targetUnit.generator(); 
 
                 const bqBlockQ = document.createElement('div');
@@ -1032,6 +1039,7 @@
 
                 for (let subIndex = 1; subIndex <= subCount; subIndex++) {
                     let problemData = problemSet[subIndex - 1]; 
+                    if (!problemData) continue;
 
                     const itemQ = document.createElement('div');
                     itemQ.className = 'sub-question-item';
