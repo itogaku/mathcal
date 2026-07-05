@@ -975,14 +975,15 @@
         };
 
         function generatePrint() {
-            const previewContainer = document.getElementById('main-preview-area');
-            previewContainer.innerHTML = ''; 
+           const previewContainer = document.getElementById('main-preview-area');
+            previewContainer.innerHTML = ''; // 🌟画面を真っ白にクリアする
 
             let selectedUnits = [];
             document.querySelectorAll('.calc-unit').forEach(cb => { if (cb.checked) selectedUnits.push(cb.value); });
 
             if (selectedUnits.length === 0) {
                 document.getElementById('layout-status').innerText = "大問 0 個";
+                previewContainer.innerHTML = ''; // 🌟修正：選択数が0個の時、確実に画面を真っ白にする
                 return;
             }
 
