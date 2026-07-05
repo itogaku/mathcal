@@ -77,7 +77,7 @@
         .num { border-bottom: 1px solid #333; padding-bottom: 1px; }
         .den { padding-top: 1px; }
         
-        .renritu-box { inline-flex; align-items: center; vertical-align: middle; font-style: normal; }
+        .renritu-box { display: inline-flex; align-items: center; vertical-align: middle; font-style: normal; }
         .renritu-bracket { font-size: 32px; font-family: sans-serif; font-weight: 300; margin-right: 2px; line-height: 1; transform: scaleY(1.2); }
         .renritu-equations { display: inline-flex; flex-direction: column; gap: 4px; font-size: 14px; text-align: left; }
 
@@ -247,6 +247,19 @@
             generatePrint();
         }
 
+        // 定義漏れしていたヘルパー関数
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         const sectionCatalog = {
             "m1_1_加法": { title: "次の加法を計算しなさい。", generator: function() {
                 let p1 = getRandomInt(2, 8); let p2 = getRandomInt(2, 8); let n1 = getRandomInt(-8, -2); let n2 = getRandomInt(-8, -2);
@@ -315,7 +328,7 @@
             "m1_1_累乗": { title: "次の累乗の計算をしなさい。", generator: function() {
                 return [
                     { q: `2³ ＝`, steps: [`＝ 2 × 2 × 2`, `＝ <span class="final-ans">8</span>`] }, { q: `(－3)² ＝`, steps: [`＝ (－3) × (－3)`, `＝ <span class="final-ans">9</span>`] },
-                    { q: `－4² ＝`, steps: [`＝ －(4 × 4)`, `＝ <span class="final-ans">－16</span>`] }, { q: `(－1)⁵ ＝`, steps: [`＝ 奇数乗ので符号はマイナス`, `＝ <span class="final-ans">－1</span>`] }
+                    { q: `－4² ＝`, steps: [`＝ －(4 × 4)`, `＝ <span class="final-ans">－16</span>`] }, { q: `(－1)⁵ ＝`, steps: [`＝ 奇数乗なので符号はマイナス`, `＝ <span class="final-ans">－1</span>`] }
                 ];
             }},
             "m1_1_除法": { title: "次の除法を計算しなさい。", generator: function() {
@@ -343,8 +356,8 @@
             "m1_1_分配法則": { title: "分配法則を利用して工夫して計算しなさい。", generator: function() {
                 return [
                     { q: `34 × (－7) ＋ 66 × (－7) ＝`, steps: [`＝ ( 34 ＋ 66 ) × (－7)`, `＝ 100 × (－7)`, `＝ <span class="final-ans">－700</span>`] },
-                    { q: `48 × ( <div class="frac"><div class="num">1</div><div class="den">2</div></div> － <div class="frac"><div class="num">1</div><div class="den">6</div></div> ) ＝`, steps: [`＝ 48 × 1/4 － 48 × 1/6`, `＝ 12 － 8`, `＝ <span class="final-ans">4</span>`] },
-                    { q: `23 × 15 － 13 × 15 ＝`, steps: [`＝ ( 23 － 13 ) × 15`, `＝ 10 × 14`, `＝ <span class="final-ans">150</span>`] },
+                    { q: `48 × ( <div class="frac"><div class="num">1</div><div class="den">4</div></div> － <div class="frac"><div class="num">1</div><div class="den">6</div></div> ) ＝`, steps: [`＝ 48 × 1/4 － 48 × 1/6`, `＝ 12 － 8`, `＝ <span class="final-ans">4</span>`] },
+                    { q: `23 × 15 － 13 × 15 ＝`, steps: [`＝ ( 23 － 13 ) × 15`, `＝ 10 × 15`, `＝ <span class="final-ans">150</span>`] },
                     { q: `15 × 102 ＝`, steps: [`＝ 15 × ( 100 ＋ 2 )`, `＝ 1500 ＋ 30`, `＝ <span class="final-ans">1530</span>`] }
                 ];
             }},
@@ -399,8 +412,11 @@
                 ];
             }},
             "m1_2_一次加減乗除": { title: "次の一次式の計算をしなさい。", generator: function() {
-                let la = getRandomInt(2, 6); let l_ans = getRandomInt(-4, 4); return [
-                    { q: `${formatXTerm(la * l_ans, true)} ÷ ${la} ＝`, steps: [`＝ <span class="final-ans">${formatXTerm(l_ans, true)}</span>`] },
+                let la = getRandomInt(2, 6); let l_ans = getRandomInt(-4, 4); 
+                let term = l_ans === 0 ? "0" : (l_ans === 1 ? "x" : (l_ans === -1 ? "－x" : `${l_ans}x`));
+                let combined = (la * l_ans) === 0 ? "0" : ((la * l_ans) === 1 ? "x" : ((la * l_ans) === -1 ? "－x" : `${la * l_ans}x`));
+                return [
+                    { q: `${combined} ÷ ${la} ＝`, steps: [`＝ <span class="final-ans">${term}</span>`] },
                     { q: `3x × 4 ＝`, steps: [`＝ <span class="final-ans">12x</span>`] },
                     { q: `－10a ÷ 5 ＝`, steps: [`＝ <span class="final-ans">－2a</span>`] },
                     { q: `(－2y) × (－3) ＝`, steps: [`＝ <span class="final-ans">6y</span>`] }
@@ -457,7 +473,7 @@
                     { q: `5x ＝ 2x ＋ 9`, steps: [`5x － 2x ＝ 9 ↳ 3x ＝ 9`, `<span class="final-ans">x ＝ 3</span>`] },
                     { q: `3x ＝ 15 － 2x`, steps: [`3x ＋ 2x ＝ 15 ↳ 5x ＝ 15`, `<span class="final-ans">x ＝ 3</span>`] },
                     { q: `2x ＋ 4 ＝ x ＋ 9`, steps: [`2x － x ＝ 9 － 4`, `<span class="final-ans">x ＝ 5</span>`] },
-                    { q: `x － 6 ＝ 4x ＋ 3`, steps: [`x － 4x ＝ 3 ＋ 7 ↳ －3x ＝ 9`, `<span class="final-ans">x ＝ －3</span>`] }
+                    { q: `x － 6 ＝ 4x ＋ 3`, steps: [`x － 4x ＝ 3 ＋ 6 ↳ －3x ＝ 9`, `<span class="final-ans">x ＝ －3</span>`] }
                 ];
             }},
             "m1_3_カッコ": { title: "（ ）を含む方程式を解きなさい。", generator: function() {
@@ -510,7 +526,7 @@
                 return [
                     { q: `yは反比例し、x＝3 のとき y＝4 である。式は？ ↳`, steps: [`a ＝ 3 × 4 ＝ 12`, `<span class="final-ans">y ＝ <div class="frac"><div class="num">12</div><div class="den">x</div></div></span>`] },
                     { q: `yは反比例し、x＝2 のとき y＝－5 である。式は？ ↳`, steps: [`a ＝ 2 × (－5) ＝ －10`, `<span class="final-ans">y ＝ －<div class="frac"><div class="num">10</div><div class="den">x</div></div></span>`] },
-                    { q: `yは反比例し、x＝－4 のとき y＝－6 である。式は？ ↳`, steps: [`a ＝ －4 × (－6) ＝ 24`, `<span class="final-ans">y ＝ －<div class="frac"><div class="num">10</div><div class="den">x</div></div></span>`] },
+                    { q: `yは反比例し、x＝－4 のとき y＝－6 である。式は？ ↳`, steps: [`a ＝ －4 × (－6) ＝ 24`, `<span class="final-ans">y ＝ <div class="frac"><div class="num">24</div><div class="den">x</div></div></span>`] },
                     { q: `yは反比例し、x＝6 のとき y＝2 である。式は？ ↳`, steps: [`a ＝ 6 × 2 ＝ 12`, `<span class="final-ans">y ＝ <div class="frac"><div class="num">12</div><div class="den">x</div></div></span>`] }
                 ];
             }},
@@ -677,7 +693,7 @@
                     { q: `5 ＝ 2x ＋ y ＝ x － y ＋ 3`, steps: [`最左辺が定数： {2x＋y＝5, x－y＋3＝5}`, `<span class="final-ans">x ＝ 2, y ＝ 1</span>`] },
                     { q: `3x － y ＝ x ＋ y ＝ 4`, steps: [`最右辺が定数： {3x－y＝4, x＋y＝4}`, `<span class="final-ans">x ＝ 2, y ＝ 2</span>`] },
                     { q: `x ＋ 2y ＝ 2x － y ＋ 5 ＝ 8`, steps: [`最右辺が定数： {x＋2y＝8, 2x－y＝3}`, `<span class="final-ans">x ＝ 2, y ＝ 3</span>`] },
-                    { q: `6 ＝ 4x － y ＝ 2x ＋ y ＋ 2`, steps: [`最left辺が定数： {4x－y＝6, 2x＋y＝4}`, `<span class="final-ans">x ＝ 1, y ＝ 2</span>`] }
+                    { q: `6 ＝ 4x － y ＝ 2x ＋ y ＋ 2`, steps: [`最左辺が定数： {4x－y＝6, 2x＋y＝4}`, `<span class="final-ans">x ＝ 1, y ＝ 2</span>`] }
                 ];
             }},
             "m2_3_式座標": { title: "式から座標を求めなさい。", generator: function() {
@@ -700,7 +716,7 @@
                 return [
                     { q: `「xが3増加するとyが6増加する」直線の傾き ↳`, steps: [`a ＝ 6 / 3`, `<span class="final-ans">傾き ＝ 2</span>`] },
                     { q: `「xが2増加するとyが4減少する」直線の傾き ↳`, steps: [`a ＝ －4 / 2`, `<span class="final-ans">傾き ＝ －2</span>`] },
-                    { q: `「直線 y＝－5x ＋ 8 に平行である Preferences」直線の傾き ↳`, steps: [`平行＝傾きが等しい`, `<span class="final-ans">傾き ＝ －5</span>`] },
+                    { q: `「直線 y＝－5x ＋ 8 に平行である」直線の傾き ↳`, steps: [`平行＝傾きが等しい`, `<span class="final-ans">傾き ＝ －5</span>`] },
                     { q: `「xの変域が2のとき、yの増加量が8である(a>0)」傾き ↳`, steps: [`a ＝ 8 / 2`, `<span class="final-ans">傾き ＝ 4</span>`] }
                 ];
             }},
@@ -746,7 +762,7 @@
             }},
             "m3_1_優先順位": { title: "式の展開と分配法則の優先順位に注意せよ。", generator: function() {
                 return [
-                    { q: `2x² － ( x ＋ 3 )( x － 3 ) ＝`, steps: [`＝ 2x² － ( x² － 9 )`, `＝ <span class="final-ans">x² ＋ 4</span>`] },
+                    { q: `2x² － ( x ＋ 3 )( x － 3 ) ＝`, steps: [`＝ 2x² － ( x² － 9 )`, `＝ <span class="final-ans">x² ＋ 9</span>`] },
                     { q: `5x － 2( x － 1 )² ＝`, steps: [`＝ 5x － 2( x² － 2x ＋ 1 )`, `＝ <span class="final-ans">－2x² ＋ 9x － 2</span>`] },
                     { q: `( x ＋ 4 )( x － 2) － ( x － 1 )² ＝`, steps: [`＝ ( x² ＋ 2x － 8 ) － ( x² － 2x ＋ 1 )`, `＝ <span class="final-ans">4x － 9</span>`] },
                     { q: `3( x ＋ 2 )² － 3x² ＝`, steps: [`＝ 3( x² ＋ 4x ＋ 4 ) － 3x²`, `＝ <span class="final-ans">12x ＋ 12</span>`] }
@@ -882,12 +898,6 @@
                     { q: `( √7 ＋ √2 )( √7 － √2 ) ＝`, steps: [`＝ 7 － 2`, `＝ <span class="final-ans">5</span>`] }, { q: `( √2 － 3 )² ＝`, steps: [`＝ 2 － 6√2 ＋ 9`, `＝ <span class="final-ans">11 － 6√2</span>`] }
                 ];
             }},
-            "m3_3_NaN_因数方程式": { title: "因数分解を利用した方程式を解きなさい。", generator: function() {
-                return [
-                    { q: `(x － 2)(x － 5) ＝ 0`, steps: [`<span class="final-ans">x ＝ 2 , 5</span>`] }, { q: `(x ＋ 3)(x － 1) ＝ 0`, steps: [`<span class="final-ans">x ＝ －3 , 1</span>`] },
-                    { q: `(x ＋ 4)² ＝ 0`, steps: [`<span class="final-ans">x ＝ －4</span>`] }, { q: `x² － 9x ＋ 20 ＝ 0`, steps: [`(x － 4)(x － 5) ＝ 0`, `<span class="final-ans">x ＝ 4 , 5</span>`] }
-                ];
-            }},
             "m3_3_因数方程式": { title: "因数分解を利用した方程式を解きなさい。", generator: function() {
                 return [
                     { q: `(x － 2)(x － 5) ＝ 0`, steps: [`<span class="final-ans">x ＝ 2 , 5</span>`] }, { q: `(x ＋ 3)(x － 1) ＝ 0`, steps: [`<span class="final-ans">x ＝ －3 , 1</span>`] },
@@ -950,7 +960,7 @@
             }},
             "m3_4_放物直線": { title: "直線と放物線の交点を求めなさい。", generator: function() {
                 return [
-                    { q: `y ＝ x² &nbsp;と&nbsp; y ＝ x ＋ 2 &nbsp;的交点 ↳`, steps: [`連立： x² － x － 2 ＝ 0`, `<span class="final-ans">( 2 , 4 ) , ( －1 , 1 )</span>`] },
+                    { q: `y ＝ x² &nbsp;と&nbsp; y ＝ x ＋ 2 &nbsp;の交点 ↳`, steps: [`連立： x² － x － 2 ＝ 0`, `<span class="final-ans">( 2 , 4 ) , ( －1 , 1 )</span>`] },
                     { q: `y ＝ 2x² &nbsp;と&nbsp; y ＝ 4x &nbsp;の交点 ↳`, steps: [`連立： 2x² － 4x ＝ 0`, `<span class="final-ans">( 0 , 0 ) , ( 2 , 8 )</span>`] },
                     { q: `y ＝ x² &nbsp;と&nbsp; y ＝ －2x ＋ 3 &nbsp;の交点 ↳`, steps: [`連立： x² ＋ 2x － 3 ＝ 0`, `<span class="final-ans">( 1 , 1 ) , ( －3 , 9 )</span>`] },
                     { q: `y ＝ －x² &nbsp;と&nbsp; y ＝ 2x － 3 &nbsp;の交点 ↳`, steps: [`連立： x² ＋ 2x － 3 ＝ 0`, `<span class="final-ans">( 1 , －1 ) , ( －3 , －9 )</span>`] }
