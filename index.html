@@ -119,7 +119,7 @@
             </div>
             <div class="menu-unit-title">【2章 文字式】</div>
             <div class="checkbox-list">
-                <label><input type="checkbox" class="calc-unit" value="m1_2_ルール" onchange="generatePrint()"> 文字式のルールで表せ</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_2_rules" var-name="m1_2_ルール" onchange="generatePrint()"> 文字式のルールで表せ</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_2_四則表し" onchange="generatePrint()"> 文字を含む四則演算の表し方</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_2_記号化" onchange="generatePrint()"> 文字式を記号で表せ</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_2_代入" onchange="generatePrint()"> 代入と式の値</label>
@@ -315,7 +315,7 @@
             "m1_1_累乗": { title: "次の累乗の計算をしなさい。", generator: function() {
                 return [
                     { q: `2³ ＝`, steps: [`＝ 2 × 2 × 2`, `＝ <span class="final-ans">8</span>`] }, { q: `(－3)² ＝`, steps: [`＝ (－3) × (－3)`, `＝ <span class="final-ans">9</span>`] },
-                    { q: `－4² ＝`, steps: [`＝ －(4 × 4)`, `＝ <span class="final-ans">－16</span>`] }, { q: `(－1)⁵ ＝`, steps: [`＝ 奇数乗なので符号はマイナス`, `＝ <span class="final-ans">－1</span>`] }
+                    { q: `－4² ＝`, steps: [`＝ －(4 × 4)`, `＝ <span class="final-ans">－16</span>`] }, { q: `(－1)⁵ ＝`, steps: [`＝ 奇数乗ので符号はマイナス`, `＝ <span class="final-ans">－1</span>`] }
                 ];
             }},
             "m1_1_除法": { title: "次の除法を計算しなさい。", generator: function() {
@@ -422,7 +422,7 @@
                     { q: `－15 × <div class="frac"><div class="num">x － 1</div><div class="den">5</div></div> ＝`, steps: [`＝ －3 × (x － 1)`, `＝ <span class="final-ans">－3x ＋ 3</span>`] }
                 ];
             }},
-            "m1_2_複数のカッコ": { title: "複数の（ ）がある文字式を計算しなさい。", generator: function() {
+            "m1_2_複数カッコ": { title: "複数の（ ）がある文字式を計算しなさい。", generator: function() {
                 return [
                     { q: `2(x ＋ 3) ＋ 4(x － 1) ＝`, steps: [`＝ 2x ＋ 6 ＋ 4x － 4`, `＝ <span class="final-ans">6x ＋ 2</span>`] },
                     { q: `3(2a － 1) － 2(a － 4) ＝`, steps: [`＝ 6a － 3 － 2a ＋ 8`, `＝ <span class="final-ans">4a ＋ 5</span>`] },
