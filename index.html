@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>【中学数学計算全網羅】71単元・完全エラー修正版・無限プリント基盤</title>
+    <title>【中学数学計算全網羅】71単元・完全修復確定版・無限プリント基盤</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
@@ -101,7 +101,8 @@
             <div class="checkbox-list">
                 <label><input type="checkbox" class="calc-unit" value="m1_1_加法" checked onchange="generatePrint()"> 加法</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_1_交換結合" checked onchange="generatePrint()"> 交換法則結合法則（計算の工夫）</label>
-                <label><input type="checkbox" class="calc-unit" value="m1_1_減法" onchange="generatePrint()"> 減法</label>                <label><input type="checkbox" class="calc-unit" value="m1_1_カッコなし式" onchange="generatePrint()"> カッコのない式にする</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_減法" onchange="generatePrint()"> 減法</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_カッコなし式" onchange="generatePrint()"> カッコのない式にする</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_1_カッコあり式" onchange="generatePrint()"> カッコのある式にする</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_1_加減混合" onchange="generatePrint()"> 加減の混じった計算</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_1_乗法" onchange="generatePrint()"> 乗法</label>
@@ -241,32 +242,9 @@
     </div>
 
     <script>
-        function getRandomInt(min, max, excludeZero = true) {
-            let num = Math.floor(Math.random() * (max - min + 1)) + min;
-            if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
-            return num;
-        }
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function formatTerm(value, isFirst = false) {
-            if (value === 0) return "";
-            if (value > 0) return isFirst ? `${value}` : `＋ ${value}`;
-            return isFirst ? `－${Math.abs(value)}` : `－ ${Math.abs(value)}`;
-        }
-
-        function formatXTerm(coef, isFirst = false, varChar = "x") {
-            if (coef === 0) return "";
-            let sign = coef > 0 ? (isFirst ? "" : "＋ ") : "－ ";
-            let absCoef = Math.abs(coef);
-            let coefStr = absCoef === 1 ? "" : absCoef;
-            return `${sign}${coefStr}${varChar}`;
+        function resetCheckboxes() {
+            document.querySelectorAll('.calc-unit').forEach(cb => cb.checked = false);
+            generatePrint();
         }
 
         const sectionCatalog = {
@@ -976,40 +954,30 @@
 
         function generatePrint() {
             const previewContainer = document.getElementById('main-preview-area');
-            
-            // 1. まずは右側のプレビューエリアを完全に空っぽにする
             previewContainer.innerHTML = ''; 
 
-            // 2. チェックがついている単元（calc-unit）の値を集める
             let selectedUnits = [];
-            document.querySelectorAll('.calc-unit').forEach(cb => { 
-                if (cb.checked) selectedUnits.push(cb.value); 
-            });
+            document.querySelectorAll('.calc-unit').forEach(cb => { if (cb.checked) selectedUnits.push(cb.value); });
 
-            // 3. 🌟修正点：もし選択されている単元が0個なら、画面を確実に真っ白にして処理を終える
             if (selectedUnits.length === 0) {
                 document.getElementById('layout-status').innerText = "大問 0 個";
-                return; // ここで処理を抜けるため、古いプリントが残りません
+                return;
             }
 
             let bqCount = selectedUnits.length;
-            let pageCount = Math.ceil(bqCount / 6); // 1ページ最大6大問
-            let subCount = 4; // 1単元あたり4問固定（網羅条件保証）
+            let pageCount = Math.ceil(bqCount / 6); 
+            let subCount = 4; 
 
-            // 左下のステータス表示を更新
             document.getElementById('layout-status').innerHTML = `大問: ${bqCount} 個 選出<br>用紙: 各 ${pageCount} 枚構成 (A4固定)`;
 
-            // 問題ページと解答ページの台紙（箱）を必要枚数分だけ作成
             let qPages = [];
             let aPages = [];
             for (let p = 0; p < pageCount; p++) {
-                let qPage = document.createElement('div'); 
-                qPage.className = 'page';
+                let qPage = document.createElement('div'); qPage.className = 'page';
                 qPage.innerHTML = `<div class="sheet-header"><h1 class="sheet-title">数学計算確認ドリル（問題）- P.${p+1}</h1><div class="student-info"><div>組</div><div>番</div><div style="width:120px;">氏名：</div></div></div><div class="document-body" id="page-q-${p}"></div>`;
                 qPages.push(qPage);
 
-                let aPage = document.createElement('div'); 
-                aPage.className = 'page';
+                let aPage = document.createElement('div'); aPage.className = 'page';
                 aPage.innerHTML = `<div class="sheet-header"><h1 class="sheet-title" style="color: #e53e3e;">数学計算確認ドリル（途中式解答）- P.${p+1}</h1></div><div class="document-body" id="page-a-${p}"></div>`;
                 aPages.push(aPage);
             }
@@ -1019,21 +987,11 @@
                 let targetPageIndex = Math.floor(index / 6); 
                 let unitsInThisPage = Math.min(6, bqCount - (targetPageIndex * 6)); 
 
-                // A4の有効縦幅から、各大問に配分する高さをミリ単位で計算
                 let singleBigQHeightMM = 235 / unitsInThisPage;
 
-                const targetUnit = sectionCatalog[unitKey];
-                
-                // 万が一、カタログに存在しないキーが指定された場合の安全対策エラーガード
-                if (!targetUnit || typeof targetUnit.generator !== 'function') {
-                    console.error(`エラー: 単元データ「${unitKey}」が見つからないか、generatorが未定義です。`);
-                    return; 
-                }
-
-                // 4つの出題パターンが詰まった配列を取得
+                const targetUnit = sectionCatalog[unitKey] || sectionCatalog["m1_1_加法"];
                 let problemSet = targetUnit.generator(); 
 
-                // 問題側の大問枠を作成
                 const bqBlockQ = document.createElement('div');
                 bqBlockQ.className = 'big-question';
                 bqBlockQ.style.minHeight = `${singleBigQHeightMM}mm`; 
@@ -1042,7 +1000,6 @@
                     <div class="sub-question-grid" id="grid-q-${bigQIndex}"></div>
                 `;
 
-                // 解答側の大問枠を作成
                 const bqBlockA = document.createElement('div');
                 bqBlockA.className = 'big-question';
                 bqBlockA.style.minHeight = `${singleBigQHeightMM}mm`; 
@@ -1051,28 +1008,22 @@
                     <div class="sub-question-grid" id="grid-a-${bigQIndex}"></div>
                 `;
 
-                // 適切な各ページの document-body の中へ大問枠を差し込む
                 qPages[targetPageIndex].querySelector('.document-body').appendChild(bqBlockQ);
                 aPages[targetPageIndex].querySelector('.document-body').appendChild(bqBlockA);
 
                 const gridQ = qPages[targetPageIndex].querySelector(`#grid-q-${bigQIndex}`);
                 const gridA = aPages[targetPageIndex].querySelector(`#grid-a-${bigQIndex}`);
 
-                // 小問4問のループ生成とHTML流し込み
                 for (let subIndex = 1; subIndex <= subCount; subIndex++) {
                     let problemData = problemSet[subIndex - 1]; 
 
-                    // 問題セルの組み立て
                     const itemQ = document.createElement('div');
                     itemQ.className = 'sub-question-item';
                     itemQ.innerHTML = `<div class="item-main"><span class="num-tag">（${subIndex}）</span><span class="formula">${problemData.q}</span></div>`;
                     gridQ.appendChild(itemQ);
 
-                    // 解答（途中式ステップ）セルの組み立て
                     let stepsHtml = "";
-                    problemData.steps.forEach(step => { 
-                        stepsHtml += `<div class="step-line"><span class="step-arrow">↳</span><span>${step}</span></div>`; 
-                    });
+                    problemData.steps.forEach(step => { stepsHtml += `<div class="step-line"><span class="step-arrow">↳</span><span>${step}</span></div>`; });
 
                     const itemA = document.createElement('div');
                     itemA.className = 'sub-question-item';
@@ -1083,7 +1034,6 @@
                 bigQIndex++;
             });
 
-            // 最後に、完成した「問題の用紙」と「解答の用紙」をすべて順番にプレビュー画面へ描画
             qPages.forEach(p => previewContainer.appendChild(p));
             aPages.forEach(p => previewContainer.appendChild(p));
         }
