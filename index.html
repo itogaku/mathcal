@@ -306,7 +306,7 @@
             }},
             "乗法工夫": { title: "乗法の各種法則を利用して計算しなさい。", generator: function() {
                 return [
-                    { q: `(－4) × 13 × (－25) ＝`, steps: [`＝ (－4) × (－25) × 13`, `＝ <span class="diff">100</span> × 17`, `＝ <span class="final-ans">1300</span>`] },
+                    { q: `(－4) × 13 × (－25) ＝`, steps: [`＝ (－4) × (－25) × 13`, `＝ <span class="diff">100</span> × 13`, `＝ <span class="final-ans">1300</span>`] },
                     { q: `2.5 × (－7) × 4 ＝`, steps: [`＝ 2.5 × 4 × (－7)`, `＝ <span class="diff">10</span> × (－7)`, `＝ <span class="final-ans">－70</span>`] },
                     { q: `(－2) × 9 × (－5) ＝`, steps: [`＝ (－2) × (－5) × 9`, `＝ <span class="diff">10</span> × 9`, `＝ <span class="final-ans">90</span>`] },
                     { q: `25 × (－3) × (－4) ＝`, steps: [`＝ 25 × (－4) × (－3)`, `＝ <span class="diff">－100</span> × (－3)`, `＝ <span class="final-ans">300</span>`] }
@@ -675,8 +675,8 @@
             "m2_2_等号2つ": { title: "等号が2つある方程式（最左辺が整数 or 多項式）を解け。", generator: function() {
                 return [
                     { q: `5 ＝ 2x ＋ y ＝ x － y ＋ 3`, steps: [`最左辺が定数： {2x＋y＝5, x－y＋3＝5}`, `<span class="final-ans">x ＝ 2, y ＝ 1</span>`] },
-                    { q: `3x － y ＝ x ＋ y ＝ 4`, steps: [`最right辺が定数： {3x－y＝4, x＋y＝4}`, `<span class="final-ans">x ＝ 2, y ＝ 2</span>`] },
-                    { q: `x ＋ 2y ＝ 2x － y ＋ 5 ＝ 8`, steps: [`最right辺が定数： {x＋2y＝8, 2x－y＝3}`, `<span class="final-ans">x ＝ 2, y ＝ 3</span>`] },
+                    { q: `3x － y ＝ x ＋ y ＝ 4`, steps: [`最右辺が定数： {3x－y＝4, x＋y＝4}`, `<span class="final-ans">x ＝ 2, y ＝ 2</span>`] },
+                    { q: `x ＋ 2y ＝ 2x － y ＋ 5 ＝ 8`, steps: [`最右辺が定数： {x＋2y＝8, 2x－y＝3}`, `<span class="final-ans">x ＝ 2, y ＝ 3</span>`] },
                     { q: `6 ＝ 4x － y ＝ 2x ＋ y ＋ 2`, steps: [`最left辺が定数： {4x－y＝6, 2x＋y＝4}`, `<span class="final-ans">x ＝ 1, y ＝ 2</span>`] }
                 ];
             }},
@@ -824,7 +824,7 @@
             }},
             "m3_2_自然数根号": { title: "次の値を根号（√ ）を使った形に表しなさい。", generator: function() {
                 return [
-                    { q: `6 ＝`, steps: [`＝ √6²`, `＝ <span class="final-ans">√36</span>`] }, { q: `2√3 ＝`, steps: [`＝ √4 × 3`, `＝ <span class="final-ans">text ＝ √12</span>`] },
+                    { q: `6 ＝`, steps: [`＝ √6²`, `＝ <span class="final-ans">√36</span>`] }, { q: `2√3 ＝`, steps: [`＝ √4 × 3`, `＝ <span class="final-ans">√12</span>`] },
                     { q: `5√2 ＝`, steps: [`＝ √25 × 2`, `＝ <span class="final-ans">√50</span>`] }, { q: `10 ＝`, steps: [`＝ √10²`, `＝ <span class="final-ans">√100</span>`] }
                 ];
             }},
@@ -838,7 +838,7 @@
             }},
             "m3_2_有理化": { title: "分母の有理化をしなさい。", generator: function() {
                 return [
-                    { q: `<div class="frac"><div class="num">3</div><div class="den">√2</div></div> ＝`, steps: [`＝ <span class="final-ans"><div class="frac"><div class="num">3√2</div><div class="den">2</div></div></span>`] },
+                    { q: `<div class="frac"><div class="num">3</div><div class="den">√2</div></div> ＝`, steps: [`＝ 3√2 / 2`, `＝ <span class="final-ans"><div class="frac"><div class="num">3√2</div><div class="den">2</div></div></span>`] },
                     { q: `<div class="frac"><div class="num">1</div><div class="den">√3</div></div> ＝`, steps: [`＝ <span class="final-ans"><div class="frac"><div class="num">√3</div><div class="den">3</div></div></span>`] },
                     { q: `<div class="frac"><div class="num">√5</div><div class="den">√2</div></div> ＝`, steps: [`＝ <span class="final-ans"><div class="frac"><div class="num">√10</div><div class="den">2</div></div></span>`] },
                     { q: `<div class="frac"><div class="num">6</div><div class="den">√3</div></div> ＝`, steps: [`＝ 6√3 / 3 ＝ 2√3`, `＝ <span class="final-ans">2√3</span>`] }
