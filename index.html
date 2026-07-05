@@ -99,14 +99,14 @@
             <div class="menu-grade-title">■ 中学1年</div>
             <div class="menu-unit-title">【1章 正負の数】</div>
             <div class="checkbox-list">
-                <label><input type="checkbox" class="calc-unit" value="加法" checked onchange="generatePrint()"> 加法</label>
-                <label><input type="checkbox" class="calc-unit" value="交換結合" checked onchange="generatePrint()"> 交換法則結合法則（計算の工夫）</label>
-                <label><input type="checkbox" class="calc-unit" value="減法" onchange="generatePrint()"> 減法</label>
-                <label><input type="checkbox" class="calc-unit" value="カッコなし式" onchange="generatePrint()"> カッコのない式にする</label>
-                <label><input type="checkbox" class="calc-unit" value="カッコあり式" onchange="generatePrint()"> カッコのある式にする</label>
-                <label><input type="checkbox" class="calc-unit" value="加減混合" onchange="generatePrint()"> 加減の混じった計算</label>
-                <label><input type="checkbox" class="calc-unit" value="乗法" onchange="generatePrint()"> 乗法</label>
-                <label><input type="checkbox" class="calc-unit" value="乗法工夫" onchange="generatePrint()"> 乗法の結合法則交換法則</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_加法" checked onchange="generatePrint()"> 加法</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_交換結合" checked onchange="generatePrint()"> 交換法則結合法則（計算の工夫）</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_減法" onchange="generatePrint()"> 減法</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_カッコなし式" onchange="generatePrint()"> カッコのない式にする</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_カッコあり式" onchange="generatePrint()"> カッコのある式にする</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_加減混合" onchange="generatePrint()"> 加減の混じった計算</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_乗法" onchange="generatePrint()"> 乗法</label>
+                <label><input type="checkbox" class="calc-unit" value="m1_1_乗法工夫" onchange="generatePrint()"> 乗法の結合法則交換法則</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_1_累乗" onchange="generatePrint()"> 累乗</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_1_除法" onchange="generatePrint()"> 除法</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_1_乗除混合" onchange="generatePrint()"> 乗法と除法のまじった計算</label>
@@ -242,13 +242,36 @@
     </div>
 
     <script>
-        function resetCheckboxes() {
-            document.querySelectorAll('.calc-unit').forEach(cb => cb.checked = false);
-            generatePrint();
+        function getRandomInt(min, max, excludeZero = true) {
+            let num = Math.floor(Math.random() * (max - min + 1)) + min;
+            if (excludeZero && num === 0) return getRandomInt(min, max, excludeZero);
+            return num;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function formatTerm(value, isFirst = false) {
+            if (value === 0) return "";
+            if (value > 0) return isFirst ? `${value}` : `＋ ${value}`;
+            return isFirst ? `－${Math.abs(value)}` : `－ ${Math.abs(value)}`;
+        }
+
+        function formatXTerm(coef, isFirst = false, varChar = "x") {
+            if (coef === 0) return "";
+            let sign = coef > 0 ? (isFirst ? "" : "＋ ") : "－ ";
+            let absCoef = Math.abs(coef);
+            let coefStr = absCoef === 1 ? "" : absCoef;
+            return `${sign}${coefStr}${varChar}`;
         }
 
         const sectionCatalog = {
-            "加法": { title: "次の加法を計算しなさい。", generator: function() {
+            "m1_1_加法": { title: "次の加法を計算しなさい。", generator: function() {
                 let p1 = getRandomInt(2, 8); let p2 = getRandomInt(2, 8); let n1 = getRandomInt(-8, -2); let n2 = getRandomInt(-8, -2);
                 return shuffleArray([
                     { q: `${p1} ＋ (${n1}) ＝`, steps: [`＝ ${p1} － ${Math.abs(n1)}`, `＝ <span class="final-ans">${p1 + n1}</span>`] },
@@ -257,7 +280,7 @@
                     { q: `${p1} ＋ ${p2} ＝`, steps: [`＝ <span class="final-ans">${p1 + p2}</span>`] }
                 ]);
             }},
-            "交換結合": { title: "交換法則や結合法則を工夫して、10や0などキリの良い数を作って計算しなさい。", generator: function() {
+            "m1_1_交換結合": { title: "交換法則や結合法則を工夫して、10や0などキリの良い数を作って計算しなさい。", generator: function() {
                 let a = getRandomInt(11, 18); let b = getRandomInt(21, 29);
                 return [
                     { q: `${a} ＋ (－${b}) ＋ ${20-a} ＝`, steps: [`＝ ${a} ＋ ${20-a} ＋ (－${b})`, `＝ <span class="diff">30</span> ＋ (－${b})`, `＝ <span class="final-ans">${30-b}</span>`] },
@@ -266,7 +289,7 @@
                     { q: `(－14) ＋ 9 ＋ (－6) ＝`, steps: [`＝ (－14) ＋ (－6) ＋ 9`, `＝ <span class="diff">－20</span> ＋ 9`, `＝ <span class="final-ans">－11</span>`] }
                 ];
             }},
-            "減法": { title: "次の減法を計算しなさい。", generator: function() {
+            "m1_1_減法": { title: "次の減法を計算しなさい。", generator: function() {
                 let p1 = getRandomInt(2, 8); let p2 = getRandomInt(2, 8); let n1 = getRandomInt(-8, -2); let n2 = getRandomInt(-8, -2);
                 return shuffleArray([
                     { q: `${p1} － (${n1}) ＝`, steps: [`＝ ${p1} <span class="diff">＋ ${Math.abs(n1)}</span>`, `＝ <span class="final-ans">${p1 - n1}</span>`] },
@@ -275,19 +298,19 @@
                     { q: `${p1} － ${p2} ＝`, steps: [`＝ <span class="final-ans">${p1 - p2}</span>`] }
                 ]);
             }},
-            "カッコなし式": { title: "次の式をカッコのない式にしなさい（計算は不要）。", generator: function() {
+            "m1_1_カッコなし式": { title: "次の式をカッコのない式にしなさい（計算は不要）。", generator: function() {
                 return [
                     { q: `3 ＋ (－5) ＝`, steps: [`＝ <span class="final-ans">3 － 5</span>`] }, { q: `(－4) － 2 ＝`, steps: [`＝ <span class="final-ans">－4 － 2</span>`] },
                     { q: `(－7) － (－9) ＝`, steps: [`＝ <span class="final-ans">－7 ＋ 9</span>`] }, { q: `6 － 8 ＝`, steps: [`＝ <span class="final-ans">6 － 8</span>`] }
                 ];
             }},
-            "カッコあり式": { title: "次の式をカッコのある、加法だけの式に戻しなさい。", generator: function() {
+            "m1_1_カッコあり式": { title: "次の式をカッコのある、加法だけの式に戻しなさい。", generator: function() {
                 return [
                     { q: `2 － 6 ＝`, steps: [`＝ <span class="final-ans">2 ＋ (－6)</span>`] }, { q: `－3 － 5 ＝`, steps: [`＝ <span class="final-ans">(－3) ＋ (－5)</span>`] },
                     { q: `－4 ＋ 7 ＝`, steps: [`＝ <span class="final-ans">(－4) ＋ 7</span>`] }, { q: `8 ＋ 1 ＝`, steps: [`＝ <span class="final-ans">8 ＋ 1</span>`] }
                 ];
             }},
-            "加減混合": { title: "次の加減の混じった計算をしなさい。", generator: function() {
+            "m1_1_加減混合": { title: "次の加減の混じった計算をしなさい。", generator: function() {
                 return [
                     { q: `5 － (－8) ＋ (－4) ＝`, steps: [`＝ 5 ＋ 8 － 4`, `＝ 13 － 4`, `＝ <span class="final-ans">9</span>`] },
                     { q: `－9 ＋ 15 － 3 ＋ 2 ＝`, steps: [`＝ 15 ＋ 2 － 9 － 3`, `＝ 17 － 12`, `＝ <span class="final-ans">5</span>`] },
@@ -295,7 +318,7 @@
                     { q: `－2 － 8 ＋ 14 － 1 ＝`, steps: [`＝ 14 － 2 － 8 － 1`, `＝ 14 － 11`, `＝ <span class="final-ans">3</span>`] }
                 ];
             }},
-            "乗法": { title: "次の乗法を計算しなさい。", generator: function() {
+            "m1_1_乗法": { title: "次の乗法を計算しなさい。", generator: function() {
                 let p1 = getRandomInt(2, 6); let p2 = getRandomInt(2, 6); let n1 = getRandomInt(-6, -2); let n2 = getRandomInt(-6, -2);
                 return shuffleArray([
                     { q: `${p1} × (${n1}) ＝`, steps: [`＝ －(${p1} × ${Math.abs(n1)})`, `＝ <span class="final-ans">${p1 * n1}</span>`] },
@@ -304,7 +327,7 @@
                     { q: `${p1} × ${p2} ＝`, steps: [`＝ <span class="final-ans">${p1 * p2}</span>`] }
                 ]);
             }},
-            "乗法工夫": { title: "乗法の各種法則を利用して計算しなさい。", generator: function() {
+            "m1_1_乗法工夫": { title: "乗法の各種法則を利用して計算しなさい。", generator: function() {
                 return [
                     { q: `(－4) × 13 × (－25) ＝`, steps: [`＝ (－4) × (－25) × 13`, `＝ <span class="diff">100</span> × 13`, `＝ <span class="final-ans">1300</span>`] },
                     { q: `2.5 × (－7) × 4 ＝`, steps: [`＝ 2.5 × 4 × (－7)`, `＝ <span class="diff">10</span> × (－7)`, `＝ <span class="final-ans">－70</span>`] },
