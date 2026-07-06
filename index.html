@@ -80,7 +80,126 @@
                 { q: `${getR(5,9)} ÷ (${getR(2,4)} + (-${getR(2,4)})) + (${-getR(2,5)})`, steps: ["カッコ内が先"] },
                 { q: `(-${getR(2,5)}) × (<div class="frac"><div class="num">1</div><div class="den">3</div></div> - <div class="frac"><div class="num">1</div><div class="den">2</div></div>)`, steps: ["分数計算"] },
                 { q: `${getR(2,5)} × (-${getR(2,5)}) - ${getR(2,5)} × (-${getR(2,5)})`, steps: ["共通因数で分配法則を利用"] }
-            ])}
+            ])},
+
+            "m1_15_素因数分解": { title: "1.5章 整数（素数・倍数・素因数分解）", generator: () => shuffleArray([
+                { q: `2桁の素因数分解 (${getR(12, 99)})`, steps: ["割れる素数で分解"] },
+                { q: `次の数から素数を選べ: ${getR(10,50)}, ${getR(10,50)}, ${getR(10,50)}, ${getR(10,50)}`, steps: ["素数判定"] },
+                { q: `2, 3, 5の倍数を選べ: ${getR(100, 999)}, ${getR(100, 999)}, ${getR(100, 999)}`, steps: ["倍数判定法を使う"] },
+                { q: `3桁の素因数分解 (${getR(100, 999)})`, steps: ["3桁まで順次分解"] }
+            ])},
+
+            // --- 2章 文字式 ---
+            "m1_2_ルール": { title: "文字式のルール", generator: () => {
+                let v = getRandomVariables(); let a = getRandomInt(2,9); let b = getRandomInt(2,9);
+                return shuffleArray([
+                    { q: `${v[0]} × ${a}`, steps: [`＝ ${a}${v[0]}`] },
+                    { q: `${v[0]} × (-${a}) × ${v[1]}`, steps: [`＝ -${a}${v[0]}${v[1]}`] },
+                    { q: `${v[1]} × ${v[1]}`, steps: [`＝ ${v[1]}²`] },
+                    { q: `(${v[0]} + ${a}) × ${b}`, steps: [`＝ ${b}(${v[0]} + ${a})`] },
+                    { q: `(${v[0]} - ${v[1]}) × (-${a})`, steps: [`＝ -${a}(${v[0]} - ${v[1]})`] },
+                    { q: `${v[0]} ÷ ${a}`, steps: [`＝ ${v[0]}/${a}`] },
+                    { q: `${v[0]} ÷ (-${a})`, steps: [`＝ -${v[0]}/${a}`] },
+                    { q: `(${v[0]} - ${v[1]}) ÷ ${a}`, steps: [`＝ (${v[0]}-${v[1]})/${a}`] },
+                    { q: `${a} × ${v[0]} + ${b}`, steps: [`＝ ${a}${v[0]} + ${b}`] },
+                    { q: `${a} × ${v[0]} - ${v[1]} × ${b}`, steps: [`＝ ${a}${v[0]} - ${b}${v[1]}`] },
+                    { q: `${a} × (${v[0]} + ${b}) ÷ ${getR(2,4)}`, steps: [`分配と分数化`] }
+                ]);
+            }},
+            "m1_2_記号": { title: "記号を用いた表現", generator: () => {
+                let v = getRandomVariables(); let a = getRandomInt(2,9);
+                return shuffleArray([
+                    { q: `${a}${v[0]}`, steps: [`＝ ${a} × ${v[0]}`] },
+                    { q: `${v[0]} / ${a}`, steps: [`＝ ${v[0]} ÷ ${a}`] },
+                    { q: `${v[0]}² + ${v[1]} / ${a}`, steps: [`＝ ${v[0]} × ${v[0]} + ${v[1]} ÷ ${a}`] },
+                    { q: `${a}(${v[0]} - ${v[1]}) / ${getR(2,4)}`, steps: [`＝ (${a} × (${v[0]}-${v[1]})) ÷ ${getR(2,4)}`] }
+                ]);
+            }},
+            "m1_2_代入": { title: "代入（負の数を含む）", generator: () => {
+                let a = getRandomInt(2,9);
+                return shuffleArray([
+                    { q: `x=${-a}のとき x + ${a*2}`, steps: [`(-${a}) + ${a*2}`] },
+                    { q: `x=${-a}のとき 12 / x`, steps: [`12 / (-${a})`] },
+                    { q: `x=${-a}のとき 5 - 3x`, steps: [`5 - 3×(-${a})`] },
+                    { q: `x=${-a}のとき -x²`, steps: [`-(-${a})²`] }
+                ]);
+            }},
+            "m1_2_複数代入": { title: "2数の代入", generator: () => {
+                let a = getRandomInt(2,5); let b = getRandomInt(2,5);
+                return shuffleArray([
+                    { q: `a=${a}, b=${-b}のとき a + ${b}b`, steps: [`代入計算`] },
+                    { q: `a=${a}, b=${-b}のとき ab²`, steps: [`代入計算`] },
+                    { q: `a=${a}, b=${-b}のとき -${a}ab`, steps: [`代入計算`] },
+                    { q: `a=${a}, b=${-b}のとき ${a}a + b²`, steps: [`代入計算`] }
+                ]);
+            }},
+            "m1_2_同類項": { title: "同類項まとめ（x, xy, y 混合）", generator: () => {
+                let c1 = getRandomInt(2,9); let c2 = getRandomInt(2,9);
+                return shuffleArray([
+                    { q: `${c1}x + ${c2}y + ${c1}x + ${c2}y`, steps: [`xはx, yはyでまとめる`] },
+                    { q: `${c1}x + ${c2}y - ${c1} - ${c2}x - ${c1}`, steps: [`定数項と文字項の整理`] },
+                    { q: `(${c1}x - ${c2}) + (${-c1}x - ${c2})`, steps: [`カッコを外して整理`] },
+                    { q: `(${c1}x + ${c2}) - (${c1}x - ${c2})`, steps: [`マイナスの分配に注意`] },
+                    { q: `${c1}x × ${c2}`, steps: [`単項式の積`] },
+                    { q: `(-${c1*2}a) ÷ (-${c1})`, steps: [`負の数による除法`] },
+                    { q: `${c1}(x + ${c2})`, steps: [`分配法則`] },
+                    { q: `(-${c1}a + ${c2}) ÷ (-${c1})`, steps: [`カッコ内の項をすべて割る`] },
+                    { q: `${c1}x / ${getR(2,4)} × ${getR(2,4)}`, steps: [`分数×整数`] },
+                    { q: `${c1}(${c1}x - ${c2}) - ${c1}(x - ${c2})`, steps: [`分配法則の2重適用`] }
+                ]);
+            }},
+            "m1_3_移項": { title: "3章 移項の基本", generator: () => shuffleArray([
+                { q: `x - ${getR(2,9)} = ${getR(2,9)}`, steps: ["移項して解く"] },
+                { q: `x + ${getR(2,9)} = ${getR(2,9)}`, steps: ["移項して解く"] }
+            ])},
+            "m1_3_係数処理": { title: "3章 係数の処理", generator: () => shuffleArray([
+                { q: `${getR(2,9)}x = -${getR(2,9)}`, steps: ["両辺を係数で割る"] },
+                { q: `x / ${getR(2,5)} = ${getR(2,9)}`, steps: ["両辺に分母を掛ける"] }
+            ])},
+            "m1_3_方程式の解": { title: "3章 方程式の解（複雑なパターン含む）", generator: () => shuffleArray([
+                { q: `x - ${getR(2,9)} = ${getR(2,9)}`, steps: ["基本の移項"] },
+                { q: `${getR(2,5)} + x = ${getR(2,9)}`, steps: ["項の順序に注意"] },
+                { q: `-${getR(2,5)}x = -${getR(2,9)}`, steps: ["負の数の割り算"] },
+                { q: `${getR(2,5)}x - ${getR(2,9)} = ${getR(2,9)}`, steps: ["移項と係数処理"] },
+                { q: `-${getR(2,5)}x - ${getR(2,9)} = ${getR(2,5)}x`, steps: ["文字項の移項"] },
+                { q: `${getR(2,5)}x - ${getR(2,9)} = ${getR(2,5)}x + ${getR(2,9)}`, steps: ["両辺に文字を含む方程式"] }
+            ])},
+            "m1_3_分配法則": { title: "3章 分配法則を含む方程式", generator: () => shuffleArray([
+                { q: `${getR(2,5)}(x - ${getR(2,5)}) = ${getR(2,9)}`, steps: ["カッコを展開"] },
+                { q: `${getR(2,5)} + ${getR(2,5)}(${getR(2,5)}x + ${getR(2,5)}) = ${getR(2,9)}`, steps: ["分配法則の計算"] }
+            ])},
+            "m1_3_小数分数": { title: "3章 小数・分数の方程式", generator: () => shuffleArray([
+                { q: `0.${getR(1,9)}x + 0.${getR(1,9)} = 0.${getR(1,9)}`, steps: ["10倍して整数にする"] },
+                { q: `x/${getR(2,4)} - ${getR(2,9)} = x/${getR(5,9)}`, steps: ["最小公倍数で分母を払う"] }
+            ])},
+            "m1_3_多項分数": { title: "3章 多項式を含む分数方程式", generator: () => shuffleArray([
+                { q: `(x - ${getR(2,9)}) / ${getR(2,5)} = x/${getR(2,5)} + ${getR(2,5)}`, steps: ["分母を払う"] },
+                { q: `(${getR(2,4)}x - ${getR(2,9)}) / ${getR(2,5)} = ${getR(2,5)}x + ${getR(2,5)}`, steps: ["カッコの扱いと分母の処理"] }
+            ])},
+            "m1_3_比例式": { title: "3章 比例式", generator: () => shuffleArray([
+                { q: `x : ${getR(2,5)} = (x + ${getR(2,5)}) : ${getR(6,9)}`, steps: ["内項の積＝外項の積"] },
+                { q: `(x + ${getR(2,5)}) : ${getR(2,5)} = (x - ${getR(2,5)}) : ${getR(6,9)}`, steps: ["比の性質を利用"] }
+            ])},
+            "m1_3_解と定数a": { title: "3章 方程式の解からaの値を求める", generator: () => shuffleArray([
+                { q: `ax - ${getR(2,5)} = ${getR(2,9)} の解が x=${getR(2,5)}`, steps: ["解を代入してaを解く"] },
+                { q: `-${getR(2,5)}x - ${getR(2,9)} = ${getR(2,5)}a + ${getR(2,5)} の解が x=${-getR(2,5)}`, steps: ["複雑な定数aの算出"] }
+            ])},
+            "m1_4_比例": { title: "4章 比例の基本", generator: () => shuffleArray([
+                { q: `yはxに比例し、x=${getR(2,5)}のときy=${getR(2,5)*2}。式は？`, steps: ["y=axに代入"] },
+                { q: `yはxに比例し、x=${getR(2,5)}のときy=-${getR(2,5)*2}。式は？`, steps: ["比例定数が負の場合"] },
+                { q: `y=${getR(2,5)}xについて、x=${getR(2,5)}のときのyの値は？`, steps: ["値を代入"] },
+                { q: `y=${getR(2,5)}xについて、y=${getR(2,5)*2}のときのxの値は？`, steps: ["式を逆に計算"] }
+            ])},
+            "m1_4_反比例": { title: "4章 反比例の基本", generator: () => {
+                let a = getR(2,6) * getR(2,3); // 比例定数
+                return shuffleArray([
+                    { q: `yはxに反比例し、x=${getR(2,5)}のときy=${a/getR(2,5)}。式は？`, steps: ["y=a/xに代入"] },
+                    { q: `yはxに反比例し、x=${getR(2,5)}のときy=-${a/getR(2,5)}。式は？`, steps: ["比例定数が負"] },
+                    { q: `yはxに反比例し、x=1/${getR(2,4)}のときy=${a * getR(2,4)}。式は？`, steps: ["分数と分数の処理"] },
+                    { q: `y=${a}/xについて、x=${getR(2,4)}のときのyの値は？`, steps: ["値を代入"] },
+                    { q: `y=${a}/xについて、y=${a/getR(2,4)}のときのxの値は？`, steps: ["式を逆に計算"] }
+                ]);
+            }}
         };
 
         // メニュー生成
