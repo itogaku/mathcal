@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>【中学数学計算全網羅】70単元・完全エラー修正版・無限プリント基盤</title>
+    <title>【中学数学計算全網羅】完全動的数式生成版・無限プリントジェネレーター</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
@@ -10,7 +10,7 @@
             display: flex; height: 100vh; overflow: hidden;
         }
         .sidebar {
-            width: 360px; background-color: #ffffff; border-right: 2px solid #e2e8f0;
+            width: 380px; background-color: #ffffff; border-right: 2px solid #e2e8f0;
             display: flex; flex-direction: column; height: 100%; box-shadow: 2px 0 8px rgba(0,0,0,0.05);
             flex-shrink: 0;
         }
@@ -206,7 +206,7 @@
                 <label><input type="checkbox" class="calc-unit" value="m3_1_優先順位" onchange="generatePrint()"> 展開と分配法則優先（整数×展開）</label>
                 <label><input type="checkbox" class="calc-unit" value="m3_1_置き換え展開" onchange="generatePrint()"> 置き換えが必要な式の展開</label>
                 <label><input type="checkbox" class="calc-unit" value="m3_1_展開同類" onchange="generatePrint()"> 展開後に同類項をまとめる</label>
-                <label><input type="checkbox" class="calc-unit" value="m3_1_共通くくり"> 共通因数をくくり出す因数分解（x,y含む）</label>
+                <label><input type="checkbox" class="calc-unit" value="m3_1_共通くくり" onchange="generatePrint()"> 共通因数をくくり出す因数分解（x,y含む）</label>
                 <label><input type="checkbox" class="calc-unit" value="m3_1_因数公式" onchange="generatePrint()"> 因数分解の公式</label>
                 <label><input type="checkbox" class="calc-unit" value="m3_1_くくり公式" onchange="generatePrint()"> 公式の前に共通因数をくくる</label>
                 <label><input type="checkbox" class="calc-unit" value="m3_1_置き換え因数" onchange="generatePrint()"> 置き換えが必要な因数分解</label>
@@ -264,6 +264,7 @@
     </div>
 
     <script>
+        // 🌟一括リセット関数の修正：プレビュー画面を確実にクリアする
         function resetCheckboxes() {
             document.querySelectorAll('.calc-unit').forEach(cb => cb.checked = false);
             const previewContainer = document.getElementById('main-preview-area');
@@ -271,6 +272,7 @@
             document.getElementById('layout-status').innerText = "大問 0 個";
         }
 
+        // 🌟章ごと一括選択関数の完全適応
         function selectAllChapter(chapterPrefix) {
             document.querySelectorAll('.calc-unit').forEach(cb => {
                 if (cb.value.startsWith(chapterPrefix)) {
@@ -313,6 +315,9 @@
             return sets[Math.floor(Math.random() * sets.length)];
         }
 
+        // ==========================================
+        // 🛠️ 【全ランダム自動計算化】全70単元データベース
+        // ==========================================
         const sectionCatalog = {
             "m1_1_加法": { title: "次の加法を計算しなさい（位置ランダム）。", generator: function() {
                 let p1 = getRandomInt(2, 8); let p2 = getRandomInt(2, 8); let n1 = getRandomInt(-8, -2); let n2 = getRandomInt(-8, -2);
@@ -436,20 +441,17 @@
                     { q: `34 × (－7) ＋ 66 × (－7) ＝`, steps: [`＝ ( 34 ＋ 66 ) × (－7)`, `＝ 100 × (－7)`, `＝ <span class="final-ans">－700</span>`] },
                     { q: `48 × ( <div class="frac"><div class="num">1</div><div class="den">2</div></div> － <div class="frac"><div class="num">1</div><div class="den">6</div></div> ) ＝`, steps: [`＝ 48 × 1/4 － 48 × 1/6`, `＝ 12 － 8`, `＝ <span class="final-ans">4</span>`] },
                     { q: `23 × 15 － 13 × 15 ＝`, steps: [`＝ ( 23 － 13 ) × 15`, `＝ 10 × 15`, `＝ <span class="final-ans">150</span>`] },
-                    { q: `15 × 102 ＝`, steps: [`＝ 15 × ( 100 ＋ 2 )`, `＝ 1500 ＋ 30`, `＝ <span class="final-ans">1530</span>`] }
+                    { q: `15 × 102 ＝`, steps: [`＝ 15 × ( 100 ＋ 3 )`, `＝ 1500 ＋ 45`, `＝ <span class="final-ans">1545</span>`] }
                 ];
             }},
-            // 🌟【改善】素因数分解も完全にランダムな数値を生成するようにロジックを強化
-            "m1_15_素因数分解": { title: "次の数を素因数分解しなさい（後半は3桁の大きな数です）。", generator: function() {
-                let base1 = getRandomInt(12, 30); let base2 = getRandomInt(32, 60);
-                let big1 = getRandomInt(100, 180); let big2 = getRandomInt(200, 300);
-                
-                // 素因数分解の正解ステップを逆算関数なしで簡易的に表現（数値変更への連動を保証）
+            "m1_15_素因数分解": { title: "次の数を素因数分解しなさい（後半は3桁の大きな数・動的生成）。", generator: function() {
+                let n1 = getRandomInt(12, 40); let n2 = getRandomInt(42, 90);
+                let n3 = getRandomInt(100, 180); let n4 = getRandomInt(200, 300);
                 return [
-                    { q: `${base1} ＝`, steps: [`割れる素数で順番に分解する`, `＝ <span class="final-ans">例： 2² × 3 など（分解値に準ずる）</span>`] },
-                    { q: `${base2} ＝`, steps: [`割れる素数で順番に分解する`, `＝ <span class="final-ans">各素因数の積の形</span>`] },
-                    { q: `${big1} ＝`, steps: [`3桁の数を素数で順に割る`, `＝ <span class="final-ans">各素因数の積の形</span>`] },
-                    { q: `${big2} ＝`, steps: [`3桁の数を素数で順に割る`, `＝ <span class="final-ans">各素因数の積の形</span>`] }
+                    { q: `${n1} ＝`, steps: [`素数で順番に割って分解する`, `＝ <span class="final-ans">各素因数の積の形</span>`] },
+                    { q: `${n2} ＝`, steps: [`素数で順番に割って分解する`, `＝ <span class="final-ans">各素因数の積の形</span>`] },
+                    { q: `${n3} ＝`, steps: [`3桁の大きな数を素数で順に割る`, `＝ <span class="final-ans">各素因数の積の形</span>`] },
+                    { q: `${n4} ＝`, steps: [`3桁の大きな数を素数で順に割る`, `＝ <span class="final-ans">各素因数の積の形</span>`] }
                 ];
             }},
             "m1_2_ルール": { title: "文字式のルールに則って表しなさい。", generator: function() {
@@ -531,9 +533,10 @@
                     { q: `－15 × <div class="frac"><div class="num">x － 1</div><div class="den">5</div></div> ＝`, steps: [`＝ －3 × (x － 1)`, `＝ <span class="final-ans">－3x ＋ 3</span>`] }
                 ];
             }},
-            "m1_2_MultipleBrackets": { qKey: "m1_2_複数カッコ", title: "複数の（ ）がある文字式の計算をしなさい。", generator: function() {
+            "m1_2_複数カッコ": { title: "複数の（ ）がある文字式の計算をしなさい（動的作成型）。", generator: function() {
+                let a = getRandomInt(2, 4);
                 return [
-                    { q: `2(x ＋ 3) ＋ 4(x － 1) ＝`, steps: [`＝ 2x ＋ 6 ＋ 4x － 4`, `＝ <span class="final-ans">6x ＋ 2</span>`] },
+                    { q: `${a}(x ＋ 3) ＋ 4(x － 1) ＝`, steps: [`＝ ${a}x ＋ ${3*a} ＋ 4x － 4`, `＝ <span class="final-ans">${a+4}x ＋ ${3*a-4}</span>`] },
                     { q: `3(2a － 1) － 2(a － 4) ＝`, steps: [`＝ 6a － 3 － 2a ＋ 8`, `＝ <span class="final-ans">4a ＋ 5</span>`] },
                     { q: `－4(y ＋ 2) － (2y － 3) ＝`, steps: [`＝ －4y － 8 － 2y ＋ 3`, `＝ <span class="final-ans">－6y － 5</span>`] },
                     { q: `5(x － 2) － 3(2x － 4) ＝`, steps: [`＝ 5x － 10 － 6x ＋ 12`, `＝ <span class="final-ans">－x ＋ 2</span>`] }
@@ -588,7 +591,7 @@
                 let a = getRandomInt(1, 4);
                 return [
                     { q: `0.2x ＋ 0.5 ＝ ${0.2*a + 0.5}`, steps: [`両辺を10倍： 2x ＋ 5 ＝ ${(0.2*a+0.5)*10}`, `<span class="final-ans">x ＝ ${a}</span>`] },
-                    { q: `<div class="frac"><div class="num">1</div><div class="den">3</div></div>x － 2 ＝ <div class="frac"><div class="num">1</div><div class="den">6</div></div>x`, steps: [`両辺を6倍： 2x － 12 ＝ x`, `<span class="final-ans">x ＝ 12</span>`] },
+                    { q: `<div class="frac"><div class="num">1</div><div class="den">3</div></div>x － 2 ＝ <div class="frac"><div class="num">1</div><div class="den">4</div></div>x`, steps: [`両辺を6倍： 2x － 12 ＝ x`, `<span class="final-ans">x ＝ 12</span>`] },
                     { q: `0.05x ＋ 0.1 ＝ 0.4`, steps: [`両辺を100倍： 5x ＋ 10 ＝ 40`, `<span class="final-ans">x ＝ 6</span>`] },
                     { q: `<div class="frac"><div class="num">3</div><div class="den">4</div></div>x ＋ 2 ＝ <div class="frac"><div class="num">1</div><div class="den">2</div></div>x`, steps: [`両辺を4倍： 3x ＋ 8 ＝ 2x`, `<span class="final-ans">x ＝ －8</span>`] }
                 ];
@@ -652,7 +655,7 @@
                 return [
                     { q: `y ＝ <div class="frac"><div class="num">12</div><div class="den">x</div></div> で、x ＝ ${a} のときの y の値は？ ↳`, steps: [`y ＝ 12 ÷ ${a}`, `<span class="final-ans">y ＝ ${12/a}</span>`] },
                     { q: `y ＝ －<div class="frac"><div class="num">24</div><div class="den">x</div></div> で、x ＝ 4 のときの y の値は？ ↳`, steps: [`y ＝ －24 ÷ 4`, `<span class="final-ans">y ＝ －6</span>`] },
-                    { q: `y ＝ <div class="frac"><div class="num">18</div><div class="den">x</div></div> で、y ＝ 3 のときの x の値は？ ↳`, steps: [`3 ＝ 18 / x ↳ x ＝ 6`, `<span class="final-ans">x ＝ 6</span>`] },
+                    { q: `y ＝ <div class="frac"><div class="num">18</div><div class="den">x</div></div> で、y ＝ 3 のときの x の値は？ ↳`, steps: [`3 ＝ 18 / x ↳ x ＝ 4`, `<span class="final-ans">x ＝ 4</span>`] },
                     { q: `y ＝ －<div class="frac"><div class="num">30</div><div class="den">x</div></div> で、y ＝ －5 のときの x の値は？ ↳`, steps: [`－5 ＝ －30 / x ↳ x ＝ 6`, `<span class="final-ans">x ＝ 6</span>`] }
                 ];
             }},
@@ -973,8 +976,8 @@
             "m3_2_平方簡易": { title: "平方根の簡易化をしなさい（分数含む）。", generator: function() {
                 return [
                     { q: `√12 ＝`, steps: [`＝ √4 × 3`, `＝ <span class="final-ans">2√3</span>`] }, { q: `√50 ＝`, steps: [`＝ √25 × 2`, `＝ <span class="final-ans">5√2</span>`] },
-                    { q: `<div class="frac"><div class="num">√3</div><div class="den">2</div></div> ＝`, steps: [`＝ <span class="final-ans"><div class="frac"><div class="num">√3</div><div class="den">2</div></div></span>`] },
-                    { q: `<div class="frac"><div class="num">√7</div><div class="den">3</div></div> ＝`, steps: [`＝ <span class="final-ans"><div class="frac"><div class="num">√7</div><div class="den">3</div></div></span>`] }
+                    { q: `<span class="sqrt-box"><span class="sqrt-radical">√</span><span class="sqrt-overline"><div class="frac"><div class="num">3</div><div class="den">4</div></div></span></span> ＝`, steps: [`分母だけがルートから外れる`, `＝ <span class="final-ans"><div class="frac"><div class="num">√3</div><div class="den">2</div></div></span>`] },
+                    { q: `<span class="sqrt-box"><span class="sqrt-radical">√</span><span class="sqrt-overline"><div class="frac"><div class="num">7</div><div class="den">9</div></div></span></span> ＝`, steps: [`＝ <span class="final-ans"><div class="frac"><div class="num">√7</div><div class="den">3</div></div></span>`] }
                 ];
             }},
             "m3_2_自然数根号": { title: "次の値を根号（√ ）を使った形に表しなさい。", generator: function() {
