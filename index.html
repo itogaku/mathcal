@@ -2,10 +2,10 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>中学数学計算 全70単元網羅ジェネレーター</title>
+    <title>中学数学計算 全単元網羅ジェネレーター</title>
     <style>
         body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: #f0f2f5; }
-        .sidebar { width: 300px; background: #fff; overflow-y: auto; padding: 20px; border-right: 1px solid #ccc; }
+        .sidebar { width: 320px; background: #fff; overflow-y: auto; padding: 20px; border-right: 1px solid #ccc; }
         .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
         .page { width: 210mm; min-height: 297mm; background: #fff; padding: 20mm; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 20px; box-sizing: border-box; }
         .big-question { border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
@@ -16,7 +16,7 @@
 </head>
 <body>
     <div class="sidebar">
-        <h3>全70単元選択</h3>
+        <h3>単元選択</h3>
         <div id="menu-area"></div>
         <button class="btn" onclick="generatePrint()">🔄 数値変更して再生成</button>
         <button class="btn btn-reset" onclick="resetCheckboxes()">🧹 全リセット</button>
@@ -24,10 +24,17 @@
     <div class="main-content" id="main-preview-area"></div>
 
     <script>
+        // --- 必要なヘルパー関数群を追加 ---
         const getR = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-        
-        // 70単元分のロジック定義
-        const sectionCatalog = {
+        const getRandomInt = (min, max) => getR(min, max);
+        const getRandomVariables = () => {
+            const vars = [['x', 'y'], ['a', 'b']];
+            return vars[Math.floor(Math.random() * vars.length)];
+        };
+        const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
+
+        // --- カタログ定義 (generator キーに統一) ---
+        const catalog = {
             "m1_1_加減": { title: "1-1 正負の数の加減（全パターン）", generator: () => shuffleArray([
                 { q: `${getR(2,9)} + (${-getR(2,9)})`, steps: ["符号を整理して加える"] },
                 { q: `${-getR(2,9)} + ${getR(2,9)}`, steps: ["符号を整理して加える"] },
@@ -203,18 +210,20 @@
         };
 
         // メニュー生成
+// メニュー生成
         const menu = document.getElementById('menu-area');
         for(let key in catalog) {
-            menu.innerHTML += `<div class="label-group"><input type="checkbox" class="calc-unit" value="${key}" onchange="generatePrint()"> ${catalog[key].title}</div>`;
+            menu.innerHTML += `<div><input type="checkbox" class="calc-unit" value="${key}"> ${catalog[key].title}</div>`;
         }
 
+        // 生成処理
         function generatePrint() {
             const preview = document.getElementById('main-preview-area');
             preview.innerHTML = '';
             document.querySelectorAll('.calc-unit:checked').forEach(cb => {
                 const item = catalog[cb.value];
                 if(item) {
-                    const problems = item.gen();
+                    const problems = item.generator(); // ここを generator() に修正
                     let html = `<div class="page"><div class="big-question"><h2>${item.title}</h2><div class="grid">`;
                     problems.forEach((p, i) => html += `<div>（${i+1}） ${p.q} ＝ </div>`);
                     html += `</div></div></div>`;
