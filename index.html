@@ -144,7 +144,7 @@
                 <label><input type="checkbox" class="calc-unit" value="m1_3_移項係数" onchange="generatePrint()"> 移項と係数処理の方程式</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_3_文字項移項" onchange="generatePrint()"> 文字項の移項が必要な方程式</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_3_カッコ" onchange="generatePrint()"> （）を含む方程式</label>
-                <label><input type="checkbox" class="calc-unit" value="m1_3_小数分数" onchange="generatePrint()"> 小数分数を含む方程式</label>
+                <label><input type="checkbox" class="calc-unit" value="m3_3_小数分数" onchange="generatePrint()"> 小数分数を含む方程式</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_3_分子1次" onchange="generatePrint()"> 分子に１次式を持つ分数式</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_3_比例式" onchange="generatePrint()"> 比例式</label>
                 <label><input type="checkbox" class="calc-unit" value="m1_3_解と文字" onchange="generatePrint()"> 方程式の解が決まっているときaを求める</label>
@@ -432,7 +432,7 @@
                 return [
                     { q: `${a*3} ＋ (－2) × 3 ＝`, steps: [`＝ ${a*3} ＋ (－6)`, `＝ <span class="final-ans">${a*3 - 6}</span>`] },
                     { q: `24 ÷ (－2)³ ＋ 7 ＝`, steps: [`＝ 24 ÷ (－8) ＋ 7`, `＝ －3 ＋ 7`, `＝ <span class="final-ans">4</span>`] },
-                    { q: `4 × ( 3 － 8 ) ＝`, steps: [`＝ 4 × (－5)`, `＝ <span class="final-ans">－20</span>`] },
+                    { q: `${a} × ( 3 － 8 ) ＝`, steps: [`＝ ${a} × (－5)`, `＝ <span class="final-ans">${a * -5}</span>`] },
                     { q: `(－3) × 4 － 12 ÷ (－2) ＝`, steps: [`＝ －12 － (－6)`, `＝ －12 ＋ 6`, `＝ <span class="final-ans">－6</span>`] }
                 ];
             }},
@@ -623,7 +623,7 @@
                     { q: `x の方程式 a(x － 1) ＝ 6 の解が x ＝ 4 のとき、a ＝`, steps: [`a(4 － 1) ＝ 6 ↳ 3a ＝ 6`, `<span class="final-ans">a ＝ 2</span>`] }
                 ];
             }},
-            "m1_4_比例式求": { title: "yはxに比例する。次の条件からyをx of 式で表しなさい（(1)は比例定数提示あり）。", generator: function() {
+            "m1_4_比例式求": { title: "yはxに比例する。次の条件からyをxの式で表しなさい（(1)は比例定数提示あり）。", generator: function() {
                 let a = getRandomInt(2, 6);
                 return [
                     { q: `（１）比例定数が ${a} のとき ↳`, steps: [`y ＝ ax にそのままあてはめる`, `<span class="final-ans">y ＝ ${a}x</span>`] },
@@ -671,7 +671,7 @@
             "m2_1_多項加減": { title: "次の多項式の加減計算をしなさい（完全数値ランダム）。", generator: function() {
                 let a = getRandomInt(2, 5);
                 return [
-                    { q: `(${a}x ＋ y) ＋ (2x － 4y) ＝`, steps: [`＝ ${a}x ＋ 2x ＋ y － 4y`, `＝ <span class="final-ans">${a+2}x － 3y</span>`] },
+                    { q: `（${a}x ＋ y） ＋ (2x － 4y) ＝`, steps: [`＝ ${a}x ＋ 2x ＋ y － 4y`, `＝ <span class="final-ans">${a+2}x － 3y</span>`] },
                     { q: `(5a － 2b) － (3a － 5b) ＝`, steps: [`＝ 5a － 2b － 3a ＋ 5b`, `＝ <span class="final-ans">2a ＋ 3b</span>`] },
                     { q: `2x² － 4x － (x² － 5x) ＝`, steps: [`＝ 2x² － 4x － x² ＋ 5x`, `＝ <span class="final-ans">x² ＋ x</span>`] },
                     { q: `－(a － 2b) ＋ (3a － b) ＝`, steps: [`＝ －a ＋ 2b ＋ 3a － b`, `＝ <span class="final-ans">2a ＋ b</span>`] }
@@ -683,7 +683,7 @@
                     { q: `${a}( 3x － y ) ＝`, steps: [`＝ ${a}×3x ＋ ${a}×(－y)`, `＝ <span class="final-ans">${a*3}x － ${a}y</span>`] },
                     { q: `－3( 2a ＋ 4b ) ＝`, steps: [`＝ －6a － 12b`, `＝ <span class="final-ans">－6a － 12b</span>`] },
                     { q: `( 12x － 18y ) ÷ (－6) ＝`, steps: [`＝ 12x÷(－6) － 18y÷(－6)`, `＝ <span class="final-ans">－2x ＋ 3y</span>`] },
-                    { q: `－2( －3a ＋ 5b ) ＝ ＝`, steps: [`＝ 6a － 10b`, `＝ <span class="final-ans">6a － 10b</span>`] }
+                    { q: `－2( －3a ＋ 5b ) ＝`, steps: [`＝ 6a － 10b`, `＝ <span class="final-ans">6a － 10b</span>`] }
                 ];
             }},
             "m2_1_分配同類": { title: "分配法則を開いた後、同類項をまとめなさい（完全数値ランダム）。", generator: function() {
@@ -723,9 +723,9 @@
             "m2_1_単項乗除混": { title: "単項式の乗除が混じった計算をしなさい（２つ連続する割り算も含みます・完全数値ランダム）。", generator: function() {
                 return [
                     { q: `8ab × 3b ÷ 2a ＝`, steps: [`＝ 24ab² ÷ 2a`, `＝ <span class="final-ans">12b²</span>`] },
-                    { q: `12x³ ÷ 2x ÷ 3x ＝`, steps: [`＝ 6x² ÷ 3x`, `＝ <span class="final-ans">2x</span>`] },
+                    { q: `12x³ ÷ 2x ÷ 3x ＝`, steps: [`＝ 6x² ÷ 3x &nbsp; [連続割算]`, `＝ <span class="final-ans">2x</span>`] },
                     { q: `－6a²b ÷ 2ab × (－4a) ＝`, steps: [`＝ (－3a) × (－4a)`, `＝ <span class="final-ans">12a²</span>`] },
-                    { q: `4x²y ÷ 2x ÷ (－y) ＝`, steps: [`＝ 2xy ÷ (－y)`, `＝ <span class="final-ans">－2x</span>`] }
+                    { q: `4x²y ÷ 2x ÷ (－y) ＝`, steps: [`＝ 2xy ÷ (－y) &nbsp; [連続割算]`, `＝ <span class="final-ans">－2x</span>`] }
                 ];
             }},
             "m2_1_式の値": { title: "多項式を整理して簡単な形にしてから代入しなさい（完全数値ランダム）。", generator: function() {
@@ -863,7 +863,7 @@
                     { q: `「xの変域が2のとき、yの増加量が8である(a>0)」傾き ↳`, steps: [`a ＝ 8 / 2`, `<span class="final-ans">傾き ＝ 4</span>`] }
                 ];
             }},
-            "m2_3_変化割合": { title: "1次関数の変化の割合を求めなさい（xが「○から□まで増加する」正負混合・完全数値ランダム）。", generator: function() {
+            "m2_3_変化割合": { title: "1次関数の変化 of 割合を求めなさい（xが「○から□まで増加する」正負混合・完全数値ランダム）。", generator: function() {
                 let a = getRandomInt(2, 6);
                 return [
                     { q: `y ＝ ${a}x ＋ 2 で、x の値が －1 から 3 まで増加するときの変化の割合 ↳`, steps: [`1次関数の変化の割合は、常に一定（xの係数）`, `<span class="final-ans">変化の割合 ＝ ${a}</span>`] },
@@ -899,7 +899,7 @@
                     { q: `y ＝ 3x － 5 &nbsp;と&nbsp; y ＝ －2x ＋ 5 &nbsp;の交点 ↳`, steps: [`連立： 3x － 5 ＝ －2x ＋ 5`, `<span class="final-ans">( 2 , 1 )</span>`] }
                 ];
             }},
-            "m3_1_多項積": { title: "多項式の積を展開しなさい（最初に分配法則・乗除を含みます・完全数値ランダム）。", generator: function() {
+            "m3_1_多項積": { title: "多項式の積を展開しなさい（最初に分配法則・乗除を扱います・完全数値ランダム）。", generator: function() {
                 let a = getRandomInt(2, 5);
                 return [
                     { q: `${a}x( 3x ＋ 4y ) ＝`, steps: [`展開： ${a}x×3x ＋ ${a}x×4y`, `＝ <span class="final-ans">${a*3}x² ＋ ${a*4}xy</span>`] },
@@ -1075,7 +1075,7 @@
                     { q: `${a}√5 ＋ 4√5 ＝`, steps: [`＝ ( ${a} ＋ 4 )√5`], `＝ <span class="final-ans">${a+4}√5</span>` },
                     { q: `7√3 － 2√3 ＝`, steps: [`＝ <span class="final-ans">5√3</span>`] },
                     { q: `－3√2 ＋ 5√2 ＝`, steps: [`＝ <span class="final-ans">2√2</span>`] },
-                    { q: `√7 － 4√7 ＝`, steps: [`＝ LOG_ans ＝ －3√7`, `＝ <span class="final-ans">－3√7</span>`] }
+                    { q: `√7 － 4√7 ＝`, steps: [`＝ －3√7`, `＝ <span class="final-ans">－3√7</span>`] }
                 ];
             }},
             "m3_2_中身整理加減": { title: "根号の中身の整理と加減をしなさい（完全数値ランダム）。", generator: function() {
@@ -1261,13 +1261,7 @@
 
                 let singleBigQHeightMM = 235 / unitsInThisPage;
 
-                const targetUnit = sectionCatalog[unitKey];
-                
-                if (!targetUnit) {
-                    console.warn(`キー「${unitKey}」に一致するデータが見つかりません。`);
-                    return;
-                }
-
+                const targetUnit = sectionCatalog[unitKey] || sectionCatalog["m1_1_加法"];
                 let problemSet = targetUnit.generator(); 
 
                 const bqBlockQ = document.createElement('div');
