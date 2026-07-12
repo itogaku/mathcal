@@ -4,83 +4,361 @@
     <meta charset="UTF-8">
     <title>中学数学・詳細単元選択計算ジェネレーター</title>
     <style>
-        body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: #f0f2f5; }
-        .sidebar { width: 350px; background: #fff; overflow-y: auto; padding: 20px; border-right: 1px solid #ccc; }
-        .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-        .page { width: 210mm; min-height: 297mm; background: #fff; padding: 15mm; margin-bottom: 20px; box-shadow: 0 0 5px rgba(0,0,0,0.1); box-sizing: border-box; }
-        .big-question { border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; }
-        .btn { padding: 10px; margin-top: 10px; width: 100%; cursor: pointer; border: none; background: #3182ce; color: #fff; border-radius: 4px; }
-        .btn-reset { background: #e53e3e; }
-        .cat-title { font-weight: bold; margin-top: 15px; color: #2b6cb0; border-bottom: 1px solid #ccc; }
-        .label-group { font-size: 12px; margin: 3px 0; display: block; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+            margin: 0; display: flex; height: 100vh; background: #eef2f7; color: #2d3748;
+        }
+
+        /* ---------- サイドバー ---------- */
+        .sidebar {
+            width: 320px; flex-shrink: 0; background: #fff; overflow-y: auto;
+            padding: 20px; border-right: 1px solid #e2e8f0;
+            box-shadow: 2px 0 6px rgba(0,0,0,0.03);
+        }
+        .sidebar h3 {
+            margin: 0 0 16px; font-size: 17px; color: #1a365d;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .cat-block {
+            margin-bottom: 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+            overflow: hidden; background: #f8fafc;
+        }
+        .cat-title {
+            font-weight: bold; font-size: 14px; color: #fff; background: #3182ce;
+            margin: 0; padding: 8px 12px;
+        }
+        .cat-body { padding: 8px 10px; }
+        .label-group {
+            font-size: 13px; margin: 2px 0; padding: 6px 8px; border-radius: 6px;
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .label-group:hover { background: #ebf4ff; }
+        .label-group input { width: 16px; height: 16px; accent-color: #3182ce; cursor: pointer; }
+
+        .btn {
+            padding: 12px; margin-top: 10px; width: 100%; cursor: pointer; border: none;
+            background: #3182ce; color: #fff; border-radius: 8px; font-size: 14px; font-weight: bold;
+            transition: background 0.15s;
+        }
+        .btn:hover { background: #2b6cb0; }
+        .btn-reset { background: #fff; color: #e53e3e; border: 1px solid #e53e3e; }
+        .btn-reset:hover { background: #fff5f5; }
+        .btn-print { background: #38a169; }
+        .btn-print:hover { background: #2f855a; }
+        .btn-bar { position: sticky; bottom: 0; background: #fff; padding-top: 10px; }
+
+        /* ---------- プレビュー / 印刷ページ ---------- */
+        .main-content {
+            flex-grow: 1; overflow-y: auto; padding: 30px; display: flex;
+            flex-direction: column; align-items: center; gap: 24px;
+        }
+        .empty-hint {
+            color: #a0aec0; font-size: 15px; margin-top: 80px; text-align: center; line-height: 1.8;
+        }
+        .page {
+            width: 210mm; min-height: 297mm; background: #fff; padding: 15mm;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12); box-sizing: border-box;
+            display: flex; flex-direction: column;
+        }
+        .page-header {
+            flex: 0 0 auto;
+            display: flex; justify-content: space-between; align-items: baseline;
+            border-bottom: 3px solid #2b6cb0; padding-bottom: 10px; margin-bottom: 14px;
+        }
+        .page-header h2 { margin: 0; font-size: 20px; color: #1a365d; }
+        .page-header .meta { font-size: 13px; color: #4a5568; white-space: nowrap; }
+        .page-header .meta span { display: inline-block; min-width: 90px; border-bottom: 1px solid #a0aec0; margin-left: 4px; }
+        .page-body { flex: 1 1 auto; }
+        .unit-block { margin-bottom: 18px; }
+        .unit-title {
+            font-size: 14px; font-weight: bold; color: #2b6cb0; margin: 0 0 8px;
+            padding-bottom: 4px; border-bottom: 1px dashed #cbd5e0;
+        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .problem {
+            display: flex; align-items: flex-start; gap: 8px; padding: 12px 12px;
+            border: 1px solid #e2e8f0; border-radius: 8px; background: #fbfcfe; min-height: 100px;
+        }
+        .problem-num {
+            font-weight: bold; color: #fff; background: #3182ce; border-radius: 50%;
+            width: 22px; height: 22px; flex-shrink: 0; display: flex; align-items: center;
+            justify-content: center; font-size: 12px;
+        }
+        .problem-q { font-size: 16px; line-height: 1.6; }
+
+        /* ---------- 解答ページ ---------- */
+        .ans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; }
+        .ans-item {
+            font-size: 14px; padding: 5px 2px; border-bottom: 1px dotted #e2e8f0;
+        }
+        .ans-item b { color: #2b6cb0; }
+
+        /* ---------- 印刷時 ---------- */
+        @media print {
+            .sidebar, .empty-hint { display: none; }
+            .main-content { padding: 0; gap: 0; }
+            .page { box-shadow: none; margin: 0; page-break-after: always; }
+        }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h3>詳細単元選択</h3>
+        <h3>📚 詳細単元選択</h3>
         <div id="menu-area"></div>
-        <button class="btn" onclick="generatePrint()">🔄 数値変更して生成</button>
-        <button class="btn btn-reset" onclick="resetCheckboxes()">🧹 全リセット</button>
+        <div class="btn-bar">
+            <button class="btn" onclick="generatePrint()">🔄 数値変更して生成</button>
+            <button class="btn btn-print" onclick="window.print()">🖨️ 印刷する</button>
+            <button class="btn btn-reset" onclick="resetCheckboxes()">🧹 全リセット</button>
+        </div>
     </div>
-    <div class="main-content" id="main-preview-area"></div>
+    <div class="main-content" id="main-preview-area">
+        <div class="empty-hint">← 左のメニューから単元にチェックを入れてください<br>（チェックすると自動で問題が表示されます）</div>
+    </div>
 
     <script>
         const getR = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
         const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
 
-        // 70単元レベルに細分化したデータベース
+        // 70単元レベルに細分化したデータベース（q: 問題文, a: 正しい解答）
         const catalog = {
             "正負の数": {
-                "加法": { gen: () => [{q:`${getR(2,9)}+(-${getR(2,9)})`}, {q:`${-getR(2,9)}+${getR(2,9)}`}]},
-                "減法": { gen: () => [{q:`${getR(2,9)}-${getR(2,9)}`}, {q:`${-getR(2,9)}-(-${getR(2,9)})`}]},
-                "乗法": { gen: () => [{q:`${getR(2,9)}×(-${getR(2,9)})`}, {q:`(-${getR(2,9)})×(-${getR(2,9)})`}]},
-                "除法": { gen: () => [{q:`${getR(2,9)}÷(-${getR(2,9)})`}, {q:`(-${getR(2,9)})÷(-${getR(2,9)})`}]}
+                "加法": { gen: () => {
+                    const a1=getR(2,9), b1=getR(2,9), a2=getR(2,9), b2=getR(2,9);
+                    return [
+                        {q:`${a1}+(-${b1})`, a: a1-b1},
+                        {q:`${-a2}+${b2}`, a: b2-a2}
+                    ];
+                }},
+                "減法": { gen: () => {
+                    const a1=getR(2,9), b1=getR(2,9), a2=getR(2,9), b2=getR(2,9);
+                    return [
+                        {q:`${a1}-${b1}`, a: a1-b1},
+                        {q:`${-a2}-(-${b2})`, a: b2-a2}
+                    ];
+                }},
+                "乗法": { gen: () => {
+                    const a1=getR(2,9), b1=getR(2,9), a2=getR(2,9), b2=getR(2,9);
+                    return [
+                        {q:`${a1}×(-${b1})`, a: -(a1*b1)},
+                        {q:`(-${a2})×(-${b2})`, a: a2*b2}
+                    ];
+                }},
+                "除法": { gen: () => {
+                    const d1=getR(2,9), k1=getR(2,9), d2=getR(2,9), k2=getR(2,9);
+                    return [
+                        {q:`${d1*k1}÷(-${d1})`, a: -k1},
+                        {q:`(-${d2*k2})÷(-${d2})`, a: k2}
+                    ];
+                }}
             },
             "文字式": {
-                "式の表し方": { gen: () => [{q:`xの${getR(2,9)}倍`}, {q:`${getR(10,50)}からaを引く`}]},
-                "代入": { gen: () => [{q:`x=${-getR(2,5)}のとき 5x-3`}, {q:`a=${getR(2,5)},b=${-getR(2,5)}のとき 2a-3b`}]},
-                "同類項": { gen: () => [{q:`${getR(2,5)}x+${getR(2,5)}y-x+${getR(2,5)}y`}]}
+                "式の表し方": { gen: () => {
+                    const n1=getR(2,9), n2=getR(10,50);
+                    return [
+                        {q:`xの${n1}倍`, a:`${n1}x`},
+                        {q:`${n2}からaを引く`, a:`${n2}-a`}
+                    ];
+                }},
+                "代入": { gen: () => {
+                    const x=-getR(2,5), a=getR(2,5), b=-getR(2,5);
+                    return [
+                        {q:`x=${x}のとき 5x-3`, a: 5*x-3},
+                        {q:`a=${a},b=${b}のとき 2a-3b`, a: 2*a-3*b}
+                    ];
+                }},
+                "同類項": { gen: () => {
+                    const c1=getR(2,5), c2=getR(2,5);
+                    const xCoef = c1-1;
+                    return [{q:`${c1}x+${c2}y-x+${c2}y`, a: `${xCoef===1?'':xCoef}x+${c2*2}y`}];
+                }}
             },
             "方程式": {
-                "基本解法": { gen: () => [{q:`x-${getR(2,9)}=${getR(2,9)}`}, {q:`${getR(2,5)}x+${getR(2,5)}=${getR(2,9)}`}]},
-                "分配・分数": { gen: () => [{q:`${getR(2,5)}(x+${getR(2,5)})=${getR(2,9)}`}, {q:`x/${getR(2,4)}-${getR(2,5)}=1`}]}
+                "基本解法": { gen: () => {
+                    const b1=getR(2,9), x1=getR(2,9);
+                    const a2=getR(2,5), b2=getR(2,5), x2=getR(2,9);
+                    return [
+                        {q:`x-${b1}=${x1-b1}`, a: x1},
+                        {q:`${a2}x+${b2}=${a2*x2+b2}`, a: x2}
+                    ];
+                }},
+                "分配・分数": { gen: () => {
+                    const a1=getR(2,5), b1=getR(2,5), x1=getR(2,9);
+                    const a2=getR(2,4), b2=getR(2,5);
+                    return [
+                        {q:`${a1}(x+${b1})=${a1*(x1+b1)}`, a: x1},
+                        {q:`x/${a2}-${b2}=1`, a: a2*(1+b2)}
+                    ];
+                }}
             },
             "多項式展開因数分解": {
-                "展開": { gen: () => [{q:`(x+${getR(2,5)})(x+${getR(2,5)})`}, {q:`(x+${getR(2,5)})²`}]},
-                "因数分解": { gen: () => [{q:`x²+${getR(3,8)}x+${getR(10,20)}`}, {q:`x²-${getR(4,9)}²`}]}
+                "展開": { gen: () => {
+                    const a1=getR(2,5), b1=getR(2,5), a2=getR(2,5);
+                    return [
+                        {q:`(x+${a1})(x+${b1})`, a: `x²+${a1+b1}x+${a1*b1}`},
+                        {q:`(x+${a2})²`, a: `x²+${2*a2}x+${a2*a2}`}
+                    ];
+                }},
+                "因数分解": { gen: () => {
+                    const p1=getR(2,9), q1=getR(2,9), a2=getR(4,9);
+                    return [
+                        {q:`x²+${p1+q1}x+${p1*q1}`, a: `(x+${p1})(x+${q1})`},
+                        {q:`x²-${a2*a2}`, a: `(x-${a2})(x+${a2})`}
+                    ];
+                }}
             },
             "2次方程式": {
-                "平方根解法": { gen: () => [{q:`x²=${getR(16,81)}`}, {q:`(x-${getR(2,5)})²=${getR(2,9)}`}]},
-                "因数分解解法": { gen: () => [{q:`x²-${getR(3,8)}x+${getR(7,15)}=0`}]}
+                "平方根解法": { gen: () => {
+                    const k1=getR(4,9), c2=getR(2,5), e2=getR(2,9);
+                    return [
+                        {q:`x²=${k1*k1}`, a: `x=±${k1}`},
+                        {q:`(x-${c2})²=${e2*e2}`, a: `x=${c2}±${e2}`}
+                    ];
+                }},
+                "因数分解解法": { gen: () => {
+                    const p1=getR(2,9), q1=getR(2,9);
+                    return [{q:`x²-${p1+q1}x+${p1*q1}=0`, a: `x=${p1}, ${q1}`}];
+                }}
             }
         };
 
         // メニュー描画（大項目・小項目）
         const menu = document.getElementById('menu-area');
         for(let category in catalog) {
-            menu.innerHTML += `<div class="cat-title">${category}</div>`;
+            let block = `<div class="cat-block"><p class="cat-title">${category}</p><div class="cat-body">`;
             for(let sub in catalog[category]) {
-                menu.innerHTML += `<label class="label-group"><input type="checkbox" class="calc-unit" data-cat="${category}" data-sub="${sub}"> ${sub}</label>`;
+                block += `<label class="label-group"><input type="checkbox" class="calc-unit" data-cat="${category}" data-sub="${sub}"> ${sub}</label>`;
             }
+            block += `</div></div>`;
+            menu.innerHTML += block;
+        }
+        // チェックを入れた瞬間に問題を再生成する
+        menu.addEventListener('change', (e) => {
+            if (e.target.classList.contains('calc-unit')) generatePrint();
+        });
+
+        const emptyHint = '<div class="empty-hint">← 左のメニューから単元にチェックを入れてください<br>（チェックすると自動で問題が表示されます）</div>';
+
+        function unitTitleHTML(cls, cat, sub) {
+            return `<p class="${cls}">${cat}：${sub}</p>`;
+        }
+        function problemSectionHTML(sec) {
+            let html = `<div class="unit-block">${unitTitleHTML('unit-title', sec.cat, sec.sub)}<div class="grid">`;
+            sec.items.forEach(it => {
+                html += `<div class="problem"><div class="problem-num">${it.num}</div><div class="problem-q">${it.q} ＝</div></div>`;
+            });
+            html += `</div></div>`;
+            return html;
+        }
+        function answerSectionHTML(sec) {
+            let html = `<div class="unit-block">${unitTitleHTML('unit-title', sec.cat, sec.sub)}<div class="ans-grid">`;
+            sec.items.forEach(it => {
+                html += `<div class="ans-item">（${it.num}）${it.q} ＝ <b>${it.a}</b></div>`;
+            });
+            html += `</div></div>`;
+            return html;
+        }
+        function wrapPage(bodyHtml, titleText, showMeta) {
+            return `<div class="page">
+                <div class="page-header">
+                    <h2>${titleText}</h2>
+                    ${showMeta ? '<div class="meta">名前：<span></span>　得点：<span></span></div>' : ''}
+                </div>
+                <div class="page-body">${bodyHtml}</div>
+            </div>`;
+        }
+
+        // セクション（単元）ごとのHTMLを、実際のページサイズを基準に
+        // なるべく1ページに詰め、収まらない分だけ次ページへ送る
+        function paginate(sectionHtmlList, titleText, showMeta) {
+            if (sectionHtmlList.length === 0) return [''];
+
+            // ページ本文に使える高さと幅を、実際のflexレイアウトで計測する
+            const pageWrap = document.createElement('div');
+            pageWrap.style.position = 'absolute';
+            pageWrap.style.visibility = 'hidden';
+            pageWrap.style.left = '-99999px';
+            pageWrap.style.top = '0';
+            pageWrap.innerHTML = wrapPage('', titleText, showMeta);
+            document.body.appendChild(pageWrap);
+            const pageBodyEl = pageWrap.querySelector('.page-body');
+            const maxHeight = pageBodyEl.clientHeight;
+            const contentWidth = pageBodyEl.clientWidth;
+            document.body.removeChild(pageWrap);
+
+            // 各セクションの実際の高さは、flex-growの影響を受けない
+            // 通常のブロック要素（同じ幅）で個別に計測する
+            const measureEl = document.createElement('div');
+            measureEl.style.position = 'absolute';
+            measureEl.style.visibility = 'hidden';
+            measureEl.style.left = '-99999px';
+            measureEl.style.top = '0';
+            measureEl.style.width = contentWidth + 'px';
+            document.body.appendChild(measureEl);
+            const heights = sectionHtmlList.map(html => {
+                measureEl.innerHTML = html;
+                return measureEl.scrollHeight;
+            });
+            document.body.removeChild(measureEl);
+
+            const pages = [];
+            let current = '';
+            let currentHeight = 0;
+            sectionHtmlList.forEach((html, i) => {
+                const h = heights[i];
+                if (currentHeight > 0 && currentHeight + h > maxHeight) {
+                    pages.push(current);
+                    current = html;
+                    currentHeight = h;
+                } else {
+                    current += html;
+                    currentHeight += h;
+                }
+            });
+            if (current) pages.push(current);
+            return pages.length ? pages : [''];
         }
 
         function generatePrint() {
             const preview = document.getElementById('main-preview-area');
-            preview.innerHTML = '';
-            document.querySelectorAll('.calc-unit:checked').forEach(cb => {
+            const checked = document.querySelectorAll('.calc-unit:checked');
+            if (checked.length === 0) {
+                preview.innerHTML = emptyHint;
+                return;
+            }
+
+            let counter = 0;
+            const sections = [];
+            checked.forEach(cb => {
                 const cat = cb.dataset.cat;
                 const sub = cb.dataset.sub;
                 const probs = shuffleArray(catalog[cat][sub].gen());
-                let html = `<div class="page"><div class="big-question"><h2>${cat}：${sub}</h2><div class="grid">`;
-                probs.forEach((p, i) => html += `<div>（${i+1}） ${p.q} ＝ </div>`);
-                html += `</div></div></div>`;
-                preview.innerHTML += html;
+                const items = probs.map(p => ({ num: ++counter, q: p.q, a: p.a }));
+                sections.push({ cat, sub, items });
             });
+
+            const problemHtmlList = sections.map(problemSectionHTML);
+            const answerHtmlList = sections.map(answerSectionHTML);
+
+            const problemPages = paginate(problemHtmlList, '計算プリント', true);
+            const answerPages = paginate(answerHtmlList, '解答', false);
+
+            let out = '';
+            problemPages.forEach((body, i) => {
+                const title = problemPages.length > 1 ? `計算プリント（${i+1}/${problemPages.length}）` : '計算プリント';
+                out += wrapPage(body, title, true);
+            });
+            answerPages.forEach((body, i) => {
+                const title = answerPages.length > 1 ? `解答（${i+1}/${answerPages.length}）` : '解答';
+                out += wrapPage(body, title, false);
+            });
+            preview.innerHTML = out;
         }
+
         function resetCheckboxes() {
             document.querySelectorAll('.calc-unit').forEach(cb => cb.checked = false);
-            document.getElementById('main-preview-area').innerHTML = '';
+            document.getElementById('main-preview-area').innerHTML = emptyHint;
         }
     </script>
 </body>
