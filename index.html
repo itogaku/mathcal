@@ -20,6 +20,11 @@
             margin: 0 0 16px; font-size: 17px; color: #1a365d;
             display: flex; align-items: center; gap: 6px;
         }
+        .grade-divider {
+            font-weight: bold; font-size: 13px; color: #718096; margin: 18px 0 8px;
+            padding-top: 12px; border-top: 2px solid #cbd5e0; letter-spacing: 1px;
+        }
+        .grade-divider:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
         .cat-block {
             margin-bottom: 14px; border: 1px solid #e2e8f0; border-radius: 8px;
             overflow: hidden; background: #f8fafc;
@@ -120,10 +125,14 @@
     <script>
         const getR = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
         const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
+        const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); return b === 0 ? a : gcd(b, a % b); };
+        const reduceFrac = (num, den) => { const g = gcd(num, den) || 1; return `${num / g}/${den / g}`; };
+        const fmtTerm = (n) => n >= 0 ? `+${n}` : `${n}`;
+        const isPerfectSquare = (n) => { const r = Math.round(Math.sqrt(n)); return r * r === n; };
 
-        // 70単元レベルに細分化したデータベース（q: 問題文, a: 正しい解答）
+        // 中学1〜3年の「計算」単元を細分化したデータベース（q: 問題文, a: 正しい解答）
         const catalog = {
-            "正負の数": {
+            "【1年】正負の数": {
                 "加法": { gen: () => {
                     const a1=getR(2,9), b1=getR(2,9), a2=getR(2,9), b2=getR(2,9);
                     return [
@@ -151,9 +160,24 @@
                         {q:`${d1*k1}÷(-${d1})`, a: -k1},
                         {q:`(-${d2*k2})÷(-${d2})`, a: k2}
                     ];
+                }},
+                "四則混合": { gen: () => {
+                    const a1=getR(2,9), b1=getR(2,9), c1=getR(2,9);
+                    const a2=getR(2,9), b2=getR(2,9), c2=getR(2,9);
+                    return [
+                        {q:`${a1}+${b1}×${c1}`, a: a1+b1*c1},
+                        {q:`(${a2}+${b2})×${c2}`, a: (a2+b2)*c2}
+                    ];
+                }},
+                "累乗": { gen: () => {
+                    const a1=getR(2,9), a2=getR(2,9);
+                    return [
+                        {q:`(-${a1})²`, a: a1*a1},
+                        {q:`-${a2}²`, a: -(a2*a2)}
+                    ];
                 }}
             },
-            "文字式": {
+            "【1年】文字式": {
                 "式の表し方": { gen: () => {
                     const n1=getR(2,9), n2=getR(10,50);
                     return [
@@ -172,9 +196,25 @@
                     const c1=getR(2,5), c2=getR(2,5);
                     const xCoef = c1-1;
                     return [{q:`${c1}x+${c2}y-x+${c2}y`, a: `${xCoef===1?'':xCoef}x+${c2*2}y`}];
+                }},
+                "1次式の加減": { gen: () => {
+                    const a1=getR(2,5), b1=getR(2,9), c1=getR(2,5), d1=getR(2,9);
+                    const a2=getR(2,9), b2=getR(2,9), c2=getR(2,5), d2=getR(2,9);
+                    return [
+                        {q:`(${a1}x+${b1})+(${c1}x+${d1})`, a: `${a1+c1}x+${b1+d1}`},
+                        {q:`(${a2}x+${b2})-(${c2}x-${d2})`, a: `${a2-c2}x+${b2+d2}`}
+                    ];
+                }},
+                "単項式の乗除": { gen: () => {
+                    const a1=getR(2,9), b1=getR(2,9);
+                    const d2=getR(2,9), k2=getR(2,9);
+                    return [
+                        {q:`${a1}x×${b1}`, a: `${a1*b1}x`},
+                        {q:`${d2*k2}x÷${d2}`, a: `${k2}x`}
+                    ];
                 }}
             },
-            "方程式": {
+            "【1年】1次方程式": {
                 "基本解法": { gen: () => {
                     const b1=getR(2,9), x1=getR(2,9);
                     const a2=getR(2,5), b2=getR(2,5), x2=getR(2,9);
@@ -190,9 +230,132 @@
                         {q:`${a1}(x+${b1})=${a1*(x1+b1)}`, a: x1},
                         {q:`x/${a2}-${b2}=1`, a: a2*(1+b2)}
                     ];
+                }},
+                "比例式": { gen: () => {
+                    const p1=getR(2,5), q1=getR(2,5), t1=getR(2,5), t1b=getR(2,5);
+                    const a1=p1*t1, b1=q1*t1, c1=q1*t1b, x1=p1*t1b;
+                    const p2=getR(2,5), q2=getR(2,5), t2=getR(2,5), t2b=getR(2,5);
+                    const a2=p2*t2, b2=q2*t2, c2=q2*t2b, x2=p2*t2b;
+                    return [
+                        {q:`${a1}:${b1}=x:${c1}`, a: x1},
+                        {q:`${a2}:x=${b2}:${c2}`, a: x2}
+                    ];
                 }}
             },
-            "多項式展開因数分解": {
+            "【1年】比例と反比例": {
+                "比例の式": { gen: () => {
+                    const a1=getR(2,9), x1=getR(2,9);
+                    const a2=getR(2,9), x2=getR(2,9); const y2=a2*x2;
+                    return [
+                        {q:`y=${a1}xで、x=${x1}のときのyの値`, a: a1*x1},
+                        {q:`y=axで、x=${x2},y=${y2}のときのaの値`, a: a2}
+                    ];
+                }},
+                "反比例の式": { gen: () => {
+                    const x1=getR(2,9), k1=getR(2,9); const av1=x1*k1;
+                    const x2=getR(2,9), y2=getR(2,9);
+                    return [
+                        {q:`y=${av1}/xで、x=${x1}のときのyの値`, a: k1},
+                        {q:`y=a/xで、x=${x2},y=${y2}のときのaの値`, a: x2*y2}
+                    ];
+                }}
+            },
+            "【1年】図形の計量": {
+                "柱体の体積": { gen: () => {
+                    const s=getR(10,30), h=getR(3,9);
+                    const r=getR(2,6), h2=getR(2,9);
+                    return [
+                        {q:`底面積${s}cm²、高さ${h}cmの角柱の体積`, a: `${s*h}cm³`},
+                        {q:`底面の半径${r}cm、高さ${h2}cmの円柱の体積`, a: `${r*r*h2}πcm³`}
+                    ];
+                }},
+                "おうぎ形": { gen: () => {
+                    const k1=getR(2,6), r1=2*k1;
+                    const k2=getR(2,6), r2=2*k2;
+                    return [
+                        {q:`半径${r1}cm、中心角90°のおうぎ形の弧の長さ`, a: `${r1/2}πcm`},
+                        {q:`半径${r2}cm、中心角90°のおうぎ形の面積`, a: `${(r2*r2)/4}πcm²`}
+                    ];
+                }}
+            },
+            "【2年】式の計算": {
+                "単項式の乗除": { gen: () => {
+                    const a1=getR(2,9), b1=getR(2,9);
+                    const a2=getR(2,9), b2=getR(2,9);
+                    return [
+                        {q:`${a1}x×${b1}y`, a: `${a1*b1}xy`},
+                        {q:`${a2*b2}x²÷${a2}x`, a: `${b2}x`}
+                    ];
+                }},
+                "等式の変形": { gen: () => {
+                    const b=getR(2,5), m=getR(2,5), n=getR(2,9);
+                    const a=b*m, c=b*n;
+                    return [{q:`${a}x+${b}y=${c} を y について解く`, a: `y=-${m}x+${n}`}];
+                }}
+            },
+            "【2年】連立方程式": {
+                "加減法": { gen: () => {
+                    const x0=getR(1,9), y0=getR(1,9);
+                    let a1=getR(2,5), b1=getR(2,5), a2=getR(2,5), b2=getR(2,5);
+                    if (a1*b2 - a2*b1 === 0) a2 += 1;
+                    const c1=a1*x0+b1*y0, c2=a2*x0+b2*y0;
+                    return [{q:`${a1}x+${b1}y=${c1}<br>${a2}x+${b2}y=${c2}`, a: `x=${x0}, y=${y0}`}];
+                }},
+                "代入法": { gen: () => {
+                    const x0=getR(1,9), y0=getR(1,9);
+                    const m=getR(2,4);
+                    const n=y0-m*x0;
+                    const a2=getR(2,5), b2=getR(2,5);
+                    const c2=a2*x0+b2*y0;
+                    return [{q:`y=${m}x${fmtTerm(n)}<br>${a2}x+${b2}y=${c2}`, a: `x=${x0}, y=${y0}`}];
+                }}
+            },
+            "【2年】1次関数": {
+                "変化の割合": { gen: () => {
+                    const a1=getR(2,5), b1=getR(2,9);
+                    const k2=getR(2,5);
+                    const x1=getR(1,5), dx=getR(1,4), x2=x1+dx;
+                    const y1=getR(1,9), y2=y1+k2*dx;
+                    return [
+                        {q:`y=${a1}x+${b1}の変化の割合`, a: a1},
+                        {q:`2点(${x1},${y1}),(${x2},${y2})を通る直線の変化の割合`, a: k2}
+                    ];
+                }},
+                "直線の式": { gen: () => {
+                    const a1=getR(2,5), x1=getR(-4,4), y1=getR(-9,9);
+                    const b1=y1-a1*x1;
+                    return [{q:`傾き${a1}で点(${x1},${y1})を通る直線の式`, a: `y=${a1}x${fmtTerm(b1)}`}];
+                }}
+            },
+            "【2年】図形の角": {
+                "多角形の内角": { gen: () => {
+                    const n1=getR(4,10);
+                    const divisors=[3,4,5,6,8,9,10,12,15,18,20];
+                    const n2=divisors[getR(0,divisors.length-1)];
+                    return [
+                        {q:`${n1}角形の内角の和`, a: `${(n1-2)*180}°`},
+                        {q:`正${n2}角形の1つの内角`, a: `${180-360/n2}°`}
+                    ];
+                }},
+                "平行線と角": { gen: () => {
+                    const a1=getR(30,150), a2=getR(30,150);
+                    return [
+                        {q:`平行線に1本の直線が交わり、一方の角が${a1}°のとき、錯角の大きさ`, a: `${a1}°`},
+                        {q:`平行線に1本の直線が交わり、一方の角が${a2}°のとき、同側内角の大きさ`, a: `${180-a2}°`}
+                    ];
+                }}
+            },
+            "【2年】確率": {
+                "さいころの確率": { gen: () => {
+                    const th1=getR(2,5), fav1=6-th1+1;
+                    const th2=getR(2,5), fav2=th2;
+                    return [
+                        {q:`さいころを1回投げるとき、出た目が${th1}以上になる確率`, a: reduceFrac(fav1,6)},
+                        {q:`さいころを1回投げるとき、出た目が${th2}以下になる確率`, a: reduceFrac(fav2,6)}
+                    ];
+                }}
+            },
+            "【3年】多項式": {
                 "展開": { gen: () => {
                     const a1=getR(2,5), b1=getR(2,5), a2=getR(2,5);
                     return [
@@ -206,9 +369,59 @@
                         {q:`x²+${p1+q1}x+${p1*q1}`, a: `(x+${p1})(x+${q1})`},
                         {q:`x²-${a2*a2}`, a: `(x-${a2})(x+${a2})`}
                     ];
+                }},
+                "共通因数の因数分解": { gen: () => {
+                    const coprimePair = () => { let p,q; do { p=getR(2,5); q=getR(2,5); } while (gcd(p,q)!==1); return [p,q]; };
+                    const k1=getR(2,6); const [p1,q1]=coprimePair();
+                    const k2=getR(2,6); const [p2,q2]=coprimePair();
+                    return [
+                        {q:`${k1*p1}x+${k1*q1}`, a: `${k1}(${p1}x+${q1})`},
+                        {q:`${k2*p2}x²+${k2*q2}x`, a: `${k2}x(${p2}x+${q2})`}
+                    ];
                 }}
             },
-            "2次方程式": {
+            "【3年】平方根": {
+                "乗除": { gen: () => {
+                    const a1=getR(2,9), b1=getR(2,9);
+                    const m=getR(2,5), b2=getR(2,5), a2=b2*m*m;
+                    return [
+                        {q:`√${a1}×√${b1}`, a: `√${a1*b1}`},
+                        {q:`√${a2}÷√${b2}`, a: m}
+                    ];
+                }},
+                "加減": { gen: () => {
+                    const c1=getR(2,9), coefA1=getR(2,5), coefB1=getR(2,5);
+                    const c2=getR(2,9), coefA2=getR(4,9), coefB2=getR(2,3);
+                    return [
+                        {q:`${coefA1}√${c1}+${coefB1}√${c1}`, a: `${coefA1+coefB1}√${c1}`},
+                        {q:`${coefA2}√${c2}-${coefB2}√${c2}`, a: `${coefA2-coefB2}√${c2}`}
+                    ];
+                }},
+                "有理化": { gen: () => {
+                    const list=[2,3,5,6,7,10,11,13,14,15];
+                    const b1=list[getR(0,list.length-1)], a1=getR(2,9);
+                    const b2=list[getR(0,list.length-1)], a2=getR(2,9);
+                    return [
+                        {q:`${a1}/√${b1}`, a: `${a1}√${b1}/${b1}`},
+                        {q:`${a2}/√${b2}`, a: `${a2}√${b2}/${b2}`}
+                    ];
+                }},
+                "大小比較": { gen: () => {
+                    const mk = () => {
+                        const b=getR(2,6);
+                        const delta=getR(1,5)*(Math.random()<0.5?1:-1);
+                        let a=b*b+delta; if (a<1) a=b*b+Math.abs(delta)+1;
+                        const bigger = a>b*b ? `√${a}` : `${b}`;
+                        return {a, b, bigger};
+                    };
+                    const r1=mk(), r2=mk();
+                    return [
+                        {q:`√${r1.a} と ${r1.b} ではどちらが大きいか`, a: r1.bigger},
+                        {q:`√${r2.a} と ${r2.b} ではどちらが大きいか`, a: r2.bigger}
+                    ];
+                }}
+            },
+            "【3年】2次方程式": {
                 "平方根解法": { gen: () => {
                     const k1=getR(4,9), c2=getR(2,5), e2=getR(2,9);
                     return [
@@ -219,14 +432,63 @@
                 "因数分解解法": { gen: () => {
                     const p1=getR(2,9), q1=getR(2,9);
                     return [{q:`x²-${p1+q1}x+${p1*q1}=0`, a: `x=${p1}, ${q1}`}];
+                }},
+                "解の公式": { gen: () => {
+                    let b, c, D;
+                    do {
+                        b=getR(2,8); c=getR(-8,8);
+                        D=b*b-4*c;
+                    } while (D<0 || isPerfectSquare(D) || c===0);
+                    return [{q:`x²+${b}x${fmtTerm(c)}=0 を解の公式で解く`, a: `x=(${-b}±√${D})/2`}];
+                }}
+            },
+            "【3年】関数y=ax²": {
+                "変化の割合と値": { gen: () => {
+                    const a1=getR(2,5), p1=getR(1,4), q1=p1+getR(1,3);
+                    const a2=getR(2,5), x2=getR(-5,5);
+                    return [
+                        {q:`y=${a1}x²で、xが${p1}から${q1}まで増加するときの変化の割合`, a: a1*(p1+q1)},
+                        {q:`y=${a2}x²で、x=${x2}のときのyの値`, a: a2*x2*x2}
+                    ];
+                }}
+            },
+            "【3年】相似": {
+                "面積比・体積比": { gen: () => {
+                    const m1=getR(2,5), n1=getR(2,5);
+                    const m2=getR(2,4), n2=getR(2,4);
+                    return [
+                        {q:`相似比が${m1}:${n1}のとき、面積比`, a: `${m1*m1}:${n1*n1}`},
+                        {q:`相似比が${m2}:${n2}のとき、体積比`, a: `${m2*m2*m2}:${n2*n2*n2}`}
+                    ];
+                }}
+            },
+            "【3年】三平方の定理": {
+                "辺の長さ": { gen: () => {
+                    const triples=[[3,4,5],[5,12,13],[8,15,17],[7,24,25],[9,12,15],[20,21,29],[6,8,10]];
+                    const t1=triples[getR(0,triples.length-1)], k1=getR(1,3);
+                    const [a1,b1,c1]=t1.map(v=>v*k1);
+                    const t2=triples[getR(0,triples.length-1)], k2=getR(1,3);
+                    const [a2,b2,c2]=t2.map(v=>v*k2);
+                    return [
+                        {q:`直角をはさむ2辺が${a1}cm、${b1}cmの直角三角形の斜辺の長さ`, a: `${c1}cm`},
+                        {q:`斜辺が${c2}cm、他の1辺が${b2}cmの直角三角形のもう1辺の長さ`, a: `${a2}cm`}
+                    ];
                 }}
             }
         };
 
-        // メニュー描画（大項目・小項目）
+        // メニュー描画（学年区切り・大項目・小項目）
         const menu = document.getElementById('menu-area');
+        let lastGrade = null;
         for(let category in catalog) {
-            let block = `<div class="cat-block"><p class="cat-title">${category}</p><div class="cat-body">`;
+            const gradeMatch = category.match(/^【(.+?)】(.*)$/);
+            const grade = gradeMatch ? gradeMatch[1] : null;
+            const label = gradeMatch ? gradeMatch[2] : category;
+            if (grade && grade !== lastGrade) {
+                menu.innerHTML += `<div class="grade-divider">${grade}</div>`;
+                lastGrade = grade;
+            }
+            let block = `<div class="cat-block"><p class="cat-title">${label}</p><div class="cat-body">`;
             for(let sub in catalog[category]) {
                 block += `<label class="label-group"><input type="checkbox" class="calc-unit" data-cat="${category}" data-sub="${sub}"> ${sub}</label>`;
             }
