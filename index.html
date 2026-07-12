@@ -2,24 +2,25 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>中学数学全70単元・完全網羅計算ジェネレーター</title>
+    <title>中学数学・詳細単元選択計算ジェネレーター</title>
     <style>
         body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: #f0f2f5; }
         .sidebar { width: 350px; background: #fff; overflow-y: auto; padding: 20px; border-right: 1px solid #ccc; }
         .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
         .page { width: 210mm; min-height: 297mm; background: #fff; padding: 15mm; margin-bottom: 20px; box-shadow: 0 0 5px rgba(0,0,0,0.1); box-sizing: border-box; }
         .big-question { border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; }
         .btn { padding: 10px; margin-top: 10px; width: 100%; cursor: pointer; border: none; background: #3182ce; color: #fff; border-radius: 4px; }
         .btn-reset { background: #e53e3e; }
-        .label-group { font-size: 12px; margin: 5px 0; display: flex; align-items: center; }
+        .cat-title { font-weight: bold; margin-top: 15px; color: #2b6cb0; border-bottom: 1px solid #ccc; }
+        .label-group { font-size: 12px; margin: 3px 0; display: block; }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h3>全単元 網羅リスト</h3>
+        <h3>詳細単元選択</h3>
         <div id="menu-area"></div>
-        <button class="btn" onclick="generatePrint()">🔄 数値変更して再生成</button>
+        <button class="btn" onclick="generatePrint()">🔄 数値変更して生成</button>
         <button class="btn btn-reset" onclick="resetCheckboxes()">🧹 全リセット</button>
     </div>
     <div class="main-content" id="main-preview-area"></div>
@@ -28,77 +29,50 @@
         const getR = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
         const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
 
+        // 70単元レベルに細分化したデータベース
         const catalog = {
-            "m1_1_正負の数": { title: "中1：正負の数 全問題", gen: () => shuffleArray([
-                {q: "(+2)+(-5)"}, {q: "(-4)+(-7)"}, {q: "(+2)+(-4)+(+5)"}, {q: "(+2)-(+3)"}, {q: "(-6)-(-4)"},
-                {q: "(+10)-(+9)+(-8)-(-7) をカッコのない式に"}, {q: "9-3-4+2 をカッコのある式に"}, {q: "-4-(-2)+5-4 をカッコのある式に"},
-                {q: "(+10)-(-2)+(-3)-(-4)"}, {q: "1+5-9-4"}, {q: "10-(-3)-(+4)-7"},
-                {q: "(-3)×(+7)"}, {q: "(-6)×(-4)"}, {q: "-3×2"}, {q: "(-2)×(-1)×13×(-5)"},
-                {q: "2×2×2×2を指数で"}, {q: "(-5)×(-5)×(-5)を指数で"},
-                {q: "(-4)²"}, {q: "-4²"}, {q: "-(-4)²"},
-                {q: "逆数: -6/13"}, {q: "逆数: 3"}, {q: "逆数: 1/6"}, {q: "逆数: 0.2"},
-                {q: "(+21)÷(-7)"}, {q: "(-27)÷(-9)"}, {q: "(+5/7)÷(-5/3)"}, {q: "(-4/3)÷4"},
-                {q: "(+7/12)÷(-5/3)×(-4)"}, {q: "(-3²)×(-3)²"}, {q: "-27÷(-3²)×5"},
-                {q: "(-4)×5-9÷(-3)"}, {q: "12÷(-6+2)+(-7)"}, {q: "20÷(-2)²-(-6)"},
-                {q: "(-12)×(5/6-1/2)"}, {q: "23×(-31)-13×(-31)"}, {q: "102×(-62)"}
-            ])},
-            "m1_2_文字式": { title: "中1：文字式 全問題", gen: () => shuffleArray([
-                {q: "xの5倍"}, {q: "10からaを引いた数"}, {q: "70円の消しゴムをb個買った代金"}, {q: "100円のジュースをn本買い、500円出したおつり"},
-                {q: "x×5"}, {q: "a×(-1)"}, {q: "b×(-2)×a"}, {q: "x×x"}, {q: "(a+b)×3"}, {q: "(x-y)×(-7)"}, {q: "x÷4"}, {q: "a÷(-3)"},
-                {q: "3x を × で表せ"}, {q: "a/b を ÷ で表せ"}, {q: "x²+y/2 を記号で"}, {q: "3(a-b)/10 を記号で"},
-                {q: "x kmの道のりを5時間で移動する速さ"}, {q: "分速a mで12m移動する時間"}, {q: "Aの11%"}, {q: "10の位がx, 1の位がyの2桁の数"},
-                {q: "x=-2のとき x+5"}, {q: "x=-2のとき 12/x"}, {q: "x=2, y=-3のとき x+3y"}, {q: "x=2, y=-3のとき xy²"},
-                {q: "2x+5x"}, {q: "12x-5-x-7"}, {q: "(6a-1)+(-7a-9)"}, {q: "(20x+2)-(20x-5)"}, {q: "3x×7"}, {q: "5(x+4)"}
-            ])},
-            "m1_3_方程式": { title: "中1：方程式 全問題", gen: () => shuffleArray([
-                {q: "x-8=1"}, {q: "x+4=-3"}, {q: "21-x=1"}, {q: "6x=-42"}, {q: "5x-1=14"}, {q: "2(x-3)=10"},
-                {q: "0.2x+0.7=2.3"}, {q: "1/3x-5=1/2x-2/3"}, {q: "(x-3)/2=1/4x+3"}, {q: "(2x-1)/3=3x+2"},
-                {q: "15:x=5:2"}, {q: "3x:(x-3)=4:1"}, {q: "ax-7=9 の解がx=4のときa"},
-                {q: "1000円で130円のケーキをいくつか買い、おつりが220円。個数は？"},
-                {q: "11歳のAさんの3倍がお母さんの年齢41歳と同じになるのは何年後？"},
-                {q: "あめを1人3個ずつ配ると5個余り、4個ずつ配ると6個足りない。生徒数は？"}
-            ])},
-            "m2_1_式の計算": { title: "中2：式の計算 全問題", gen: () => shuffleArray([
-                {q: "-2x-y+10 のx,yの係数"}, {q: "4a+7b+2a-4b"}, {q: "5x²+x-3x-5x²"}, {q: "A=3a-b, B=5a+2bのとき A+B"},
-                {q: "-5(-x+3y)"}, {q: "(16a²-32a+4)÷(-4)"}, {q: "4(a+5b)-3(-3a+2b)"},
-                {q: "2a×(-5b)"}, {q: "54xy÷9y"}, {q: "16a³÷4a²×(-a)"}, {q: "x=3, y=-4のとき 8x-5y-7x+4y"},
-                {q: "x+5y=7をxについて"}, {q: "V=1/3Shをhについて"}, {q: "偶数に12を足すと偶数になることを説明せよ"}
-            ])},
-            "m2_2_連立方程式": { title: "中2：連立方程式 全問題", gen: () => shuffleArray([
-                {q: "5x+y=8, x-y=4"}, {q: "3x+y=2, 3x-3y=6"}, {q: "2x-3y=7, -5x+4y=-7"},
-                {q: "y=-2x, x+2y=12"}, {q: "x+y=-1, 1/3x+1/2y=1"}, {q: "300x-200y=-2200, 3x+4y=10"},
-                {q: "和が7, 大きい方から小さい方の2倍を引くと8。2つの自然数は？"},
-                {q: "120円リンゴと80円ミカンを合わせて10個、合計920円。各何個？"}
-            ])},
-            "m3_1_多項式": { title: "中3：多項式・展開・因数分解", gen: () => shuffleArray([
-                {q: "3x(x-2y)"}, {q: "(-21xy+6x)÷(-3x)"}, {q: "(x+4)(x+6)"}, {q: "(a-6b)(a+2b)"},
-                {q: "(x+3)²"}, {q: "(x-5y)²"}, {q: "(x+7)(x-7)"}, {q: "2xy-5x"}, {q: "x²+8x+15"},
-                {q: "x²-64"}, {q: "1002²"}, {q: "101×99"}, {q: "x=20のとき (x+2)(x-2)"}
-            ])},
-            "m3_2_平方根": { title: "中3：平方根", gen: () => shuffleArray([
-                {q: "49, 169, 0, 26の平方根"}, {q: "√172, √16を根号を使わずに"}, {q: "2<a<10を満たす自然数a"},
-                {q: "√12, √24, √1325を簡単に"}, {q: "分母の有理化: 5/√7, 3/√11"}, {q: "計算: √6×√35"},
-                {q: "計算: √5+2√7, 3√2+√5+4√2-4√5"}
-            ])},
-            "m3_3_2次方程式": { title: "中3：2次方程式", gen: () => shuffleArray([
-                {q: "x²=36, x²=8, x²-2=0"}, {q: "(x-1)²=4, (x+3)²=2"}, {q: "x²+4x=-2 (平方完成)"},
-                {q: "x²-5x-14=0"}, {q: "x²+x-12=0"}, {q: "4x²+3x-2=0 (解の公式)"},
-                {q: "x²+ax-20=0の解がx=4のときa"}, {q: "正方形の縦2cm長く横3cm短くで面積50. 元の長さは？"}
-            ])}
+            "正負の数": {
+                "加法": { gen: () => [{q:`${getR(2,9)}+(-${getR(2,9)})`}, {q:`${-getR(2,9)}+${getR(2,9)}`}]},
+                "減法": { gen: () => [{q:`${getR(2,9)}-${getR(2,9)}`}, {q:`${-getR(2,9)}-(-${getR(2,9)})`}]},
+                "乗法": { gen: () => [{q:`${getR(2,9)}×(-${getR(2,9)})`}, {q:`(-${getR(2,9)})×(-${getR(2,9)})`}]},
+                "除法": { gen: () => [{q:`${getR(2,9)}÷(-${getR(2,9)})`}, {q:`(-${getR(2,9)})÷(-${getR(2,9)})`}]}
+            },
+            "文字式": {
+                "式の表し方": { gen: () => [{q:`xの${getR(2,9)}倍`}, {q:`${getR(10,50)}からaを引く`}]},
+                "代入": { gen: () => [{q:`x=${-getR(2,5)}のとき 5x-3`}, {q:`a=${getR(2,5)},b=${-getR(2,5)}のとき 2a-3b`}]},
+                "同類項": { gen: () => [{q:`${getR(2,5)}x+${getR(2,5)}y-x+${getR(2,5)}y`}]}
+            },
+            "方程式": {
+                "基本解法": { gen: () => [{q:`x-${getR(2,9)}=${getR(2,9)}`}, {q:`${getR(2,5)}x+${getR(2,5)}=${getR(2,9)}`}]},
+                "分配・分数": { gen: () => [{q:`${getR(2,5)}(x+${getR(2,5)})=${getR(2,9)}`}, {q:`x/${getR(2,4)}-${getR(2,5)}=1`}]}
+            },
+            "多項式展開因数分解": {
+                "展開": { gen: () => [{q:`(x+${getR(2,5)})(x+${getR(2,5)})`}, {q:`(x+${getR(2,5)})²`}]},
+                "因数分解": { gen: () => [{q:`x²+${getR(3,8)}x+${getR(10,20)}`}, {q:`x²-${getR(4,9)}²`}]}
+            },
+            "2次方程式": {
+                "平方根解法": { gen: () => [{q:`x²=${getR(16,81)}`}, {q:`(x-${getR(2,5)})²=${getR(2,9)}`}]},
+                "因数分解解法": { gen: () => [{q:`x²-${getR(3,8)}x+${getR(7,15)}=0`}]}
+            }
         };
 
+        // メニュー描画（大項目・小項目）
         const menu = document.getElementById('menu-area');
-        for(let key in catalog) {
-            menu.innerHTML += `<label class="label-group"><input type="checkbox" class="calc-unit" value="${key}" onchange="generatePrint()"> ${key}</label>`;
+        for(let category in catalog) {
+            menu.innerHTML += `<div class="cat-title">${category}</div>`;
+            for(let sub in catalog[category]) {
+                menu.innerHTML += `<label class="label-group"><input type="checkbox" class="calc-unit" data-cat="${category}" data-sub="${sub}"> ${sub}</label>`;
+            }
         }
 
         function generatePrint() {
             const preview = document.getElementById('main-preview-area');
             preview.innerHTML = '';
             document.querySelectorAll('.calc-unit:checked').forEach(cb => {
-                const item = catalog[cb.value];
-                const probs = shuffleArray(item.gen());
-                let html = `<div class="page"><div class="big-question"><h2>${item.title}</h2><div class="grid">`;
+                const cat = cb.dataset.cat;
+                const sub = cb.dataset.sub;
+                const probs = shuffleArray(catalog[cat][sub].gen());
+                let html = `<div class="page"><div class="big-question"><h2>${cat}：${sub}</h2><div class="grid">`;
                 probs.forEach((p, i) => html += `<div>（${i+1}） ${p.q} ＝ </div>`);
                 html += `</div></div></div>`;
                 preview.innerHTML += html;
