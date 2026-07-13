@@ -20,22 +20,35 @@
             margin: 0 0 16px; font-size: 17px; color: #1a365d;
             display: flex; align-items: center; gap: 6px;
         }
-        .grade-divider {
-            font-weight: bold; font-size: 13px; color: #718096; margin: 18px 0 8px;
-            padding-top: 12px; border-top: 2px solid #cbd5e0; letter-spacing: 1px;
+        .grade-block { margin-bottom: 10px; }
+        .grade-block:first-child { margin-top: 0; }
+        .grade-header {
+            font-weight: bold; font-size: 15px; color: #fff; background: #1a365d;
+            margin: 14px 0 8px; padding: 10px 12px; border-radius: 8px;
+            cursor: pointer; user-select: none;
+            display: flex; align-items: center; gap: 8px;
         }
-        .grade-divider:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+        .grade-header:hover { background: #234876; }
+        .grade-header:first-of-type { margin-top: 0; }
+        .grade-arrow { display: inline-block; transition: transform 0.15s; font-size: 11px; }
+        .grade-header.expanded .grade-arrow { transform: rotate(90deg); }
+        .grade-body { display: none; }
+        .grade-body.expanded { display: block; }
         .cat-block {
-            margin-bottom: 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+            margin-bottom: 10px; border: 1px solid #e2e8f0; border-radius: 8px;
             overflow: hidden; background: #f8fafc;
         }
         .cat-title {
             font-weight: bold; font-size: 14px; color: #fff; background: #3182ce;
-            margin: 0; padding: 8px 12px; cursor: pointer;
+            margin: 0; padding: 8px 12px;
             display: flex; align-items: center; gap: 8px;
         }
-        .cat-title input { width: 15px; height: 15px; accent-color: #fff; cursor: pointer; }
-        .cat-body { padding: 8px 10px; }
+        .cat-title input { width: 15px; height: 15px; accent-color: #fff; cursor: pointer; flex-shrink: 0; }
+        .cat-label { cursor: pointer; user-select: none; flex: 1; display: flex; align-items: center; gap: 6px; }
+        .cat-arrow { display: inline-block; transition: transform 0.15s; font-size: 10px; }
+        .cat-label.expanded .cat-arrow { transform: rotate(90deg); }
+        .cat-body { padding: 8px 10px; display: none; }
+        .cat-body.expanded { display: block; }
         .label-group {
             font-size: 13px; margin: 2px 0; padding: 6px 8px; border-radius: 6px;
             display: flex; align-items: center; gap: 8px; cursor: pointer;
@@ -54,8 +67,6 @@
         .btn-reset:hover { background: #fff5f5; }
         .btn-print { background: #38a169; }
         .btn-print:hover { background: #2f855a; }
-        .btn-selectall { background: #fff; color: #3182ce; border: 1px solid #3182ce; }
-        .btn-selectall:hover { background: #ebf4ff; }
         .btn-bar { position: sticky; bottom: 0; background: #fff; padding-top: 10px; }
 
         /* ---------- プレビュー / 印刷ページ ---------- */
@@ -120,7 +131,6 @@
         <div class="btn-bar">
             <button class="btn" onclick="generatePrint()">🔄 数値変更して生成</button>
             <button class="btn btn-print" onclick="window.print()">🖨️ 印刷する</button>
-            <button class="btn btn-selectall" onclick="selectAllUnits()">✅ 全単元を選択</button>
             <button class="btn btn-reset" onclick="resetCheckboxes()">🧹 全リセット</button>
         </div>
     </div>
@@ -1031,23 +1041,27 @@
             }
         };
 
-        // メニュー描画（学年区切り・大項目・小項目）
+        // メニュー描画（学年→単元→サブ単元の3階層、折りたたみ式）
         const menu = document.getElementById('menu-area');
-        let lastGrade = null;
-        for(let category in catalog) {
+        const gradeGroups = {};
+        for (let category in catalog) {
             const gradeMatch = category.match(/^【(.+?)】(.*)$/);
-            const grade = gradeMatch ? gradeMatch[1] : null;
+            const grade = gradeMatch ? gradeMatch[1] : 'その他';
             const label = gradeMatch ? gradeMatch[2] : category;
-            if (grade && grade !== lastGrade) {
-                menu.innerHTML += `<div class="grade-divider">${grade}</div>`;
-                lastGrade = grade;
-            }
-            let block = `<div class="cat-block"><label class="cat-title"><input type="checkbox" class="cat-select-all" data-cat="${category}"> ${label}</label><div class="cat-body">`;
-            for(let sub in catalog[category]) {
-                block += `<label class="label-group"><input type="checkbox" class="calc-unit" data-cat="${category}" data-sub="${sub}"> ${sub}</label>`;
-            }
-            block += `</div></div>`;
-            menu.innerHTML += block;
+            if (!gradeGroups[grade]) gradeGroups[grade] = [];
+            gradeGroups[grade].push({ category, label });
+        }
+        for (let grade in gradeGroups) {
+            let gradeHtml = `<div class="grade-block"><div class="grade-header" data-grade="${grade}"><span class="grade-arrow">▶</span>${grade}</div><div class="grade-body">`;
+            gradeGroups[grade].forEach(({ category, label }) => {
+                gradeHtml += `<div class="cat-block"><div class="cat-title"><input type="checkbox" class="cat-select-all" data-cat="${category}"><span class="cat-label" data-cat="${category}"><span class="cat-arrow">▶</span>${label}</span></div><div class="cat-body">`;
+                for (let sub in catalog[category]) {
+                    gradeHtml += `<label class="label-group"><input type="checkbox" class="calc-unit" data-cat="${category}" data-sub="${sub}"> ${sub}</label>`;
+                }
+                gradeHtml += `</div></div>`;
+            });
+            gradeHtml += `</div></div>`;
+            menu.innerHTML += gradeHtml;
         }
 
         // カテゴリ内の全チェックボックスの状態から、カテゴリ見出しのチェック状態（チェック/未チェック/一部）を同期する
@@ -1059,6 +1073,23 @@
             catCb.checked = checkedCount === subs.length;
             catCb.indeterminate = checkedCount > 0 && checkedCount < subs.length;
         }
+
+        // 学年見出し・単元見出しのクリックで折りたたみを開閉する
+        menu.addEventListener('click', (e) => {
+            const gradeHeader = e.target.closest('.grade-header');
+            if (gradeHeader) {
+                const body = gradeHeader.nextElementSibling;
+                const expanded = body.classList.toggle('expanded');
+                gradeHeader.classList.toggle('expanded', expanded);
+                return;
+            }
+            const catLabel = e.target.closest('.cat-label');
+            if (catLabel) {
+                const catBody = catLabel.closest('.cat-block').querySelector('.cat-body');
+                const expanded = catBody.classList.toggle('expanded');
+                catLabel.classList.toggle('expanded', expanded);
+            }
+        });
 
         // チェックを入れた瞬間に問題を再生成する
         menu.addEventListener('change', (e) => {
@@ -1073,12 +1104,6 @@
                 generatePrint();
             }
         });
-
-        function selectAllUnits() {
-            document.querySelectorAll('.calc-unit').forEach(cb => cb.checked = true);
-            document.querySelectorAll('.cat-select-all').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
-            generatePrint();
-        }
 
         const emptyHint = '<div class="empty-hint">← 左のメニューから単元にチェックを入れてください<br>（チェックすると自動で問題が表示されます）</div>';
 
