@@ -149,6 +149,51 @@
         const isPerfectSquare = (n) => { const r = Math.round(Math.sqrt(n)); return r * r === n; };
         const termC = (coef, v) => coef === 0 ? '' : coef === 1 ? `+${v}` : coef === -1 ? `-${v}` : `${fmtTerm(coef)}${v}`;
         const leadC = (coef, v) => coef === 0 ? '0' : coef === 1 ? v : coef === -1 ? `-${v}` : `${coef}${v}`;
+
+        // 座標平面（比例・反比例のグラフ）をSVGで描画するヘルパー
+        function graphSVG({ size = 140, range = 6, lineA = null, hyperbolaA = null, point = null, blank = false } = {}) {
+            const scale = (size - 28) / (2 * range);
+            const cx = size / 2, cy = size / 2;
+            const X = (x) => cx + x * scale;
+            const Y = (y) => cy - y * scale;
+            let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;">`;
+            for (let i = -range; i <= range; i++) {
+                if (i === 0) continue;
+                svg += `<line x1="${X(i)}" y1="${Y(-range)}" x2="${X(i)}" y2="${Y(range)}" stroke="#e0e0e0" stroke-width="0.6"/>`;
+                svg += `<line x1="${X(-range)}" y1="${Y(i)}" x2="${X(range)}" y2="${Y(i)}" stroke="#e0e0e0" stroke-width="0.6"/>`;
+            }
+            svg += `<line x1="${X(-range)}" y1="${Y(0)}" x2="${X(range)}" y2="${Y(0)}" stroke="#333" stroke-width="1"/>`;
+            svg += `<line x1="${X(0)}" y1="${Y(-range)}" x2="${X(0)}" y2="${Y(range)}" stroke="#333" stroke-width="1"/>`;
+            svg += `<text x="${X(range) - 5}" y="${Y(0) - 3}" font-size="8">x</text>`;
+            svg += `<text x="${X(0) + 3}" y="${Y(range) + 8}" font-size="8">y</text>`;
+            svg += `<text x="${X(0) - 9}" y="${Y(0) + 9}" font-size="7">O</text>`;
+            if (!blank) {
+                if (lineA !== null) {
+                    let xEnd = range;
+                    if (Math.abs(lineA) > 1) xEnd = range / Math.abs(lineA);
+                    const x1 = -xEnd, x2 = xEnd, y1 = lineA * x1, y2 = lineA * x2;
+                    svg += `<line x1="${X(x1)}" y1="${Y(y1)}" x2="${X(x2)}" y2="${Y(y2)}" stroke="#e53e3e" stroke-width="1.6"/>`;
+                }
+                if (hyperbolaA !== null) {
+                    const steps = 24;
+                    const xMin = Math.max(Math.abs(hyperbolaA) / range, 0.3);
+                    const pts1 = []; for (let i = 0; i <= steps; i++) { const t = xMin + (range - xMin) * i / steps; pts1.push([t, hyperbolaA / t]); }
+                    const pts2 = pts1.map(([x, y]) => [-x, -y]);
+                    const toPath = (pts) => 'M ' + pts.map(([x, y]) => `${X(x).toFixed(1)},${Y(y).toFixed(1)}`).join(' L ');
+                    svg += `<path d="${toPath(pts1)}" fill="none" stroke="#e53e3e" stroke-width="1.6"/>`;
+                    svg += `<path d="${toPath(pts2)}" fill="none" stroke="#e53e3e" stroke-width="1.6"/>`;
+                }
+                if (point) {
+                    svg += `<circle cx="${X(point[0])}" cy="${Y(point[1])}" r="3" fill="#2b6cb0"/>`;
+                }
+            }
+            svg += `</svg>`;
+            return svg;
+        }
+        function tableHTML(xs, ys) {
+            const td = (v) => `<td style="border:1px solid #333;padding:3px 8px;">${v}</td>`;
+            return `<table style="border-collapse:collapse;font-size:13px;"><tr>${td('x')}${xs.map(td).join('')}</tr><tr>${td('y')}${ys.map(td).join('')}</tr></table>`;
+        }
         // 文章形式の問題（〜しなさい、〜でしょうか等）には「＝」を付けない
         const isSentenceQ = (q) => {
             const t = String(q).replace(/[）)]+$/, '');
@@ -529,21 +574,99 @@
                 }}
             },
             "【1年】比例と反比例": {
-                "比例の式": { instr:"次の問いに答えなさい。", gen: () => {
-                    const a1=getR(2,9), x1=getR(2,9);
-                    const a2=getR(2,9), x2=getR(2,9); const y2=a2*x2;
+                "比例の式：値を求める": { instr:"次の問いに答えなさい。", gen: () => {
+                    const a1=getR(2,9)*(Math.random()<0.3?-1:1), x1=getR(2,9);
+                    const a2=getR(2,9)*(Math.random()<0.3?-1:1), x2=getR(2,9); const y2=a2*x2;
                     return [
                         {q:`y=${a1}xで、x=${x1}のときのyの値`, a: a1*x1},
-                        {q:`y=axで、x=${x2},y=${y2}のときのaの値`, a: a2}
+                        {q:`y=${a2}xで、y=${y2}のときのxの値`, a: x2}
                     ];
                 }},
-                "反比例の式": { instr:"次の問いに答えなさい。", gen: () => {
+                "比例の式を求める（比例定数・座標から）": { instr:"次の条件を満たす比例の式を求めなさい。", noEq:true, gen: () => {
+                    const a1=getR(2,9)*(Math.random()<0.3?-1:1);
+                    const x2=getR(2,9), a2=getR(2,9)*(Math.random()<0.3?-1:1); const y2=a2*x2;
+                    return [
+                        {q:`yはxに比例し、比例定数が${a1}である`, a:`y=${a1}x`},
+                        {q:`yはxに比例し、x=${x2}のときy=${y2}である`, a:`y=${a2}x`}
+                    ];
+                }},
+                "比例の式とグラフ": { instr:"次の比例の式のグラフを、下の図にかき入れなさい。", noEq:true, gen: () => {
+                    const pick=()=>{ const vals=[1,2,3,4,-1,-2,-3,-4]; return vals[getR(0,vals.length-1)]; };
+                    const a1=pick(), a2=pick();
+                    return [
+                        {q:`y=${a1}x のグラフ<br>${graphSVG({blank:true})}`, a: graphSVG({lineA:a1})},
+                        {q:`y=${a2}x のグラフ<br>${graphSVG({blank:true})}`, a: graphSVG({lineA:a2})}
+                    ];
+                }},
+                "グラフから比例の式を求める": { instr:"次のグラフが表す比例の式を求めなさい。", noEq:true, gen: () => {
+                    const pick=()=>{ const vals=[1,2,3,-1,-2,-3]; return vals[getR(0,vals.length-1)]; };
+                    const a1=pick(), a2=pick();
+                    return [
+                        {q: graphSVG({lineA:a1}), a:`y=${a1}x`},
+                        {q: graphSVG({lineA:a2}), a:`y=${a2}x`}
+                    ];
+                }},
+                "比例の文章題": { instr:"次の問いに答えなさい。", gen: () => {
+                    const t=[
+                        ()=>{ const speed=getR(40,90); return {q:`分速${speed}mで歩く人がいる。歩いた時間をx分、進んだ道のりをymとするとき、yをxの式で表しなさい`, a:`y=${speed}x`}; },
+                        ()=>{ const speed=getR(40,90), t0=getR(2,9); return {q:`分速${speed}mで歩く人が、x分間歩いたときに進む道のりをymとする。${t0}分間歩いたときの道のりを求めなさい`, a:`${speed*t0}m`}; },
+                        ()=>{ const perM=getR(50,300); return {q:`1mの重さが${perM}gの針金がある。この針金xmの重さをygとするとき、yをxの式で表しなさい`, a:`y=${perM}x`}; },
+                        ()=>{ const perM=getR(50,300), n0=getR(2,9); const w0=perM*n0; return {q:`1mの重さが${perM}gの針金がある。この針金の重さが${w0}gのとき、針金の長さを求めなさい`, a:`${n0}m`}; }
+                    ];
+                    return shuffleArray(t.slice()).map(fn=>fn());
+                }},
+                "反比例の式：値を求める": { instr:"次の問いに答えなさい。", gen: () => {
                     const x1=getR(2,9), k1=getR(2,9); const av1=x1*k1;
-                    const x2=getR(2,9), y2=getR(2,9);
+                    const x2=getR(2,9), k2=getR(2,9); const av2=x2*k2;
                     return [
                         {q:`y=${av1}/xで、x=${x1}のときのyの値`, a: k1},
-                        {q:`y=a/xで、x=${x2},y=${y2}のときのaの値`, a: x2*y2}
+                        {q:`y=${av2}/xで、y=${k2}のときのxの値`, a: x2}
                     ];
+                }},
+                "反比例の式を求める（比例定数・座標から）": { instr:"次の条件を満たす反比例の式を求めなさい。", noEq:true, gen: () => {
+                    const a1=getR(2,40)*(Math.random()<0.3?-1:1);
+                    const x2=getR(2,9), y2=getR(2,9); const a2=x2*y2;
+                    return [
+                        {q:`yはxに反比例し、比例定数が${a1}である`, a:`y=${a1}/x`},
+                        {q:`yはxに反比例し、x=${x2}のときy=${y2}である`, a:`y=${a2}/x`}
+                    ];
+                }},
+                "反比例の式とグラフ": { instr:"次の反比例の式のグラフを、下の図にかき入れなさい。", noEq:true, gen: () => {
+                    const pick=()=>{ const vals=[2,3,4,6,8,-2,-3,-4,-6,-8]; return vals[getR(0,vals.length-1)]; };
+                    const a1=pick(), a2=pick();
+                    return [
+                        {q:`y=${a1}/x のグラフ<br>${graphSVG({blank:true})}`, a: graphSVG({hyperbolaA:a1})},
+                        {q:`y=${a2}/x のグラフ<br>${graphSVG({blank:true})}`, a: graphSVG({hyperbolaA:a2})}
+                    ];
+                }},
+                "グラフから反比例の式を求める": { instr:"次のグラフが表す反比例の式を求めなさい。", noEq:true, gen: () => {
+                    const pick=()=>{ const vals=[2,3,4,6,8,-2,-3,-4,-6,-8]; return vals[getR(0,vals.length-1)]; };
+                    const a1=pick(), a2=pick();
+                    return [
+                        {q: graphSVG({hyperbolaA:a1}), a:`y=${a1}/x`},
+                        {q: graphSVG({hyperbolaA:a2}), a:`y=${a2}/x`}
+                    ];
+                }},
+                "反比例の文章題": { instr:"次の問いに答えなさい。", gen: () => {
+                    const t=[
+                        ()=>{ const w=getR(2,9), h=getR(2,9); const area=w*h; return {q:`面積が${area}cm²の長方形の縦の長さをxcm、横の長さをycmとするとき、yをxの式で表しなさい`, a:`y=${area}/x`}; },
+                        ()=>{ const per=getR(2,9), n0=getR(2,9); const total=per*n0; return {q:`${total}個のみかんをx人で同じ数ずつ分けるとき、1人分の個数をy個とする。yをxの式で表しなさい`, a:`y=${total}/x`}; },
+                        ()=>{ const speed=getR(2,9)*10, t0=getR(2,9); const dist=speed*t0; return {q:`${dist}m離れた2地点間を、分速xmでy分かけて移動するとき、yをxの式で表しなさい`, a:`y=${dist}/x`}; }
+                    ];
+                    return shuffleArray(t.slice()).map(fn=>fn());
+                }},
+                "座標を読み取る": { instr:"次の点の座標を答えなさい。", noEq:true, gen: () => {
+                    const mk = () => { const x=getR(-5,5), y=getR(-5,5); return {q: graphSVG({point:[x,y]}), a:`(${x}, ${y})`}; };
+                    return [mk(), mk()];
+                }},
+                "座標に点をとる": { instr:"次の座標を、下の図に表しなさい。", noEq:true, gen: () => {
+                    const mk = () => { const x=getR(-5,5), y=getR(-5,5); return {q:`(${x}, ${y})<br>${graphSVG({blank:true})}`, a: graphSVG({point:[x,y]})}; };
+                    return [mk(), mk()];
+                }},
+                "表から式をつくる": { instr:"次の表は、yがxに比例するか反比例するかのいずれかの関係を表している。yをxの式で表しなさい。", noEq:true, gen: () => {
+                    const mkProp = () => { const a=getR(2,9)*(Math.random()<0.3?-1:1); const xs=[1,2,3]; const ys=xs.map(x=>a*x); return {q: tableHTML(xs,ys), a:`y=${a}x`}; };
+                    const mkInv = () => { const a=6*getR(1,9)*(Math.random()<0.3?-1:1); const xs=[1,2,3]; const ys=xs.map(x=>a/x); return {q: tableHTML(xs,ys), a:`y=${a}/x`}; };
+                    return Math.random()<0.5 ? [mkProp(), mkInv()] : [mkInv(), mkProp()];
                 }}
             },
             "【1年】図形の計量": {
