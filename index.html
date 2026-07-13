@@ -148,6 +148,11 @@
         const isPerfectSquare = (n) => { const r = Math.round(Math.sqrt(n)); return r * r === n; };
         const termC = (coef, v) => coef === 0 ? '' : coef === 1 ? `+${v}` : coef === -1 ? `-${v}` : `${fmtTerm(coef)}${v}`;
         const leadC = (coef, v) => coef === 0 ? '0' : coef === 1 ? v : coef === -1 ? `-${v}` : `${coef}${v}`;
+        // 文章形式の問題（〜しなさい、〜でしょうか等）には「＝」を付けない
+        const isSentenceQ = (q) => {
+            const t = String(q).replace(/[）)]+$/, '');
+            return /[。？?]$/.test(t) || /(なさい|でしょうか|せよ|大きいか|表す)$/.test(t) || q.includes('：') || q.includes('<br>');
+        };
 
         // 中学1〜3年の「計算」単元を細分化したデータベース（q: 問題文, a: 正しい解答）
         const catalog = {
@@ -942,7 +947,7 @@
                     const picks=Array.from({length:5}, () => pool[getR(0,pool.length-1)]());
                     const rationals=picks.filter(p=>!p.irr).map(p=>p.disp);
                     const irrationals=picks.filter(p=>p.irr).map(p=>p.disp);
-                    return [{q:`${picks.map(p=>p.disp).join(', ')}`, a:`有理数: ${rationals.length?rationals.join(', '):'なし'} / 無理数: ${irrationals.length?irrationals.join(', '):'なし'}`}];
+                    return [{q:`${picks.map(p=>p.disp).join(', ')}`, a:`有理数: ${rationals.length?rationals.join(', '):'なし'} / 無理数: ${irrationals.length?irrationals.join(', '):'なし'}`, noEq:true}];
                 }},
                 "近似値の計算": { instr:"√2=1.41として、次の値の近似値を求めなさい。", gen: () => {
                     const k1=getR(2,10); const n1=2*k1*k1;
@@ -1144,7 +1149,8 @@
             if (sec.instr) html += `<p class="unit-instr">${sec.instr}</p>`;
             html += `<div class="grid">`;
             sec.items.forEach(it => {
-                html += `<div class="problem"><div class="problem-num">(${it.num})</div><div class="problem-q">${it.q} ＝</div></div>`;
+                const showEq = !it.noEq && !isSentenceQ(it.q);
+                html += `<div class="problem"><div class="problem-num">(${it.num})</div><div class="problem-q">${it.q}${showEq ? ' ＝' : ''}</div></div>`;
             });
             html += `</div></div>`;
             return html;
@@ -1152,7 +1158,8 @@
         function answerSectionHTML(sec) {
             let html = `<div class="unit-block">${unitTitleHTML('unit-title', sec.cat, sec.sub)}<div class="ans-grid">`;
             sec.items.forEach(it => {
-                html += `<div class="ans-item">（${it.num}）${it.q} ＝ <b>${it.a}</b></div>`;
+                const showEq = !it.noEq && !isSentenceQ(it.q);
+                html += `<div class="ans-item">（${it.num}）${it.q} ${showEq ? '＝' : '→'} <b>${it.a}</b></div>`;
             });
             html += `</div></div>`;
             return html;
@@ -1232,7 +1239,7 @@
                 const cat = cb.dataset.cat;
                 const sub = cb.dataset.sub;
                 const probs = shuffleArray(catalog[cat][sub].gen());
-                const items = probs.map(p => ({ num: ++counter, q: p.q, a: p.a }));
+                const items = probs.map(p => ({ num: ++counter, q: p.q, a: p.a, noEq: p.noEq }));
                 sections.push({ cat, sub, instr: catalog[cat][sub].instr, items });
             });
 
