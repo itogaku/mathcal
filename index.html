@@ -31,8 +31,10 @@
         }
         .cat-title {
             font-weight: bold; font-size: 14px; color: #fff; background: #3182ce;
-            margin: 0; padding: 8px 12px;
+            margin: 0; padding: 8px 12px; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
         }
+        .cat-title input { width: 15px; height: 15px; accent-color: #fff; cursor: pointer; }
         .cat-body { padding: 8px 10px; }
         .label-group {
             font-size: 13px; margin: 2px 0; padding: 6px 8px; border-radius: 6px;
@@ -52,6 +54,8 @@
         .btn-reset:hover { background: #fff5f5; }
         .btn-print { background: #38a169; }
         .btn-print:hover { background: #2f855a; }
+        .btn-selectall { background: #fff; color: #3182ce; border: 1px solid #3182ce; }
+        .btn-selectall:hover { background: #ebf4ff; }
         .btn-bar { position: sticky; bottom: 0; background: #fff; padding-top: 10px; }
 
         /* ---------- プレビュー / 印刷ページ ---------- */
@@ -116,6 +120,7 @@
         <div class="btn-bar">
             <button class="btn" onclick="generatePrint()">🔄 数値変更して生成</button>
             <button class="btn btn-print" onclick="window.print()">🖨️ 印刷する</button>
+            <button class="btn btn-selectall" onclick="selectAllUnits()">✅ 全単元を選択</button>
             <button class="btn btn-reset" onclick="resetCheckboxes()">🧹 全リセット</button>
         </div>
     </div>
@@ -338,9 +343,8 @@
                     ];
                 }},
                 "同類項": { gen: () => {
-                    const c1=getR(2,5), c2=getR(2,5);
-                    const xCoef = c1-1;
-                    return [{q:`${c1}x+${c2}y-x+${c2}y`, a: `${xCoef===1?'':xCoef}x+${c2*2}y`}];
+                    const mk = () => { const c1=getR(2,5), c2=getR(2,5); const xCoef=c1-1; return {q:`${c1}x+${c2}y-x+${c2}y`, a: `${xCoef===1?'':xCoef}x+${c2*2}y`}; };
+                    return [mk(), mk()];
                 }},
                 "1次式の加減": { gen: () => {
                     const a1=getR(2,5), b1=getR(2,9), c1=getR(2,5), d1=getR(2,9);
@@ -612,28 +616,35 @@
                 }},
                 "文字式による証明": { gen: () => {
                     const k=getR(2,9);
-                    const t=[
+                    return [
                         {q:`偶数に${2*k}を足すと偶数になることを、nを整数として偶数を2nと表し、説明しなさい（2n+${2*k}を計算しなさい）`, a:`2n+${2*k}=2(n+${k})`},
-                        {q:`奇数と奇数の和が偶数になることを、n,mを整数として2つの奇数を2n+1,2m+1と表し、説明しなさい（(2n+1)+(2m+1)を計算しなさい）`, a:`(2n+1)+(2m+1)=2(n+m+1)`}
+                        {q:`奇数と奇数の和が偶数になることを、n,mを整数として2つの奇数を2n+1,2m+1と表し、説明しなさい（(2n+1)+(2m+1)を計算しなさい）`, a:`(2n+1)+(2m+1)=2(n+m+1)`},
+                        {q:`偶数と偶数の積が偶数になることを、n,mを整数として2つの偶数を2n,2mと表し、説明しなさい（2n×2mを計算しなさい）`, a:`2n×2m=2(2nm)`},
+                        {q:`奇数と奇数の積が奇数になることを、n,mを整数として2つの奇数を2n+1,2m+1と表し、説明しなさい（(2n+1)(2m+1)を計算しなさい）`, a:`(2n+1)(2m+1)=2(2nm+n+m)+1`}
                     ];
-                    return [t[getR(0,1)]];
                 }}
             },
             "【2年】連立方程式": {
                 "加減法": { gen: () => {
-                    const x0=getR(1,9), y0=getR(1,9);
-                    let a1=getR(2,5), b1=getR(2,5), a2=getR(2,5), b2=getR(2,5);
-                    if (a1*b2 - a2*b1 === 0) a2 += 1;
-                    const c1=a1*x0+b1*y0, c2=a2*x0+b2*y0;
-                    return [{q:`${a1}x+${b1}y=${c1}<br>${a2}x+${b2}y=${c2}`, a: `x=${x0}, y=${y0}`}];
+                    const mk = () => {
+                        const x0=getR(1,9), y0=getR(1,9);
+                        let a1=getR(2,5), b1=getR(2,5), a2=getR(2,5), b2=getR(2,5);
+                        if (a1*b2 - a2*b1 === 0) a2 += 1;
+                        const c1=a1*x0+b1*y0, c2=a2*x0+b2*y0;
+                        return {q:`${a1}x+${b1}y=${c1}<br>${a2}x+${b2}y=${c2}`, a: `x=${x0}, y=${y0}`};
+                    };
+                    return [mk(), mk()];
                 }},
                 "代入法": { gen: () => {
-                    const x0=getR(1,9), y0=getR(1,9);
-                    const m=getR(2,4);
-                    const n=y0-m*x0;
-                    const a2=getR(2,5), b2=getR(2,5);
-                    const c2=a2*x0+b2*y0;
-                    return [{q:`y=${m}x${fmtTerm(n)}<br>${a2}x+${b2}y=${c2}`, a: `x=${x0}, y=${y0}`}];
+                    const mk = () => {
+                        const x0=getR(1,9), y0=getR(1,9);
+                        const m=getR(2,4);
+                        const n=y0-m*x0;
+                        const a2=getR(2,5), b2=getR(2,5);
+                        const c2=a2*x0+b2*y0;
+                        return {q:`y=${m}x${fmtTerm(n)}<br>${a2}x+${b2}y=${c2}`, a: `x=${x0}, y=${y0}`};
+                    };
+                    return [mk(), mk()];
                 }},
                 "いろいろな連立方程式": { gen: () => {
                     const t=[
@@ -649,9 +660,12 @@
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
                 "連立方程式の係数決定": { gen: () => {
-                    const a0=getR(2,9), b0=getR(2,9), x0=getR(2,9), y0=getR(2,9);
-                    const c1=a0*x0-b0*y0, c2=b0*x0+a0*y0;
-                    return [{q:`連立方程式 ax-by=${c1}<br>bx+ay=${c2} の解が、x=${x0}, y=${y0} のとき、a, bの値を求めなさい`, a:`a=${a0}, b=${b0}`}];
+                    const mk = () => {
+                        const a0=getR(2,9), b0=getR(2,9), x0=getR(2,9), y0=getR(2,9);
+                        const c1=a0*x0-b0*y0, c2=b0*x0+a0*y0;
+                        return {q:`連立方程式 ax-by=${c1}<br>bx+ay=${c2} の解が、x=${x0}, y=${y0} のとき、a, bの値を求めなさい`, a:`a=${a0}, b=${b0}`};
+                    };
+                    return [mk(), mk()];
                 }},
                 "連立方程式の文章題": { gen: () => {
                     const t=[
@@ -676,9 +690,8 @@
                     ];
                 }},
                 "直線の式": { gen: () => {
-                    const a1=getR(2,5), x1=getR(-4,4), y1=getR(-9,9);
-                    const b1=y1-a1*x1;
-                    return [{q:`傾き${a1}で点(${x1},${y1})を通る直線の式`, a: `y=${a1}x${fmtTerm(b1)}`}];
+                    const mk = () => { const a1=getR(2,5), x1=getR(-4,4), y1=getR(-9,9); const b1=y1-a1*x1; return {q:`傾き${a1}で点(${x1},${y1})を通る直線の式`, a: `y=${a1}x${fmtTerm(b1)}`}; };
+                    return [mk(), mk()];
                 }}
             },
             "【2年】図形の角": {
@@ -748,14 +761,17 @@
                     ];
                 }},
                 "単項式×多項式の展開": { gen: () => {
-                    const k1=getR(2,5), p1=getR(1,4), q1=getR(2,9)*(Math.random()<0.5?1:-1);
-                    const k2=getR(2,5), p2=getR(1,4), q2=getR(2,9)*(Math.random()<0.5?1:-1);
-                    const resultX2=k1*p1-k2*p2, resultXY=k1*q1-k2*q2;
-                    return [{q:`${k1}x(${leadC(p1,'x')}${fmtTerm(q1)}y)-${k2}x(${leadC(p2,'x')}${fmtTerm(q2)}y)`, a:`${leadC(resultX2,'x²')}${termC(resultXY,'xy')}`}];
+                    const mk = () => {
+                        const k1=getR(2,5), p1=getR(1,4), q1=getR(2,9)*(Math.random()<0.5?1:-1);
+                        const k2=getR(2,5), p2=getR(1,4), q2=getR(2,9)*(Math.random()<0.5?1:-1);
+                        const resultX2=k1*p1-k2*p2, resultXY=k1*q1-k2*q2;
+                        return {q:`${k1}x(${leadC(p1,'x')}${fmtTerm(q1)}y)-${k2}x(${leadC(p2,'x')}${fmtTerm(q2)}y)`, a:`${leadC(resultX2,'x²')}${termC(resultXY,'xy')}`};
+                    };
+                    return [mk(), mk()];
                 }},
                 "多項式÷単項式": { gen: () => {
-                    const k=getR(2,6), p=getR(2,9), q=getR(2,9);
-                    return [{q:`(-${k*p}xy+${k*q}x)÷(-${k}x)`, a:`${p}y-${q}`}];
+                    const mk = () => { const k=getR(2,6), p=getR(2,9), q=getR(2,9); return {q:`(-${k*p}xy+${k*q}x)÷(-${k}x)`, a:`${p}y-${q}`}; };
+                    return [mk(), mk()];
                 }},
                 "展開の公式（拡張）": { gen: () => {
                     const t=[
@@ -919,16 +935,19 @@
                     ];
                 }},
                 "因数分解解法": { gen: () => {
-                    const p1=getR(2,9), q1=getR(2,9);
-                    return [{q:`x²-${p1+q1}x+${p1*q1}=0`, a: `x=${p1}, ${q1}`}];
+                    const mk = () => { const p1=getR(2,9), q1=getR(2,9); return {q:`x²-${p1+q1}x+${p1*q1}=0`, a: `x=${p1}, ${q1}`}; };
+                    return [mk(), mk()];
                 }},
                 "解の公式": { gen: () => {
-                    let b, c, D;
-                    do {
-                        b=getR(2,8); c=getR(-8,8);
-                        D=b*b-4*c;
-                    } while (D<0 || isPerfectSquare(D) || c===0);
-                    return [{q:`x²+${b}x${fmtTerm(c)}=0 を解の公式で解く`, a: `x=(${-b}±√${D})/2`}];
+                    const mk = () => {
+                        let b, c, D;
+                        do {
+                            b=getR(2,8); c=getR(-8,8);
+                            D=b*b-4*c;
+                        } while (D<0 || isPerfectSquare(D) || c===0);
+                        return {q:`x²+${b}x${fmtTerm(c)}=0 を解の公式で解く`, a: `x=(${-b}±√${D})/2`};
+                    };
+                    return [mk(), mk()];
                 }},
                 "平方根解法（係数・移項あり）": { gen: () => {
                     const t=[
@@ -946,7 +965,7 @@
                         ()=>{ const constTerm=getR(-15,15); const rhs=-constTerm; return {q:`x²${fmtTerm(b)}x${fmtTerm(constTerm)}=0`, a:`(x${fmtTerm(h)})²=${rhs+h*h}`}; },
                         ()=>{ const c1=getR(1,9), d=getR(1,9); const rhs=c1+d; return {q:`x²${fmtTerm(b)}x-${c1}=${d}`, a:`(x${fmtTerm(h)})²=${rhs+h*h}`}; }
                     ];
-                    return [t[getR(0,2)]()];
+                    return t.map(fn=>fn());
                 }},
                 "因数分解解法（拡張）": { gen: () => {
                     const t=[
@@ -1023,17 +1042,43 @@
                 menu.innerHTML += `<div class="grade-divider">${grade}</div>`;
                 lastGrade = grade;
             }
-            let block = `<div class="cat-block"><p class="cat-title">${label}</p><div class="cat-body">`;
+            let block = `<div class="cat-block"><label class="cat-title"><input type="checkbox" class="cat-select-all" data-cat="${category}"> ${label}</label><div class="cat-body">`;
             for(let sub in catalog[category]) {
                 block += `<label class="label-group"><input type="checkbox" class="calc-unit" data-cat="${category}" data-sub="${sub}"> ${sub}</label>`;
             }
             block += `</div></div>`;
             menu.innerHTML += block;
         }
+
+        // カテゴリ内の全チェックボックスの状態から、カテゴリ見出しのチェック状態（チェック/未チェック/一部）を同期する
+        function syncCatCheckbox(category) {
+            const catCb = menu.querySelector(`.cat-select-all[data-cat="${CSS.escape(category)}"]`);
+            if (!catCb) return;
+            const subs = menu.querySelectorAll(`.calc-unit[data-cat="${CSS.escape(category)}"]`);
+            const checkedCount = Array.from(subs).filter(cb => cb.checked).length;
+            catCb.checked = checkedCount === subs.length;
+            catCb.indeterminate = checkedCount > 0 && checkedCount < subs.length;
+        }
+
         // チェックを入れた瞬間に問題を再生成する
         menu.addEventListener('change', (e) => {
-            if (e.target.classList.contains('calc-unit')) generatePrint();
+            if (e.target.classList.contains('cat-select-all')) {
+                const category = e.target.dataset.cat;
+                const checked = e.target.checked;
+                menu.querySelectorAll(`.calc-unit[data-cat="${CSS.escape(category)}"]`).forEach(cb => cb.checked = checked);
+                e.target.indeterminate = false;
+                generatePrint();
+            } else if (e.target.classList.contains('calc-unit')) {
+                syncCatCheckbox(e.target.dataset.cat);
+                generatePrint();
+            }
         });
+
+        function selectAllUnits() {
+            document.querySelectorAll('.calc-unit').forEach(cb => cb.checked = true);
+            document.querySelectorAll('.cat-select-all').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
+            generatePrint();
+        }
 
         const emptyHint = '<div class="empty-hint">← 左のメニューから単元にチェックを入れてください<br>（チェックすると自動で問題が表示されます）</div>';
 
@@ -1155,6 +1200,7 @@
 
         function resetCheckboxes() {
             document.querySelectorAll('.calc-unit').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.cat-select-all').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
             document.getElementById('main-preview-area').innerHTML = emptyHint;
         }
     </script>
