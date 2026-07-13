@@ -94,9 +94,10 @@
         .page-body { flex: 1 1 auto; }
         .unit-block { margin-bottom: 20px; }
         .unit-title {
-            font-size: 13px; font-weight: bold; color: #1a1a1a; margin: 0 0 6px;
+            font-size: 13px; font-weight: bold; color: #1a1a1a; margin: 0 0 4px;
             padding-bottom: 3px; border-bottom: 1px solid #1a1a1a;
         }
+        .unit-instr { font-size: 13px; color: #1a1a1a; margin: 0 0 8px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
         .problem {
             display: flex; align-items: baseline; gap: 6px; padding: 10px 6px;
@@ -151,7 +152,7 @@
         // 中学1〜3年の「計算」単元を細分化したデータベース（q: 問題文, a: 正しい解答）
         const catalog = {
             "【1年】正負の数": {
-                "加法": { gen: () => {
+                "加法": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,9), b1=getR(2,9), a2=getR(2,9), b2=getR(2,9);
                     const a3=getR(2,9), b3=getR(2,9), c3=getR(2,9);
                     return [
@@ -160,7 +161,7 @@
                         {q:`(+${a3})+(-${b3})+(+${c3})`, a: a3-b3+c3}
                     ];
                 }},
-                "減法": { gen: () => {
+                "減法": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,9), b1=getR(2,9), a2=getR(2,9), b2=getR(2,9);
                     const a3=getR(2,9), b3=getR(2,9), c3=getR(2,9);
                     return [
@@ -169,7 +170,7 @@
                         {q:`(+${a3})-(+${b3})+(-${c3})`, a: a3-b3-c3}
                     ];
                 }},
-                "乗法": { gen: () => {
+                "乗法": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,9), b1=getR(2,9), a2=getR(2,9), b2=getR(2,9);
                     const a3=getR(2,5), b3=getR(2,5), c3=getR(2,5);
                     const a4=getR(2,5), b4=getR(2,5), c4=getR(2,5), d4=getR(2,5);
@@ -180,14 +181,14 @@
                         {q:`(-${a4})×(-${b4})×${c4}×(-${d4})`, a: -(a4*b4*c4*d4)}
                     ];
                 }},
-                "除法": { gen: () => {
+                "除法": { instr:"次の計算をしなさい。", gen: () => {
                     const d1=getR(2,9), k1=getR(2,9), d2=getR(2,9), k2=getR(2,9);
                     return [
                         {q:`${d1*k1}÷(-${d1})`, a: -k1},
                         {q:`(-${d2*k2})÷(-${d2})`, a: k2}
                     ];
                 }},
-                "分数を含む乗除": { gen: () => {
+                "分数を含む乗除": { instr:"次の計算をしなさい。", gen: () => {
                     const t=[
                         ()=>{ const a=getR(2,9), b=getR(2,9), c=getR(2,9), d=getR(2,9); return {q:`(+${a}/${b})÷(-${c}/${d})`, a:`-${reduceFrac(a*d,b*c)}`}; },
                         ()=>{ const a=getR(2,9), b=getR(2,9), d=getR(2,9); return {q:`(-${a}/${b})÷${d}`, a:`-${reduceFrac(a,b*d)}`}; },
@@ -195,7 +196,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "四則混合": { gen: () => {
+                "四則混合": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,9), b1=getR(2,9), c1=getR(2,9);
                     const a2=getR(2,9), b2=getR(2,9), c2=getR(2,9);
                     const a3=getR(2,9), b3=getR(2,9), c3=getR(2,9);
@@ -205,7 +206,7 @@
                         {q:`${a3}×${b3}-${c3}`, a: a3*b3-c3}
                     ];
                 }},
-                "累乗": { gen: () => {
+                "累乗": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,9), a2=getR(2,9), a3=getR(2,9);
                     return [
                         {q:`(-${a1})²`, a: a1*a1},
@@ -213,7 +214,7 @@
                         {q:`-(-${a3})²`, a: -(a3*a3)}
                     ];
                 }},
-                "累乗の指数で表す": { gen: () => {
+                "累乗の指数で表す": { instr:"次の式を累乗の指数を用いて表しなさい。", gen: () => {
                     const a1=getR(2,9), n1=getR(2,4);
                     const a2=getR(2,9), n2=getR(2,4);
                     const sup=['','¹','²','³','⁴'];
@@ -222,7 +223,7 @@
                         {q: Array(n2).fill(`(-${a2})`).join('×'), a:`(-${a2})${sup[n2]}`}
                     ];
                 }},
-                "絶対値・大小・逆数": { gen: () => {
+                "絶対値・大小・逆数": { instr:"次の問いに答えなさい。", gen: () => {
                     const v1=getR(-15,15);
                     const rvList=[[2,3],[3,2],[6,13],[1,6],[1,5],[4,7]];
                     const rv=rvList[getR(0,rvList.length-1)];
@@ -257,7 +258,7 @@
                         {q:`次の数のうち、負の数・整数・自然数をそれぞれすべて選びなさい：${shuffleArray(items.slice()).map(i=>i.disp).join(', ')}`, a: `負の数: ${negatives.length?negatives.join(', '):'なし'} / 整数: ${integers.length?integers.join(', '):'なし'} / 自然数: ${naturals.length?naturals.join(', '):'なし'}`}
                     ];
                 }},
-                "素因数分解": { gen: () => {
+                "素因数分解": { instr:"次の数を素因数分解しなさい。", gen: () => {
                     const primes=[2,3,5,7,11];
                     const pick=() => { let n; do { n=1; const cnt=getR(2,5); for(let i=0;i<cnt;i++) n*=primes[getR(0,primes.length-1)]; } while(n>300); return n; };
                     const factorize=(n) => { let f=[], x=n, p=2; while(x>1){ while(x%p===0){f.push(p); x/=p;} p++; } return f; };
@@ -268,7 +269,7 @@
                         {q:`${n2}を素因数分解する`, a: fmtFactors(factorize(n2))}
                     ];
                 }},
-                "素数と倍数": { gen: () => {
+                "素数と倍数": { instr:"次の問いに答えなさい。", gen: () => {
                     const isPrime=(n) => { if(n<2) return false; for(let i=2;i*i<=n;i++){ if(n%i===0) return false; } return true; };
                     const limit=[20,30,40,50][getR(0,3)];
                     const primesUpTo=[]; for(let i=2;i<=limit;i++){ if(isPrime(i)) primesUpTo.push(i); }
@@ -280,7 +281,7 @@
                         {q:`次の数のうち、${divisor}の倍数をすべて選びなさい：${nums.join(', ')}`, a: matches.length?matches.join(', '):'なし'}
                     ];
                 }},
-                "累乗を含む工夫計算": { gen: () => {
+                "累乗を含む工夫計算": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,5), k1=getR(2,6), mult1=getR(2,5);
                     const dividend1=a1*a1*k1;
                     const n2=getR(10,40), p2=getR(10,40), m2=-getR(10,50);
@@ -299,7 +300,7 @@
                         {q:`(-${outer7})×(${n1_7}/${d7}-${n2_7}/${d7})`, a: -(k7*(n1_7-n2_7))}
                     ];
                 }},
-                "符号と括弧の書き換え・計算": { gen: () => {
+                "符号と括弧の書き換え・計算": { instr:"次の問いに答えなさい。", gen: () => {
                     const mkChain = () => {
                         const mags = [getR(2,9), getR(2,9), getR(2,9), getR(2,9)];
                         const innerSigns = [0,1,2,3].map(()=>Math.random()<0.5?1:-1);
@@ -325,7 +326,7 @@
                 }}
             },
             "【1年】文字式": {
-                "式の表し方": { gen: () => {
+                "式の表し方": { instr:"次の値を、文字を使った式で表しなさい。", gen: () => {
                     const n1=getR(2,9), n2=getR(10,50);
                     const price=getR(30,150), n3=getR(2,9);
                     const juice=getR(80,150), n4=getR(2,6), pay=getR(300,1000);
@@ -336,7 +337,7 @@
                         {q:`1本${juice}円のジュースをn本買い、${pay}円出したときのおつり`, a:`${pay}-${juice}n円`}
                     ];
                 }},
-                "記号×÷を用いて表す": { gen: () => {
+                "記号×÷を用いて表す": { instr:"次の式を、記号×や÷を用いて表しなさい。", gen: () => {
                     const t=[
                         ()=>{ const n=getR(2,9); return {q:`${n}x`, a:`x×${n}`}; },
                         ()=>({q:`a/b`, a:`a÷b`}),
@@ -347,18 +348,18 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "代入": { gen: () => {
+                "代入": { instr:"次の文字式において、代入して式の値を求めなさい。", gen: () => {
                     const x=-getR(2,5), a=getR(2,5), b=-getR(2,5);
                     return [
                         {q:`x=${x}のとき 5x-3`, a: 5*x-3},
                         {q:`a=${a},b=${b}のとき 2a-3b`, a: 2*a-3*b}
                     ];
                 }},
-                "同類項": { gen: () => {
+                "同類項": { instr:"次の式の同類項をまとめなさい。", gen: () => {
                     const mk = () => { const c1=getR(2,5), c2=getR(2,5); const xCoef=c1-1; return {q:`${c1}x+${c2}y-x+${c2}y`, a: `${xCoef===1?'':xCoef}x+${c2*2}y`}; };
                     return [mk(), mk()];
                 }},
-                "1次式の加減": { gen: () => {
+                "1次式の加減": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,5), b1=getR(2,9), c1=getR(2,5), d1=getR(2,9);
                     const a2=getR(2,9), b2=getR(2,9), c2=getR(2,5), d2=getR(2,9);
                     return [
@@ -366,7 +367,7 @@
                         {q:`(${a2}x+${b2})-(${c2}x-${d2})`, a: `${leadC(a2-c2,'x')}+${b2+d2}`}
                     ];
                 }},
-                "単項式の乗除": { gen: () => {
+                "単項式の乗除": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,9), b1=getR(2,9);
                     const d2=getR(2,9), k2=getR(2,9);
                     return [
@@ -374,7 +375,7 @@
                         {q:`${d2*k2}x÷${d2}`, a: `${k2}x`}
                     ];
                 }},
-                "文字式の表し方": { gen: () => {
+                "文字式の表し方": { instr:"次の式を文字式のルールに従って表しなさい。", gen: () => {
                     const t=[
                         ()=>{ const n=getR(2,9); return {q:`x×${n}`, a:`${n}x`}; },
                         ()=>({q:`a×(-1)`, a:`-a`}),
@@ -391,7 +392,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "数量を文字式で表す": { gen: () => {
+                "数量を文字式で表す": { instr:"次の値を、文字を使った式で表しなさい。", gen: () => {
                     const t=[
                         ()=>{ const n=getR(2,9); return {q:`xkmの道のりを${n}時間で移動する自動車の速さ`, a:`x/${n}km/時`}; },
                         ()=>{ const n=getR(2,20); return {q:`分速amの速さで${n}m移動したときにかかる時間`, a:`${n}/a分`}; },
@@ -411,7 +412,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "式の値（いろいろな式）": { gen: () => {
+                "式の値（いろいろな式）": { instr:"次の文字式において、代入して式の値を求めなさい。", gen: () => {
                     const divisors12=[1,-1,2,-2,3,-3,4,-4,6,-6,12,-12];
                     const t=[
                         ()=>{ const x=getR(-9,9); return {q:`x=${x}のとき、x+5`, a: x+5}; },
@@ -425,7 +426,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "1次式の計算（総合）": { gen: () => {
+                "1次式の計算（総合）": { instr:"次の計算をしなさい。", gen: () => {
                     const t=[
                         ()=>{ const n=getR(2,9), m=getR(2,9); return {q:`${n}x+${m}x`, a:`${n+m}x`}; },
                         ()=>{ const n=getR(4,9), m=getR(2,9), k=getR(2,9); return {q:`${n}x-${m}-x-${k}`, a:`${n-1}x${fmtTerm(-(m+k))}`}; },
@@ -440,7 +441,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "数量を等式・不等式で表す": { gen: () => {
+                "数量を等式・不等式で表す": { instr:"次の数量の関係を等式・不等式で表しなさい。", gen: () => {
                     const t=[
                         ()=>{ const n=getR(2,9); return {q:`ある数nの${n}倍に10を足した和はxです。これを等式で表しなさい`, a:`${n}n+10=x`}; },
                         ()=>{ const n=getR(1000,9999); return {q:`a円の商品を${n}円出して買った時のおつりはb円だった。これを等式で表しなさい`, a:`${n}-a=b`}; },
@@ -454,7 +455,7 @@
                 }}
             },
             "【1年】1次方程式": {
-                "基本解法": { gen: () => {
+                "基本解法": { instr:"次の方程式を解きなさい。", gen: () => {
                     const t=[
                         ()=>{ const b1=getR(2,9), x1=getR(2,9); return {q:`x-${b1}=${x1-b1}`, a: x1}; },
                         ()=>{ const b1=getR(2,9), x1=getR(2,9); return {q:`x+${b1}=${x1+b1}`, a: x1}; },
@@ -466,7 +467,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "分配・分数": { gen: () => {
+                "分配・分数": { instr:"次の方程式を解きなさい。", gen: () => {
                     const a1=getR(2,5), b1=getR(2,5), x1=getR(2,9);
                     const a2=getR(2,4), b2=getR(2,5);
                     return [
@@ -474,7 +475,7 @@
                         {q:`x/${a2}-${b2}=1`, a: a2*(1+b2)}
                     ];
                 }},
-                "比例式": { gen: () => {
+                "比例式": { instr:"次の比例式を解きなさい。", gen: () => {
                     const p1=getR(2,5), q1=getR(2,5), t1=getR(2,5), t1b=getR(2,5);
                     const a1=p1*t1, b1=q1*t1, c1=q1*t1b, x1=p1*t1b;
                     const p2=getR(2,5), q2=getR(2,5), t2=getR(2,5), t2b=getR(2,5);
@@ -486,7 +487,7 @@
                         {q:`${leadC(a3,'x')}:(x-${b3})=${c3}:1`, a: x3}
                     ];
                 }},
-                "いろいろな1次方程式": { gen: () => {
+                "いろいろな1次方程式": { instr:"次の方程式を解きなさい。", gen: () => {
                     const t=[
                         ()=>{ const x0=getR(1,9), a=getR(2,9); let c=getR(2,9); if(c===a)c+=1; const b=getR(2,9), d=(a-c)*x0-b; return {q:`${a}x-${b}=${c}x${fmtTerm(d)}`, a:x0}; },
                         ()=>{ const a10=getR(2,9), b10=getR(1,9), x0=getR(1,9); const c10=a10*x0+b10; return {q:`${(a10/10).toFixed(1)}x+${(b10/10).toFixed(1)}=${(c10/10).toFixed(1)}`, a:x0}; },
@@ -497,7 +498,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "解の代入から係数を求める": { gen: () => {
+                "解の代入から係数を求める": { instr:"次の問いに答えなさい。", gen: () => {
                     const a0=getR(2,9), x0=getR(2,9), c=getR(2,9), rhs=a0*x0-c;
                     const m=getR(2,5), n=getR(2,9), p=getR(2,5), x1=getR(2,9), a1=[-4,-3,-2,-1,1,2,3,4][getR(0,7)];
                     const qv=m*x1-n-p*a1;
@@ -506,7 +507,7 @@
                         {q:`${m}x-${n}=${p}a${fmtTerm(qv)} の解がx=${x1}であるとき、aの値を求めなさい`, a: a1}
                     ];
                 }},
-                "1次方程式の文章題": { gen: () => {
+                "1次方程式の文章題": { instr:"次の問いに答えなさい。", gen: () => {
                     const t=[
                         ()=>{ const price=getR(80,300), n0=getR(2,9), change=getR(10,300); const total=price*n0+change; return {q:`${total}円で、${price}円の商品をいくつか購入したらおつりが${change}円だった。商品は何個購入したでしょうか？`, a:`${n0}個`}; },
                         ()=>{ const k=getR(2,4), c0=getR(5,15), y0=getR(1,10); const p0=k*c0+y0*(k-1); return {q:`Aさんの年齢は${c0}歳。お母さんの年齢は${p0}歳です。Aさんの年齢の${k}倍がお母さんの年齢と同じになるのは何年後ですか？`, a:`${y0}年後`}; },
@@ -520,7 +521,7 @@
                 }}
             },
             "【1年】比例と反比例": {
-                "比例の式": { gen: () => {
+                "比例の式": { instr:"次の問いに答えなさい。", gen: () => {
                     const a1=getR(2,9), x1=getR(2,9);
                     const a2=getR(2,9), x2=getR(2,9); const y2=a2*x2;
                     return [
@@ -528,7 +529,7 @@
                         {q:`y=axで、x=${x2},y=${y2}のときのaの値`, a: a2}
                     ];
                 }},
-                "反比例の式": { gen: () => {
+                "反比例の式": { instr:"次の問いに答えなさい。", gen: () => {
                     const x1=getR(2,9), k1=getR(2,9); const av1=x1*k1;
                     const x2=getR(2,9), y2=getR(2,9);
                     return [
@@ -538,7 +539,7 @@
                 }}
             },
             "【1年】図形の計量": {
-                "柱体の体積": { gen: () => {
+                "柱体の体積": { instr:"次の立体の体積を求めなさい。", gen: () => {
                     const s=getR(10,30), h=getR(3,9);
                     const r=getR(2,6), h2=getR(2,9);
                     return [
@@ -546,7 +547,7 @@
                         {q:`底面の半径${r}cm、高さ${h2}cmの円柱の体積`, a: `${r*r*h2}πcm³`}
                     ];
                 }},
-                "おうぎ形": { gen: () => {
+                "おうぎ形": { instr:"次のおうぎ形について求めなさい。", gen: () => {
                     const k1=getR(2,6), r1=2*k1;
                     const k2=getR(2,6), r2=2*k2;
                     return [
@@ -556,7 +557,7 @@
                 }}
             },
             "【2年】式の計算": {
-                "単項式の乗除": { gen: () => {
+                "単項式の乗除": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,9), b1=getR(2,9);
                     const a2=getR(2,9), b2=getR(2,9);
                     return [
@@ -564,7 +565,7 @@
                         {q:`${a2*b2}x²÷${a2}x`, a: `${b2}x`}
                     ];
                 }},
-                "等式の変形": { gen: () => {
+                "等式の変形": { instr:"次の等式を、指定された文字について解きなさい。", gen: () => {
                     const t=[
                         ()=>{ const b=getR(2,5), m=getR(2,5), n=getR(2,9); const a=b*m, c=b*n; return {q:`${a}x+${b}y=${c} を y について解く`, a: `y=-${m}x+${n}`}; },
                         ()=>{ const n=getR(2,9), c=-getR(2,9); return {q:`${n}ab=${c} を b について解く`, a:`b=${c}/(${n}a)`}; },
@@ -574,7 +575,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "係数の読み取り": { gen: () => {
+                "係数の読み取り": { instr:"次の式の、指定された文字の係数を答えなさい。", gen: () => {
                     const termStr=(coef,v)=>coef===1?`+${v}`:coef===-1?`-${v}`:`${fmtTerm(coef)}${v}`;
                     const c1=getR(2,9)*(Math.random()<0.5?1:-1);
                     const xc=getR(2,9)*(Math.random()<0.5?1:-1);
@@ -584,7 +585,7 @@
                         {q:`${xc}x${termStr(c2,'y')} の y の係数`, a: c2}
                     ];
                 }},
-                "同類項の整理（多項式）": { gen: () => {
+                "同類項の整理（多項式）": { instr:"次の式の同類項をまとめなさい。", gen: () => {
                     const t=[
                         ()=>{ const p1=getR(2,9), p2=getR(2,9), p3=getR(2,9), p4=getR(2,9); return {q:`${p1}a+${p2}b+${p3}a-${p4}b`, a:`${p1+p3}a${termC(p2-p4,'b')}`}; },
                         ()=>{ const a2=getR(2,9), b=getR(2,9), c=getR(2,9); return {q:`${a2}x²+${b}x-${c}x-${a2}x²`, a:`${leadC(b-c,'x')}`}; },
@@ -593,7 +594,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "多項式の加減": { gen: () => {
+                "多項式の加減": { instr:"次の問いに答えなさい。", gen: () => {
                     const a1=getR(2,9), b1=getR(2,9), a2=getR(2,9), b2=getR(2,9);
                     const sumA=a1+a2, sumB=b2-b1;
                     const diffA=a1-a2, diffB=-b1-b2;
@@ -605,7 +606,7 @@
                         {q:`A=${p1}x²+${q1}xy-${r1}, B=${p2}x²-${q2}xy-${r2} のとき、A-B`, a: `${leadC(p1-p2,'x²')}${termC(q1+q2,'xy')}${fmtTerm(r2-r1)}`}
                     ];
                 }},
-                "多項式の計算（分配・分数）": { gen: () => {
+                "多項式の計算（分配・分数）": { instr:"次の計算をしなさい。", gen: () => {
                     const t=[
                         ()=>{ const k=getR(2,9), a=getR(2,9), b=getR(2,9); return {q:`-${k}(-${a}x+${b}y)`, a:`${k*a}x${fmtTerm(-k*b)}y`}; },
                         ()=>{ const p=getR(2,9), qc=getR(2,9), r=getR(2,9), k=getR(2,6); return {q:`(${k*p}a²-${k*qc}a+${k*r})÷(-${k})`, a:`-${p}a²+${qc}a-${r}`}; },
@@ -616,7 +617,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "単項式の乗除（拡張）": { gen: () => {
+                "単項式の乗除（拡張）": { instr:"次の計算をしなさい。", gen: () => {
                     const t=[
                         ()=>{ const c1=getR(2,9), c2=getR(2,9); return {q:`${c1}a×(-${c2}b)`, a:`-${c1*c2}ab`}; },
                         ()=>{ const c1=getR(2,9), c2=getR(2,9); return {q:`${c1}x²y×(-${c2}xyz)`, a:`-${c1*c2}x³y²z`}; },
@@ -627,7 +628,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "式の値（多項式代入）": { gen: () => {
+                "式の値（多項式代入）": { instr:"次の式の値を求めなさい。", gen: () => {
                     const t=[
                         ()=>{ const x=getR(-5,5), y=getR(-5,5), c1=getR(2,9), c2=getR(2,9), c3=getR(2,9), c4=getR(2,9); return {q:`x=${x},y=${y}のとき、${c1}x-${c2}y-${c3}x+${c4}y`, a: (c1-c3)*x+(c4-c2)*y}; },
                         ()=>{ const x=getR(-5,5), y=getR(-5,5), k1=getR(2,6), a1=getR(2,9), b1=getR(2,9), k2=getR(2,6), a2=getR(2,9), b2=getR(2,9); return {q:`x=${x},y=${y}のとき、${k1}(${a1}x-${b1}y)+${k2}(-${a2}x+${b2}y)`, a: k1*(a1*x-b1*y)+k2*(-a2*x+b2*y)}; },
@@ -635,7 +636,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "文字式による証明": { gen: () => {
+                "文字式による証明": { instr:"次の問いに答えなさい。", gen: () => {
                     const k=getR(2,9);
                     return [
                         {q:`偶数に${2*k}を足すと偶数になることを、nを整数として偶数を2nと表し、説明しなさい（2n+${2*k}を計算しなさい）`, a:`2n+${2*k}=2(n+${k})`},
@@ -646,7 +647,7 @@
                 }}
             },
             "【2年】連立方程式": {
-                "加減法": { gen: () => {
+                "加減法": { instr:"次の連立方程式を解きなさい。", gen: () => {
                     const mk = () => {
                         const x0=getR(1,9), y0=getR(1,9);
                         let a1=getR(2,5), b1=getR(2,5), a2=getR(2,5), b2=getR(2,5);
@@ -656,7 +657,7 @@
                     };
                     return [mk(), mk()];
                 }},
-                "代入法": { gen: () => {
+                "代入法": { instr:"次の連立方程式を解きなさい。", gen: () => {
                     const mk = () => {
                         const x0=getR(1,9), y0=getR(1,9);
                         const m=getR(2,4);
@@ -667,7 +668,7 @@
                     };
                     return [mk(), mk()];
                 }},
-                "いろいろな連立方程式": { gen: () => {
+                "いろいろな連立方程式": { instr:"次の連立方程式を解きなさい。", gen: () => {
                     const t=[
                         ()=>{ const x0=getR(1,9), k=-getR(2,4), y0=k*x0; let a2=getR(2,5), b2=getR(2,5); const c2=a2*x0+b2*y0; return {q:`y=${k}x<br>${a2}x+${b2}y=${c2}`, a:`x=${x0}, y=${y0}`}; },
                         ()=>{ const x0=getR(1,9), y0=getR(1,9), m=getR(2,4); const n=x0-m*y0; const a2=getR(2,5), b2=getR(2,5); const c2=a2*x0+b2*y0; return {q:`x=${m}y${fmtTerm(n)}<br>${a2}x+${b2}y=${c2}`, a:`x=${x0}, y=${y0}`}; },
@@ -680,7 +681,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "連立方程式の係数決定": { gen: () => {
+                "連立方程式の係数決定": { instr:"次の問いに答えなさい。", gen: () => {
                     const mk = () => {
                         const a0=getR(2,9), b0=getR(2,9), x0=getR(2,9), y0=getR(2,9);
                         const c1=a0*x0-b0*y0, c2=b0*x0+a0*y0;
@@ -688,7 +689,7 @@
                     };
                     return [mk(), mk()];
                 }},
-                "連立方程式の文章題": { gen: () => {
+                "連立方程式の文章題": { instr:"次の問いに答えなさい。", gen: () => {
                     const t=[
                         ()=>{ const s0=getR(1,5), b0=s0+getR(1,8); const sum=b0+s0, diffVal=b0-2*s0; return {q:`2つの自然数がある。その和は${sum}であり、大きい方の数から小さい方の数の2倍を引くと${diffVal}であった。2つの自然数をそれぞれ求めなさい。`, a:`大きい方=${b0}, 小さい方=${s0}`}; },
                         ()=>{ const priceA=getR(80,200), priceB=getR(50,priceA-10<50?priceA-1:priceA-10), nA0=getR(2,8), nB0=getR(2,8); const totalCount=nA0+nB0, totalPrice=priceA*nA0+priceB*nB0; return {q:`1個${priceA}円のりんごと1個${priceB}円のみかんを合わせて${totalCount}個買います。代金の合計が${totalPrice}円のとき、りんごとみかんをそれぞれ何個買ったでしょうか。`, a:`りんご=${nA0}個, みかん=${nB0}個`}; },
@@ -700,7 +701,7 @@
                 }}
             },
             "【2年】1次関数": {
-                "変化の割合": { gen: () => {
+                "変化の割合": { instr:"次の1次関数の変化の割合を求めなさい。", gen: () => {
                     const a1=getR(2,5), b1=getR(2,9);
                     const k2=getR(2,5);
                     const x1=getR(1,5), dx=getR(1,4), x2=x1+dx;
@@ -710,13 +711,13 @@
                         {q:`2点(${x1},${y1}),(${x2},${y2})を通る直線の変化の割合`, a: k2}
                     ];
                 }},
-                "直線の式": { gen: () => {
+                "直線の式": { instr:"次の条件を満たす直線の式を求めなさい。", gen: () => {
                     const mk = () => { const a1=getR(2,5), x1=getR(-4,4), y1=getR(-9,9); const b1=y1-a1*x1; return {q:`傾き${a1}で点(${x1},${y1})を通る直線の式`, a: `y=${a1}x${fmtTerm(b1)}`}; };
                     return [mk(), mk()];
                 }}
             },
             "【2年】図形の角": {
-                "多角形の内角": { gen: () => {
+                "多角形の内角": { instr:"次の問いに答えなさい。", gen: () => {
                     const n1=getR(4,10);
                     const divisors=[3,4,5,6,8,9,10,12,15,18,20];
                     const n2=divisors[getR(0,divisors.length-1)];
@@ -725,7 +726,7 @@
                         {q:`正${n2}角形の1つの内角`, a: `${180-360/n2}°`}
                     ];
                 }},
-                "平行線と角": { gen: () => {
+                "平行線と角": { instr:"次の問いに答えなさい。", gen: () => {
                     const a1=getR(30,150), a2=getR(30,150);
                     return [
                         {q:`平行線に1本の直線が交わり、一方の角が${a1}°のとき、錯角の大きさ`, a: `${a1}°`},
@@ -734,7 +735,7 @@
                 }}
             },
             "【2年】確率": {
-                "さいころの確率": { gen: () => {
+                "さいころの確率": { instr:"次の確率を求めなさい。", gen: () => {
                     const th1=getR(2,5), fav1=6-th1+1;
                     const th2=getR(2,5), fav2=th2;
                     return [
@@ -744,7 +745,7 @@
                 }}
             },
             "【3年】多項式": {
-                "展開": { gen: () => {
+                "展開": { instr:"次の式を展開しなさい。", gen: () => {
                     const a1=getR(2,5), b1=getR(2,5), a2=getR(2,5);
                     const a3=getR(2,4), b3=-getR(1,9), c3=getR(2,9), d3=getR(2,4);
                     const p4=getR(2,9);
@@ -759,7 +760,7 @@
                         {q:`(${k6}a+${m6}b)(${k6}a-${m6}b)`, a: `${k6*k6}a²-${m6*m6}b²`}
                     ];
                 }},
-                "因数分解": { gen: () => {
+                "因数分解": { instr:"次の式を因数分解しなさい。", gen: () => {
                     const p1=getR(2,9), q1=getR(2,9), a2=getR(4,9);
                     const a3=getR(2,9);
                     const p4=getR(2,9);
@@ -774,7 +775,7 @@
                         {q:`(x+${c6})²-${2*p6}(x+${c6})+${p6*p6}`, a: `(x${fmtTerm(c6-p6)})²`}
                     ];
                 }},
-                "共通因数の因数分解": { gen: () => {
+                "共通因数の因数分解": { instr:"次の式を因数分解しなさい。", gen: () => {
                     const coprimePair = () => { let p,q; do { p=getR(2,5); q=getR(2,5); } while (gcd(p,q)!==1); return [p,q]; };
                     const k1=getR(2,6); const [p1,q1]=coprimePair();
                     const k2=getR(2,6); const [p2,q2]=coprimePair();
@@ -783,7 +784,7 @@
                         {q:`${k2*p2}x²+${k2*q2}x`, a: `${k2}x(${p2}x+${q2})`}
                     ];
                 }},
-                "単項式×多項式の展開": { gen: () => {
+                "単項式×多項式の展開": { instr:"次の式を展開しなさい。", gen: () => {
                     const mk = () => {
                         const k1=getR(2,5), p1=getR(1,4), q1=getR(2,9)*(Math.random()<0.5?1:-1);
                         const k2=getR(2,5), p2=getR(1,4), q2=getR(2,9)*(Math.random()<0.5?1:-1);
@@ -792,11 +793,11 @@
                     };
                     return [mk(), mk()];
                 }},
-                "多項式÷単項式": { gen: () => {
+                "多項式÷単項式": { instr:"次の計算をしなさい。", gen: () => {
                     const mk = () => { const k=getR(2,6), p=getR(2,9), q=getR(2,9); return {q:`(-${k*p}xy+${k*q}x)÷(-${k}x)`, a:`${p}y-${q}`}; };
                     return [mk(), mk()];
                 }},
-                "展開の公式（拡張）": { gen: () => {
+                "展開の公式（拡張）": { instr:"次の式を展開しなさい。", gen: () => {
                     const t=[
                         ()=>{ const p=getR(2,9), q=-getR(2,9); return {q:`(a+${p}b)(a${fmtTerm(q)}b)`, a:`a²${termC(p+q,'ab')}${fmtTerm(p*q)}b²`}; },
                         ()=>{ const k=getR(2,5), p=getR(1,5), q=-getR(2,9); return {q:`${k}(x+${p})(x${fmtTerm(q)})`, a:`${k}x²${termC(k*(p+q),'x')}${fmtTerm(k*p*q)}`}; },
@@ -806,7 +807,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "因数分解（拡張）": { gen: () => {
+                "因数分解（拡張）": { instr:"次の式を因数分解しなさい。", gen: () => {
                     const t=[
                         ()=>{ const p=getR(2,9), q=getR(2,9); return {q:`x²-${p+q}xy+${p*q}y²`, a:`(x-${p}y)(x-${q}y)`}; },
                         ()=>{ const k1=getR(2,6), k2=getR(2,6); return {q:`${k1*k1}a²-${k2*k2}b²`, a:`(${k1}a-${k2}b)(${k1}a+${k2}b)`}; },
@@ -816,7 +817,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "因数分解を利用した工夫計算": { gen: () => {
+                "因数分解を利用した工夫計算": { instr:"次の式を、工夫して計算しなさい。", gen: () => {
                     const t=[
                         ()=>{ const n=1000+getR(1,9)*(Math.random()<0.5?1:-1); return {q:`${n}²`, a: n*n}; },
                         ()=>{ const base=getR(20,99)*10, d=getR(1,9); const p=base+d, q=base-d; return {q:`${p}×${q}`, a: p*q}; },
@@ -825,7 +826,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "式の値（因数分解・展開の利用）": { gen: () => {
+                "式の値（因数分解・展開の利用）": { instr:"次の式の値を求めなさい。", gen: () => {
                     const t=[
                         ()=>{ const x=getR(10,100), p=getR(2,9); return {q:`x=${x}のとき、(x+${p})(x-${p})の値`, a: x*x-p*p}; },
                         ()=>{ const p=getR(2,9), x=getR(50,150); return {q:`x=${x}のとき、x²-${2*p}x+${p*p}の値`, a: (x-p)*(x-p)}; },
@@ -835,7 +836,7 @@
                 }}
             },
             "【3年】平方根": {
-                "乗除": { gen: () => {
+                "乗除": { instr:"次の計算をしなさい。", gen: () => {
                     const a1=getR(2,9), b1=getR(2,9);
                     const m=getR(2,5), b2=getR(2,5), a2=b2*m*m;
                     const a3=getR(2,9), b3=getR(2,9);
@@ -855,7 +856,7 @@
                         {q:`${k8}√${m8}÷${k9}√${m9}`, a: `${leadC(k8/g8,'√'+(m8*m9))}/${(k9*m9)/g8}`}
                     ];
                 }},
-                "加減": { gen: () => {
+                "加減": { instr:"次の計算をしなさい。", gen: () => {
                     const c1=getR(2,9), coefA1=getR(2,5), coefB1=getR(2,5);
                     const c2=getR(2,9), coefA2=getR(4,9), coefB2=getR(2,3);
                     const c3=getR(2,9), coefA3=getR(2,9), coefB3=getR(2,9), constA3=getR(2,9), constB3=getR(2,9);
@@ -870,7 +871,7 @@
                         {q:`${n5}/√${d5}+${k5}√${d5}`, a: `${m5+k5}√${d5}`}
                     ];
                 }},
-                "有理化": { gen: () => {
+                "有理化": { instr:"次の数の分母を有理化しなさい。", gen: () => {
                     const list=[2,3,5,6,7,10,11,13,14,15];
                     const b1=list[getR(0,list.length-1)], a1=getR(2,9);
                     const b2=list[getR(0,list.length-1)], a2=getR(2,9);
@@ -885,7 +886,7 @@
                         {q:`${a5}/√${radicand5}`, a: `${leadC(a5/g5,'√'+b5)}/${(k5*b5)/g5}`}
                     ];
                 }},
-                "大小比較": { gen: () => {
+                "大小比較": { instr:"次の数の大小を、不等号を用いて表しなさい。", gen: () => {
                     const mk = () => {
                         const b=getR(2,6);
                         const delta=getR(1,5)*(Math.random()<0.5?1:-1);
@@ -899,7 +900,7 @@
                         {q:`√${r2.a} と ${r2.b} ではどちらが大きいか`, a: r2.bigger}
                     ];
                 }},
-                "平方根の基本": { gen: () => {
+                "平方根の基本": { instr:"次の数の平方根を求めなさい。", gen: () => {
                     const t=[
                         ()=>{ const k=getR(2,18); return {q:`${k*k}の平方根`, a:`±${k}`}; },
                         ()=>{ let n; do{ n=getR(2,99); } while(isPerfectSquare(n)); return {q:`${n}の平方根`, a:`±√${n}`}; },
@@ -907,7 +908,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "根号の性質・変形": { gen: () => {
+                "根号の性質・変形": { instr:"次の問いに答えなさい。", gen: () => {
                     const t=[
                         ()=>{ const a=getR(10,20); return {q:`√${a}²`, a: a}; },
                         ()=>{ const a=getR(4,15); return {q:`√${a*a}`, a: a}; },
@@ -919,7 +920,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "不等式を満たす自然数・大小": { gen: () => {
+                "不等式を満たす自然数・大小": { instr:"次の問いに答えなさい。", gen: () => {
                     const t=[
                         ()=>{ const p=getR(2,6); const qv=getR(p*p+2,p*p+15); const nums=[]; for(let a=p*p+1;a<qv;a++) nums.push(a); return {q:`${p}<√a<√${qv} を満たす自然数aをすべて求めなさい`, a: nums.length?nums.join(', '):'なし'}; },
                         ()=>{ const m=getR(2,40), n=getR(m+10,m+60); const nums=[]; for(let a=1;a*a<n;a++){ if(a*a>m) nums.push(a); } return {q:`√${m}<a<√${n} を満たす自然数aをすべて求めなさい`, a: nums.length?nums.join(', '):'なし'}; },
@@ -928,7 +929,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "有理数と無理数の分類": { gen: () => {
+                "有理数と無理数の分類": { instr:"次の数を有理数と無理数に分けなさい。", gen: () => {
                     const pool=[
                         ()=>{ const v=getR(-9,9); return {disp:`${v}`, irr:false}; },
                         ()=>{ const v=getR(1,99); return {disp:`0.${v}`, irr:false}; },
@@ -941,17 +942,17 @@
                     const picks=Array.from({length:5}, () => pool[getR(0,pool.length-1)]());
                     const rationals=picks.filter(p=>!p.irr).map(p=>p.disp);
                     const irrationals=picks.filter(p=>p.irr).map(p=>p.disp);
-                    return [{q:`次の数を有理数と無理数に分けなさい。${picks.map(p=>p.disp).join(', ')}`, a:`有理数: ${rationals.length?rationals.join(', '):'なし'} / 無理数: ${irrationals.length?irrationals.join(', '):'なし'}`}];
+                    return [{q:`${picks.map(p=>p.disp).join(', ')}`, a:`有理数: ${rationals.length?rationals.join(', '):'なし'} / 無理数: ${irrationals.length?irrationals.join(', '):'なし'}`}];
                 }},
-                "近似値の計算": { gen: () => {
+                "近似値の計算": { instr:"√2=1.41として、次の値の近似値を求めなさい。", gen: () => {
                     const k1=getR(2,10); const n1=2*k1*k1;
                     const k2=getR(2,9); const val2=(2*k2*k2/100);
                     return [
-                        {q:`√2=1.41として、√${n1}の近似値を求めなさい`, a: (k1*141/100).toFixed(2)},
-                        {q:`√2=1.41として、√${val2.toFixed(2)}の近似値を求めなさい`, a: (k2*141/1000).toFixed(3)}
+                        {q:`√${n1}`, a: (k1*141/100).toFixed(2)},
+                        {q:`√${val2.toFixed(2)}`, a: (k2*141/1000).toFixed(3)}
                     ];
                 }},
-                "平方根を含む展開": { gen: () => {
+                "平方根を含む展開": { instr:"次の計算をしなさい。", gen: () => {
                     const primeish=[2,3,5,6,7,10,11,13];
                     const k1=getR(2,5), m1=getR(2,9), n1=getR(2,20);
                     let p2=primeish[getR(0,primeish.length-1)], m2=primeish[getR(0,primeish.length-1)];
@@ -964,29 +965,29 @@
                 }}
             },
             "【3年】2次方程式": {
-                "平方根解法": { gen: () => {
+                "平方根解法": { instr:"次の方程式を解きなさい。", gen: () => {
                     const k1=getR(4,9), c2=getR(2,5), e2=getR(2,9);
                     return [
                         {q:`x²=${k1*k1}`, a: `x=±${k1}`},
                         {q:`(x-${c2})²=${e2*e2}`, a: `x=${c2}±${e2}`}
                     ];
                 }},
-                "因数分解解法": { gen: () => {
+                "因数分解解法": { instr:"次の方程式を解きなさい。", gen: () => {
                     const mk = () => { const p1=getR(2,9), q1=getR(2,9); return {q:`x²-${p1+q1}x+${p1*q1}=0`, a: `x=${p1}, ${q1}`}; };
                     return [mk(), mk()];
                 }},
-                "解の公式": { gen: () => {
+                "解の公式": { instr:"次の方程式を解の公式で解きなさい。", gen: () => {
                     const mk = () => {
                         let b, c, D;
                         do {
                             b=getR(2,8); c=getR(-8,8);
                             D=b*b-4*c;
                         } while (D<0 || isPerfectSquare(D) || c===0);
-                        return {q:`x²+${b}x${fmtTerm(c)}=0 を解の公式で解く`, a: `x=(${-b}±√${D})/2`};
+                        return {q:`x²+${b}x${fmtTerm(c)}=0`, a: `x=(${-b}±√${D})/2`};
                     };
                     return [mk(), mk()];
                 }},
-                "平方根解法（係数・移項あり）": { gen: () => {
+                "平方根解法（係数・移項あり）": { instr:"次の方程式を解きなさい。", gen: () => {
                     const t=[
                         ()=>{ const a=getR(2,6), k=getR(2,9); const b=a*k*k; return {q:`${a}x²=${b}`, a:`x=±${k}`}; },
                         ()=>{ const a=getR(2,4), k=getR(2,9), d=getR(1,9); const c=a*k*k-d; return {q:`${a}x²-${c}=${d}`, a:`x=±${k}`}; },
@@ -995,7 +996,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "平方完成": { gen: () => {
+                "平方完成": { instr:"次の等式を平方完成せよ。", gen: () => {
                     const signB=Math.random()<0.5?1:-1, bAbs=2*getR(1,6), b=bAbs*signB, h=b/2;
                     const t=[
                         ()=>{ const c=getR(-15,15); return {q:`x²${fmtTerm(b)}x=${c}`, a:`(x${fmtTerm(h)})²=${c+h*h}`}; },
@@ -1004,7 +1005,7 @@
                     ];
                     return t.map(fn=>fn());
                 }},
-                "因数分解解法（拡張）": { gen: () => {
+                "因数分解解法（拡張）": { instr:"次の方程式を解きなさい。", gen: () => {
                     const t=[
                         ()=>{ const p=getR(-9,-2), q=getR(2,9); const sum=p+q, prod=p*q; return {q:`x²${termC(-sum,'x')}${fmtTerm(prod)}=0`, a:`x=${p}, ${q}`}; },
                         ()=>{ const p=getR(2,9), q=getR(2,9); const sum=p+q, prod=p*q; return {q:`x²+${sum}x+${prod}=0`, a:`x=${-p}, ${-q}`}; },
@@ -1016,7 +1017,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "解と係数の関係": { gen: () => {
+                "解と係数の関係": { instr:"次の問いに答えなさい。", gen: () => {
                     const t=[
                         ()=>{ const knownRoot=getR(2,9), otherRoot=getR(-9,-2); const cVal=knownRoot*otherRoot, aVal=-(knownRoot+otherRoot); return {q:`2次方程式 x²+ax${fmtTerm(cVal)}=0 の解の1つがx=${knownRoot}のとき、aの値ともう1つの解を求めなさい`, a:`a=${aVal}, もう1つの解=${otherRoot}`}; },
                         ()=>{ const r1=getR(2,9), r2=getR(-9,-2); const aVal=-(r1+r2), bVal=r1*r2; return {q:`x²+ax+b=0 の解がx=${r1}, ${r2} のとき、aとbの値を求めなさい`, a:`a=${aVal}, b=${bVal}`}; },
@@ -1024,7 +1025,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "2次方程式の文章題": { gen: () => {
+                "2次方程式の文章題": { instr:"次の問いに答えなさい。", gen: () => {
                     const t=[
                         ()=>{ const small=getR(2,9), diff=getR(2,5), big=small+diff, prod=small*big; return {q:`2つの正の整数があり、大きい方の整数は小さい方の整数より${diff}大きい。そして2つの整数の積が${prod}のとき、2つの整数を求めなさい`, a:`小さい方=${small}, 大きい方=${big}`}; },
                         ()=>{ const side=getR(5,15), p=getR(1,4), q=getR(1,Math.min(4,side-2)); const area=(side+p)*(side-q); return {q:`ある正方形の、縦の長さを${p}cm長くし、横の長さを${q}cm短くして作った長方形の面積が${area}cm²であった。元の正方形の1辺の長さを求めなさい`, a:`${side}cm`}; },
@@ -1035,7 +1036,7 @@
                 }}
             },
             "【3年】関数y=ax²": {
-                "変化の割合と値": { gen: () => {
+                "変化の割合と値": { instr:"次の問いに答えなさい。", gen: () => {
                     const a1=getR(2,5), p1=getR(1,4), q1=p1+getR(1,3);
                     const a2=getR(2,5), x2=getR(-5,5);
                     return [
@@ -1045,7 +1046,7 @@
                 }}
             },
             "【3年】相似": {
-                "面積比・体積比": { gen: () => {
+                "面積比・体積比": { instr:"次の問いに答えなさい。", gen: () => {
                     const m1=getR(2,5), n1=getR(2,5);
                     const m2=getR(2,4), n2=getR(2,4);
                     return [
@@ -1055,7 +1056,7 @@
                 }}
             },
             "【3年】三平方の定理": {
-                "辺の長さ": { gen: () => {
+                "辺の長さ": { instr:"次の直角三角形について求めなさい。", gen: () => {
                     const triples=[[3,4,5],[5,12,13],[8,15,17],[7,24,25],[9,12,15],[20,21,29],[6,8,10]];
                     const t1=triples[getR(0,triples.length-1)], k1=getR(1,3);
                     const [a1,b1,c1]=t1.map(v=>v*k1);
@@ -1139,7 +1140,9 @@
             return `<p class="${cls}">${cat}：${sub}</p>`;
         }
         function problemSectionHTML(sec) {
-            let html = `<div class="unit-block">${unitTitleHTML('unit-title', sec.cat, sec.sub)}<div class="grid">`;
+            let html = `<div class="unit-block">${unitTitleHTML('unit-title', sec.cat, sec.sub)}`;
+            if (sec.instr) html += `<p class="unit-instr">${sec.instr}</p>`;
+            html += `<div class="grid">`;
             sec.items.forEach(it => {
                 html += `<div class="problem"><div class="problem-num">(${it.num})</div><div class="problem-q">${it.q} ＝</div></div>`;
             });
@@ -1230,7 +1233,7 @@
                 const sub = cb.dataset.sub;
                 const probs = shuffleArray(catalog[cat][sub].gen());
                 const items = probs.map(p => ({ num: ++counter, q: p.q, a: p.a }));
-                sections.push({ cat, sub, items });
+                sections.push({ cat, sub, instr: catalog[cat][sub].instr, items });
             });
 
             const problemHtmlList = sections.map(problemSectionHTML);
