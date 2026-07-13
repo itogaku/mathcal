@@ -107,12 +107,13 @@
         .problem-num {
             font-weight: normal; color: #1a1a1a; flex-shrink: 0; font-size: 14px;
         }
-        .problem-q { font-size: 15px; line-height: 1.6; }
+        .problem-q { font-size: 15px; line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
 
         /* ---------- 解答ページ ---------- */
         .ans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
         .ans-item {
             font-size: 13px; padding: 4px 6px; border-bottom: 1px solid #e2e2e2;
+            word-break: keep-all; overflow-wrap: break-word;
         }
         .ans-item:nth-child(odd) { border-right: 1px solid #e2e2e2; }
         .ans-item b { color: #1a1a1a; }
@@ -151,7 +152,9 @@
         // 文章形式の問題（〜しなさい、〜でしょうか等）には「＝」を付けない
         const isSentenceQ = (q) => {
             const t = String(q).replace(/[）)]+$/, '');
-            return /[。？?]$/.test(t) || /(なさい|でしょうか|せよ|大きいか|表す)$/.test(t) || q.includes('：') || q.includes('<br>');
+            // 日本語を含まず「=」を含む場合は、それ自体が完成した等式（例: x-3=5）なので＝を重ねない
+            if (!/[぀-ヿ一-鿿]/.test(t) && t.includes('=')) return true;
+            return /[。？?]$/.test(t) || /(なさい|でしょうか|せよ|大きいか|表す|する|解く)$/.test(t) || q.includes('：') || q.includes('<br>');
         };
 
         // 中学1〜3年の「計算」単元を細分化したデータベース（q: 問題文, a: 正しい解答）
@@ -331,7 +334,7 @@
                 }}
             },
             "【1年】文字式": {
-                "式の表し方": { instr:"次の値を、文字を使った式で表しなさい。", gen: () => {
+                "式の表し方": { instr:"次の値を、文字を使った式で表しなさい。", noEq:true, gen: () => {
                     const n1=getR(2,9), n2=getR(10,50);
                     const price=getR(30,150), n3=getR(2,9);
                     const juice=getR(80,150), n4=getR(2,6), pay=getR(300,1000);
@@ -397,7 +400,7 @@
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
-                "数量を文字式で表す": { instr:"次の値を、文字を使った式で表しなさい。", gen: () => {
+                "数量を文字式で表す": { instr:"次の値を、文字を使った式で表しなさい。", noEq:true, gen: () => {
                     const t=[
                         ()=>{ const n=getR(2,9); return {q:`xkmの道のりを${n}時間で移動する自動車の速さ`, a:`x/${n}km/時`}; },
                         ()=>{ const n=getR(2,20); return {q:`分速amの速さで${n}m移動したときにかかる時間`, a:`${n}/a分`}; },
@@ -1238,9 +1241,10 @@
             checked.forEach(cb => {
                 const cat = cb.dataset.cat;
                 const sub = cb.dataset.sub;
-                const probs = shuffleArray(catalog[cat][sub].gen());
-                const items = probs.map(p => ({ num: ++counter, q: p.q, a: p.a, noEq: p.noEq }));
-                sections.push({ cat, sub, instr: catalog[cat][sub].instr, items });
+                const leaf = catalog[cat][sub];
+                const probs = shuffleArray(leaf.gen());
+                const items = probs.map(p => ({ num: ++counter, q: p.q, a: p.a, noEq: p.noEq || leaf.noEq }));
+                sections.push({ cat, sub, instr: leaf.instr, items });
             });
 
             const problemHtmlList = sections.map(problemSectionHTML);
