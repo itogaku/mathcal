@@ -172,10 +172,12 @@
                 "乗法": { gen: () => {
                     const a1=getR(2,9), b1=getR(2,9), a2=getR(2,9), b2=getR(2,9);
                     const a3=getR(2,5), b3=getR(2,5), c3=getR(2,5);
+                    const a4=getR(2,5), b4=getR(2,5), c4=getR(2,5), d4=getR(2,5);
                     return [
                         {q:`${a1}×(-${b1})`, a: -(a1*b1)},
                         {q:`(-${a2})×(-${b2})`, a: a2*b2},
-                        {q:`(-${a3})×${b3}×(-${c3})`, a: a3*b3*c3}
+                        {q:`(-${a3})×${b3}×(-${c3})`, a: a3*b3*c3},
+                        {q:`(-${a4})×(-${b4})×${c4}×(-${d4})`, a: -(a4*b4*c4*d4)}
                     ];
                 }},
                 "除法": { gen: () => {
@@ -257,7 +259,7 @@
                 }},
                 "素因数分解": { gen: () => {
                     const primes=[2,3,5,7,11];
-                    const pick=() => { let n; do { n=1; const cnt=getR(2,3); for(let i=0;i<cnt;i++) n*=primes[getR(0,primes.length-1)]; } while(n>300); return n; };
+                    const pick=() => { let n; do { n=1; const cnt=getR(2,5); for(let i=0;i<cnt;i++) n*=primes[getR(0,primes.length-1)]; } while(n>300); return n; };
                     const factorize=(n) => { let f=[], x=n, p=2; while(x>1){ while(x%p===0){f.push(p); x/=p;} p++; } return f; };
                     const fmtFactors=(f) => { const c={}; f.forEach(p=>c[p]=(c[p]||0)+1); return Object.keys(c).sort((a,b)=>a-b).map(p=>c[p]>1?`${p}²`:`${p}`).join('×'); };
                     const n1=pick(), n2=pick();
@@ -384,7 +386,8 @@
                         ()=>{ const n=getR(2,9); return {q:`a÷(-${n})`, a:`-a/${n}`}; },
                         ()=>{ const n=getR(2,9); return {q:`(a-b)÷${n}`, a:`(a-b)/${n}`}; },
                         ()=>{ const n=getR(2,9), m=getR(2,9); return {q:`${n}×x+${m}`, a:`${n}x+${m}`}; },
-                        ()=>{ const n=getR(2,9), m=getR(2,9); return {q:`${n}×a-b×${m}`, a:`${n}a-${m}b`}; }
+                        ()=>{ const n=getR(2,9), m=getR(2,9); return {q:`${n}×a-b×${m}`, a:`${n}a-${m}b`}; },
+                        ()=>{ const n=getR(2,9), m=getR(2,9), p=getR(2,9); return {q:`${n}×(x+${m})÷${p}`, a:`${n}(x+${m})/${p}`}; }
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
@@ -395,6 +398,8 @@
                         ()=>({q:`秒速vcmでt秒移動したときの道のり`, a:`vt cm`}),
                         ()=>{ const n=getR(2,40); return {q:`Aの${n}%`, a:`${n}A/100`}; },
                         ()=>{ const n=getR(2,9); return {q:`Bの${n}割`, a:`${n}B/10`}; },
+                        ()=>{ const n=getR(100,900); return {q:`${n}のd%`, a:`${n}d/100`}; },
+                        ()=>{ const n=getR(2,9); return {q:`${n}のf割`, a:`${n}f/10`}; },
                         ()=>({q:`十の位がx、一の位がyの2桁の数`, a:`10x+y`}),
                         ()=>({q:`百の位がa、十の位がb、一の位がcの3桁の数`, a:`100a+10b+c`}),
                         ()=>{ const n=getR(2,9); return {q:`${n}の倍数（kを整数として）`, a:`${n}k`}; },
@@ -450,12 +455,16 @@
             },
             "【1年】1次方程式": {
                 "基本解法": { gen: () => {
-                    const b1=getR(2,9), x1=getR(2,9);
-                    const a2=getR(2,5), b2=getR(2,5), x2=getR(2,9);
-                    return [
-                        {q:`x-${b1}=${x1-b1}`, a: x1},
-                        {q:`${a2}x+${b2}=${a2*x2+b2}`, a: x2}
+                    const t=[
+                        ()=>{ const b1=getR(2,9), x1=getR(2,9); return {q:`x-${b1}=${x1-b1}`, a: x1}; },
+                        ()=>{ const b1=getR(2,9), x1=getR(2,9); return {q:`x+${b1}=${x1+b1}`, a: x1}; },
+                        ()=>{ const a2=getR(2,5), b2=getR(2,5), x2=getR(2,9); return {q:`${a2}x+${b2}=${a2*x2+b2}`, a: x2}; },
+                        ()=>{ const a2=getR(2,5), b2=getR(2,5), x2=getR(2,9); return {q:`${a2}x-${b2}=${a2*x2-b2}`, a: x2}; },
+                        ()=>{ const a3=getR(2,9), x3=getR(2,9); return {q:`${a3}x=${a3*x3}`, a: x3}; },
+                        ()=>{ const a3=getR(2,9), x3=getR(2,9); return {q:`-${a3}x=${-a3*x3}`, a: x3}; },
+                        ()=>{ const a4=getR(2,9), x4=getR(2,9); return {q:`x/${a4}=${x4}`, a: a4*x4}; }
                     ];
+                    return shuffleArray(t.slice()).map(fn=>fn());
                 }},
                 "分配・分数": { gen: () => {
                     const a1=getR(2,5), b1=getR(2,5), x1=getR(2,9);
@@ -601,7 +610,9 @@
                         ()=>{ const k=getR(2,9), a=getR(2,9), b=getR(2,9); return {q:`-${k}(-${a}x+${b}y)`, a:`${k*a}x${fmtTerm(-k*b)}y`}; },
                         ()=>{ const p=getR(2,9), qc=getR(2,9), r=getR(2,9), k=getR(2,6); return {q:`(${k*p}a²-${k*qc}a+${k*r})÷(-${k})`, a:`-${p}a²+${qc}a-${r}`}; },
                         ()=>{ const p1=getR(1,5), q1=getR(2,9), p2=getR(1,5)*(Math.random()<0.5?1:-1), q2=getR(2,9), k1=getR(2,5), k2=getR(2,5); const resultA=k1*p1-k2*p2, resultB=k1*q1-k2*q2; return {q:`${k1}(${leadC(p1,'a')}+${q1}b)-${k2}(${leadC(p2,'a')}+${q2}b)`, a:`${leadC(resultA,'a')}${termC(resultB,'b')}`}; },
-                        ()=>{ const ds=[2,3,4,6]; const d1=ds[getR(0,3)]; let d2=ds[getR(0,3)]; while(d2===d1) d2=ds[getR(0,3)]; const a=getR(2,9), b=-getR(2,9), c=getR(2,9), d=-getR(2,9); const L=d1*d2/gcd(d1,d2); const coefX=(L/d1)*a-(L/d2)*c, coefY=(L/d1)*b-(L/d2)*d; return {q:`(${a}x${fmtTerm(b)}y)/${d1}-(${c}x${fmtTerm(d)}y)/${d2}`, a:`(${leadC(coefX,'x')}${termC(coefY,'y')})/${L}`}; }
+                        ()=>{ const ds=[2,3,4,6]; const d1=ds[getR(0,3)]; let d2=ds[getR(0,3)]; while(d2===d1) d2=ds[getR(0,3)]; const a=getR(2,9), b=-getR(2,9), c=getR(2,9), d=-getR(2,9); const L=d1*d2/gcd(d1,d2); const coefX=(L/d1)*a-(L/d2)*c, coefY=(L/d1)*b-(L/d2)*d; return {q:`(${a}x${fmtTerm(b)}y)/${d1}-(${c}x${fmtTerm(d)}y)/${d2}`, a:`(${leadC(coefX,'x')}${termC(coefY,'y')})/${L}`}; },
+                        ()=>{ const d1=[2,3,4,5][getR(0,3)]; const n1=getR(1,d1-1); const k1=getR(2,4), j1=getR(2,4); const p1=d1*k1, q1=d1*j1; const d2=[2,3,4,5][getR(0,3)]; const n2=getR(1,d2-1); const k2=getR(2,4), j2=getR(2,4); const p2=d2*k2, q2=d2*j2; const resultX=n1*k1-n2*k2, resultY=n1*j1-n2*j2; return {q:`${n1}/${d1}(${p1}x+${q1}y)-${n2}/${d2}(${p2}x+${q2}y)`, a:`${leadC(resultX,'x')}${termC(resultY,'y')}`}; },
+                        ()=>{ const a=getR(2,9), b=getR(2,9)*(Math.random()<0.5?1:-1), e=getR(2,5), k=getR(2,9), j=getR(2,9)*(Math.random()<0.5?1:-1); const c=e*k, d=e*j; const resultX=a-k, resultY=b-j; return {q:`${a}x${fmtTerm(b)}y-(${c}x${fmtTerm(d)}y)/${e}`, a:`${leadC(resultX,'x')}${termC(resultY,'y')}`}; }
                     ];
                     return shuffleArray(t.slice()).map(fn=>fn());
                 }},
@@ -738,12 +749,14 @@
                     const a3=getR(2,4), b3=-getR(1,9), c3=getR(2,9), d3=getR(2,4);
                     const p4=getR(2,9);
                     const a5=getR(2,9);
+                    const k6=getR(2,6), m6=getR(2,6);
                     return [
                         {q:`(x+${a1})(x+${b1})`, a: `x²+${a1+b1}x+${a1*b1}`},
                         {q:`(x+${a2})²`, a: `x²+${2*a2}x+${a2*a2}`},
                         {q:`(${a3}x${fmtTerm(b3)})(${c3}${fmtTerm(d3)}y)`, a: `${a3*c3}x${termC(a3*d3,'xy')}${fmtTerm(b3*c3)}${termC(b3*d3,'y')}`},
                         {q:`(x-${p4}y)²`, a: `x²${termC(-2*p4,'xy')}${termC(p4*p4,'y²')}`},
-                        {q:`(x+${a5})(x-${a5})`, a: `x²-${a5*a5}`}
+                        {q:`(x+${a5})(x-${a5})`, a: `x²-${a5*a5}`},
+                        {q:`(${k6}a+${m6}b)(${k6}a-${m6}b)`, a: `${k6*k6}a²-${m6*m6}b²`}
                     ];
                 }},
                 "因数分解": { gen: () => {
@@ -829,21 +842,32 @@
                     const m4=getR(2,5), b4=getR(2,5), a4=b4*m4*m4;
                     const k5=getR(2,9), m5=getR(2,9), k6=getR(2,9), m6=getR(2,9);
                     const b7=getR(2,9), r7=getR(2,5), k7=getR(2,9);
+                    const sqSet8=[2,3,5,6,7,10,11,13];
+                    const k8=getR(2,9), m8=sqSet8[getR(0,sqSet8.length-1)], k9=getR(2,9); let m9=sqSet8[getR(0,sqSet8.length-1)]; while(m9===m8) m9=sqSet8[getR(0,sqSet8.length-1)];
+                    const g8=gcd(k8,k9*m9);
                     return [
                         {q:`√${a1}×√${b1}`, a: `√${a1*b1}`},
                         {q:`√${a2}÷√${b2}`, a: m},
                         {q:`(-√${a3})×√${b3}`, a: `-√${a3*b3}`},
                         {q:`(-√${a4})÷(-√${b4})`, a: m4},
                         {q:`${k5}√${m5}×${k6}√${m6}`, a: `${k5*k6}√${m5*m6}`},
-                        {q:`${k7*r7}√${b7*r7*r7}÷${k7}√${b7}`, a: r7*r7}
+                        {q:`${k7*r7}√${b7*r7*r7}÷${k7}√${b7}`, a: r7*r7},
+                        {q:`${k8}√${m8}÷${k9}√${m9}`, a: `${leadC(k8/g8,'√'+(m8*m9))}/${(k9*m9)/g8}`}
                     ];
                 }},
                 "加減": { gen: () => {
                     const c1=getR(2,9), coefA1=getR(2,5), coefB1=getR(2,5);
                     const c2=getR(2,9), coefA2=getR(4,9), coefB2=getR(2,3);
+                    const c3=getR(2,9), coefA3=getR(2,9), coefB3=getR(2,9), constA3=getR(2,9), constB3=getR(2,9);
+                    const sqSet=[2,3,5,6,7,10,11,13];
+                    const a4=sqSet[getR(0,sqSet.length-1)]; let b4=sqSet[getR(0,sqSet.length-1)]; while(b4===a4) b4=sqSet[getR(0,sqSet.length-1)]; let c4=sqSet[getR(0,sqSet.length-1)]; while(c4===a4||c4===b4) c4=sqSet[getR(0,sqSet.length-1)]; const k4=getR(2,5);
+                    const d5=getR(2,9), m5=getR(2,9), k5=getR(2,9); const n5=d5*m5;
                     return [
                         {q:`${coefA1}√${c1}+${coefB1}√${c1}`, a: `${coefA1+coefB1}√${c1}`},
-                        {q:`${coefA2}√${c2}-${coefB2}√${c2}`, a: leadC(coefA2-coefB2, '√'+c2)}
+                        {q:`${coefA2}√${c2}-${coefB2}√${c2}`, a: leadC(coefA2-coefB2, '√'+c2)},
+                        {q:`${coefA3}√${c3}+${constA3}-${coefB3}√${c3}+${constB3}`, a: `${leadC(coefA3-coefB3,'√'+c3)}${fmtTerm(constA3+constB3)}`},
+                        {q:`√${a4}(√${b4}-${k4}√${c4})`, a: `√${a4*b4}-${k4}√${a4*c4}`},
+                        {q:`${n5}/√${d5}+${k5}√${d5}`, a: `${m5+k5}√${d5}`}
                     ];
                 }},
                 "有理化": { gen: () => {
@@ -852,11 +876,13 @@
                     const b2=list[getR(0,list.length-1)], a2=getR(2,9);
                     let b3=list[getR(0,list.length-1)], b3b=list[getR(0,list.length-1)]; while(b3b===b3) b3b=list[getR(0,list.length-1)];
                     const k4=getR(2,9), b4=list[getR(0,list.length-1)], a4=getR(2,9); const g4=gcd(a4,k4*b4);
+                    const b5=list[getR(0,list.length-1)], k5=getR(2,4), a5=getR(2,9); const radicand5=b5*k5*k5; const g5=gcd(a5,k5*b5);
                     return [
                         {q:`${a1}/√${b1}`, a: `${a1}√${b1}/${b1}`},
                         {q:`${a2}/√${b2}`, a: `${a2}√${b2}/${b2}`},
                         {q:`√${b3}/√${b3b}`, a: `√${b3*b3b}/${b3b}`},
-                        {q:`${a4}/(${k4}√${b4})`, a: `${leadC(a4/g4,'√'+b4)}/${(k4*b4)/g4}`}
+                        {q:`${a4}/(${k4}√${b4})`, a: `${leadC(a4/g4,'√'+b4)}/${(k4*b4)/g4}`},
+                        {q:`${a5}/√${radicand5}`, a: `${leadC(a5/g5,'√'+b5)}/${(k5*b5)/g5}`}
                     ];
                 }},
                 "大小比較": { gen: () => {
@@ -884,6 +910,7 @@
                 "根号の性質・変形": { gen: () => {
                     const t=[
                         ()=>{ const a=getR(10,20); return {q:`√${a}²`, a: a}; },
+                        ()=>{ const a=getR(4,15); return {q:`√${a*a}`, a: a}; },
                         ()=>{ const a=getR(2,9); return {q:`${a}`, a: `√${a*a}`}; },
                         ()=>{ const k=getR(2,9), b=getR(2,9); return {q:`${k}√${b}`, a: `√${k*k*b}`}; },
                         ()=>{ const d=getR(2,5), inner=getR(2,9); const c=inner*d*d; return {q:`√${c}/${d}`, a: `√${inner}`}; },
@@ -917,7 +944,7 @@
                     return [{q:`次の数を有理数と無理数に分けなさい。${picks.map(p=>p.disp).join(', ')}`, a:`有理数: ${rationals.length?rationals.join(', '):'なし'} / 無理数: ${irrationals.length?irrationals.join(', '):'なし'}`}];
                 }},
                 "近似値の計算": { gen: () => {
-                    const k1=getR(2,9); const n1=2*k1*k1;
+                    const k1=getR(2,10); const n1=2*k1*k1;
                     const k2=getR(2,9); const val2=(2*k2*k2/100);
                     return [
                         {q:`√2=1.41として、√${n1}の近似値を求めなさい`, a: (k1*141/100).toFixed(2)},
@@ -980,7 +1007,8 @@
                 "因数分解解法（拡張）": { gen: () => {
                     const t=[
                         ()=>{ const p=getR(-9,-2), q=getR(2,9); const sum=p+q, prod=p*q; return {q:`x²${termC(-sum,'x')}${fmtTerm(prod)}=0`, a:`x=${p}, ${q}`}; },
-                        ()=>{ const k=getR(2,6), j=getR(2,9); const m=k*j; return {q:`${k}x²-${m}x=0`, a:`x=0, ${j}`}; },
+                        ()=>{ const p=getR(2,9), q=getR(2,9); const sum=p+q, prod=p*q; return {q:`x²+${sum}x+${prod}=0`, a:`x=${-p}, ${-q}`}; },
+                        ()=>{ const k=getR(1,6); let m=getR(-9,9); if(m===0) m=3; const g=gcd(k,Math.abs(m))||1; const rootNum=-m/g, rootDen=k/g; const rootStr=rootDen===1?`${rootNum}`:`${rootNum}/${rootDen}`; return {q:`${leadC(k,'x²')}${termC(m,'x')}=0`, a:`x=0, ${rootStr}`}; },
                         ()=>{ const p=getR(2,9), q=getR(2,9); const sum=p+q, prod=p*q; const extra=getR(2,9); const lhsCoef=sum-extra; return {q:`x²${termC(-lhsCoef,'x')}+${prod}=${extra}x`, a:`x=${p}, ${q}`}; },
                         ()=>{ const p=getR(2,9), q=getR(2,9); const sum=p+q, prod=p*q; return {q:`x(x${fmtTerm(-sum)})=${-prod}`, a:`x=${p}, ${q}`}; },
                         ()=>{ const A=-getR(2,9), B=getR(2,9); const r1=getR(-9,9)||1; const r2=-(A+B)-r1; const C=A*B-r1*r2; return {q:`(x${fmtTerm(A)})(x${fmtTerm(B)})=${C}`, a:`x=${r1}, ${r2}`}; },
